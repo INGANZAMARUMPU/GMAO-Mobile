@@ -1,0 +1,5 @@
+{
+  "appId": "com.openclinic.app",
+  "appName": "open_clinic",
+  "webDir": "dist"
+}
