@@ -1,7 +1,9 @@
 <template>
-    <div class="w-screen h-screen">
+    <div class="w-screen h-screen relative">
         <div class="w-screen h-[10%] overflow-hidden flex items-center">
-            <button class="fixed top-[] left-0 w-20 h-10 bg-sky-900 shadow-xl mx-4 my-4 rounded-xl flex justify-center items-center space-x-2 z-50">
+            <button
+                class="fixed top-[] left-0 w-20 h-10 bg-sky-900 shadow-xl mx-4 my-4 rounded-xl flex justify-center items-center space-x-2 z-50"
+                @click="isModalVisible = true">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="32" viewBox="0 0 24 24">
                     <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                         stroke-width="1.5"
@@ -36,13 +38,66 @@
                 </div>
             </div>
         </div>
+        <VueFinalModal v-model="isModalVisible" :click-to-close="true" class="flex justify-center items-end" transition="vfm-fade-in-up">
+            <div class="w-[90vw] h-[75vh] bg-white rounded-t-xl shadow-lg  overflow-hidden">
+                <div class=" h-[3%]  flex justify-center items-center">
+                    <div class="w-[13vw] h-[5px] rounded-xl bg-sky-950"></div>
+                </div>
+                <div class="h-[14%]  flex space-x-3 items-center p-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="58" height="58" @click="isModalVisible = false"
+                        viewBox="0 0 24 24">
+                        <path fill="none" stroke="#014268" stroke-linecap="round" d="m6 6l12 12m0-12L6 18" />
+                    </svg>
+                    <p class="font-poppins text-4xl text-sky-900  font-thin">Filtre</p>
+                </div>
+                <div class="h-[65%]  p-4 space-y-4">
+                    <input type="text"
+                        class="w-[100%] h-[16%] rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
+                        placeholder="Nomanclature">
+                    <input type="text"
+                        class="w-[100%] h-[16%] rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
+                        placeholder="Description">
+                    <input type="text"
+                        class="w-[100%] h-[16%] rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
+                        placeholder="Fournisseur">
+                    <div class="w-[100%] h-[16%] flex space-x-7 ">
+                        <input type="number"
+                            class="w-[45%]  rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
+                            placeholder="code">
+                        <input type="number"
+                            class="w-[45%]  rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
+                            placeholder="Numéro de série">
+                    </div>
+                    <div class="w-[100%] h-[16%] flex space-x-7 ">
+                        <input type="date"
+                            class="w-[45%]  rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
+                            placeholder="Nomanclature">
+                        <input type="date"
+                            class="w-[45%]  rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
+                            placeholder="Nomanclature">
+                    </div>
+                </div>
+                <div class=" h-[18%] w-[100%]  flex justify-center items-center gap-9 ">
+                    <button class="w-[40%] h-[60%] rounded-lg bg-sky-950 m-0 font-bold text-white">Vider</button>
+                    <button class="w-[40%] h-[60%] rounded-lg bg-sky-950 font-bold text-white">Recherche</button>
+                </div>
+            </div>
+        </VueFinalModal>
     </div>
 </template>
 
 
 <script>
+import { ref } from 'vue';
+import { VueFinalModal } from 'vue-final-modal';
+
+
 export default {
+    components: {
+        VueFinalModal
+    },
     setup() {
+        const isModalVisible = ref(false);
         const items = [
             {
                 id: '[1.10658] 1.10658',
@@ -73,7 +128,7 @@ export default {
             },
         ];
 
-        return { items };
+        return { items, isModalVisible };
     }
 };
 </script>

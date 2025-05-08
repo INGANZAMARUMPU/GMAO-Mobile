@@ -40,7 +40,7 @@
 
             </div>
             <div class=" flex gap-[17%] items-center justify-center ">
-                <div class="" @click="navigate('/')">
+                <div class="" @click="navigate('/equipement')">
                     <div class=" flex w-full justify-center">
                         <svg width="40" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg"
                             class="">
