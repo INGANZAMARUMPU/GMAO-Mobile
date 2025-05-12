@@ -7,14 +7,19 @@
                 </div>
                 <div class="w-1/2  justify-end items-center flex ">
                     <div class="w-1/2">
-                        <p class="font-segoe-ui-variable font-semibold text-[12px] ">Nzeyimana Jean 
+                        <p class="font-segoe-ui-variable font-semibold text-[12px] ">Nzeyimana Jean
                         </p>
                         <p for="" class="font-segoe-ui-variable font-light text-[10px] sm:text-[10px]">Technicien
                             Electronique</p>
                     </div>
-                    <div class=" space-y-1.5 w-1/2 ">
-                        <img src="../assets/view/img/smiling.jpeg" alt="" class="w-[60%] h-4.1 rounded-2xl mx-auto">
-                        <div class="w-7 h-[6px] rounded-2xl bg-green-500 mx-auto"></div>
+                    <div class="space-y-1.5 w-1/2">
+                        <div class=" w-full h-full  flex items-center justify-center bg-white rounded-2xl"
+                            @click="navigate('/')">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
+                                <path fill="none" stroke="#014268" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2" d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4m7 14l5-5l-5-5m5 5H9" />
+                            </svg>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -55,7 +60,7 @@
                                 stroke-linejoin="round" />
                         </svg>
                     </div>
-                    <p class="font-segoe-ui-variable font-bold text-[10px] text-white ">Equipement</p>
+                    <p class="font-segoe-ui-variable font-bold text-[10px] text-white ">Rapport</p>
                 </div>
                 <div class="" @click="navigate('/equipementSpecial')">
                     <div class="mx-auto flex w-full justify-center">
@@ -83,7 +88,7 @@
                                 fill="#ffff" />
                         </svg>
                     </div>
-                    <p class="font-segoe-ui-variable font-bold text-[10px] text-white ">Equipement</p>
+                    <p class="font-segoe-ui-variable font-bold text-[10px] text-white ">Infrastructure</p>
 
                 </div>
             </div>
@@ -108,15 +113,39 @@ export default {
             }
         }
     },
+    data() {
+        return {
+            flipped: false
+        }
+    },
     methods: {
         navigate(path) {
             if (this.$route.path !== path) {
                 this.$router.push(path);
             }
+        },
+        flip() {
+            this.flipped = !this.flipped
         }
     }
 };
 </script>
 
 
-<style></style>
+<style>
+.perspective {
+    perspective: 1000px;
+}
+
+.backface-hidden {
+    backface-visibility: hidden;
+}
+
+.transform-style {
+    transform-style: preserve-3d;
+}
+
+.rotate-y-180 {
+    transform: rotateY(180deg);
+}
+</style>

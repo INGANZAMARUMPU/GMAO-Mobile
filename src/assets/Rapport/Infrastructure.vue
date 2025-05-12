@@ -2,7 +2,7 @@
     <Base #slot3>
     <div class="">
         <div class="h-1/8  flex justify-center items-center gap-[14%] ">
-            <div class="">
+            <div class="" @click="changeSlot('Inventaire')">
                 <div class="flex w-full justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
                         viewBox="0 0 24 24"><!-- Icon from Material Symbols by Google - https://github.com/google/material-design-icons/blob/master/LICENSE -->
@@ -13,7 +13,7 @@
                 <p class="font-segoe-ui-variable font-bold text-[10px] ">Inventaire</p>
             </div>
 
-            <div class="">
+            <div class="" @click="changeSlot('PlansMaintenance')">
                 <div class=" flex w-full justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
                         viewBox="0 0 32 32"><!-- Icon from Carbon by IBM - undefined -->
@@ -26,7 +26,7 @@
                 <p class="font-segoe-ui-variable font-bold text-[10px]">Plan Maintenance</p>
             </div>
 
-            <div class="">
+            <div class="" @click="changeSlot('Operation')">
                 <div class="flex w-full justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
                         viewBox="0 0 512 512"><!-- Icon from Siemens Industrial Experience Icons by Siemens AG - https://github.com/siemens/ix-icons/blob/main/LICENSE.md -->
@@ -75,7 +75,7 @@ export default {
             index: 0,
             slots: ['Inventaire', 'PlansMaintenance', 'Operation'],
             transitionDirection: 'left',
-            transitionDirection: 'right'
+            activeSlot: 'Inventaire'
         }
     },
     computed: {
@@ -91,6 +91,12 @@ export default {
         prevSlot() {
             this.transitionDirection = 'right'
             this.index = (this.index - 1 + this.slots.length) % this.slots.length
+        },
+        changeSlot(newSlot) {
+            const newIndex = this.slots.indexOf(newSlot);
+            this.transitionDirection = newIndex > this.index ? 'left' : 'right';
+            this.index = newIndex;
+            this.activeSlot = newSlot;
         }
     }
 }

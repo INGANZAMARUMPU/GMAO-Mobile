@@ -15,7 +15,8 @@
             </div>
         </div>
         <div class="flex justify-center ">
-            <div class="h-50 w-[89%] flex bg-sky-100 rounded-3xl ">
+            <div class="h-50 w-[89%] flex bg-sky-100 rounded-3xl p-4">
+                <p class="font-poppins font-medium text-[17px] text-sky-900">Fraction des équipements opérationnels</p>
 
             </div>
         </div>

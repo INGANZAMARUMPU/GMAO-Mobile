@@ -1,8 +1,8 @@
-<template > 
+<template>
     <Base #slot1>
     <div class="">
         <div class="h-1/8  flex justify-center items-center gap-[17%] ">
-            <div class="">
+            <div class="" @click="changeSlot('Equipement')">
                 <div class="flex w-full justify-center">
                     <svg width="30" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <g clip-path="url(#clip0_186_1108)">
@@ -20,7 +20,7 @@
                 <p class="font-segoe-ui-variable font-bold text-[10px] ">Equipement</p>
             </div>
 
-            <div class="">
+            <div class="" @click="changeSlot('Infrastructure')">
                 <div class=" flex w-full justify-center">
                     <svg width="30" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path fill-rule="evenodd" clip-rule="evenodd"
@@ -31,7 +31,7 @@
                 <p class="font-segoe-ui-variable font-bold text-[10px] ">Infrastructure</p>
             </div>
 
-            <div class="">
+            <div class="" @click="changeSlot('Performance')">
                 <div class="flex w-full justify-center">
                     <svg width="30" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -57,11 +57,55 @@
     </div>
 
     <div class="relative h-7/8 overflow-y-auto" v-touch:swipe.left="nextSlot" v-touch:swipe.right="prevSlot">
+        <div class="w-screen h-12 relative">
+            <button
+                class="fixed top-[] left-0 w-20 h-10 bg-sky-900 shadow-xl mx-4 my-4 rounded-xl flex justify-center items-center space-x-2 z-50"
+                @click="isModalVisible = true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="32" viewBox="0 0 24 24">
+                    <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                        stroke-width="1.5"
+                        d="M3 7h3M3 17h6m9 0h3M15 7h6M6 7c0-.932 0-1.398.152-1.765a2 2 0 0 1 1.083-1.083C7.602 4 8.068 4 9 4s1.398 0 1.765.152a2 2 0 0 1 1.083 1.083C12 5.602 12 6.068 12 7s0 1.398-.152 1.765a2 2 0 0 1-1.083 1.083C10.398 10 9.932 10 9 10s-1.398 0-1.765-.152a2 2 0 0 1-1.083-1.083C6 8.398 6 7.932 6 7m6 10c0-.932 0-1.398.152-1.765a2 2 0 0 1 1.083-1.083C13.602 14 14.068 14 15 14s1.398 0 1.765.152a2 2 0 0 1 1.083 1.083C18 15.602 18 16.068 18 17s0 1.398-.152 1.765a2 2 0 0 1-1.083 1.083C16.398 20 15.932 20 15 20s-1.398 0-1.765-.152a2 2 0 0 1-1.083-1.083C12 18.398 12 17.932 12 17"
+                        color="#ffff" />
+                </svg>
+                <p class="font-poppins font-medium text-[13px] text-white">Filtre</p>
+            </button>
+        </div>
         <transition :name="`fade-slide-${transitionDirection}`" mode="out-in">
             <component :is="currentSlot" :key="currentSlot" />
         </transition>
     </div>
-
+    <VueFinalModal v-model="isModalVisible" :click-to-close="true" class="flex justify-center items-end"
+        transition="vfm-fade-in-up">
+        <div class="w-[90vw] h-[48vh] bg-white rounded-t-xl shadow-lg  overflow-hidden">
+            <div class=" h-[8%]  flex justify-center items-center">
+                <div class="w-[13vw] h-[5px] rounded-xl bg-sky-950"></div>
+            </div>
+            <div class="h-[14%]  flex space-x-3 items-center p-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="58" height="58" @click="isModalVisible = false"
+                    viewBox="0 0 24 24">
+                    <path fill="none" stroke="#014268" stroke-linecap="round" d="m6 6l12 12m0-12L6 18" />
+                </svg>
+                <p class="font-poppins text-4xl text-sky-900  font-extralight">Filtre</p>
+            </div>
+            <div class="h-[55%]  p-4 space-y-4">
+                <input type="text"
+                    class="w-[100%] h-[36%] rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
+                    placeholder="Service et structure">
+                <div class="w-[100%] h-[36%] flex space-x-7 ">
+                    <input type="date"
+                        class="w-[45%]  rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
+                        placeholder="Nomanclature">
+                    <input type="date"
+                        class="w-[45%]  rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
+                        placeholder="Nomanclature">
+                </div>
+            </div>
+            <div class=" h-[18%] w-[100%]  flex justify-center items-center gap-9 ">
+                <button class="w-[40%] h-[90%] rounded-lg bg-sky-950 m-0 font-bold text-white">Vider</button>
+                <button class="w-[40%] h-[90%] rounded-lg bg-sky-950 font-bold text-white">Recherche</button>
+            </div>
+        </div>
+    </VueFinalModal>
 
     </Base>
 </template>
@@ -71,17 +115,18 @@ import Base from '../../components/Base.vue'
 import Equipement from '../../components/EquipementRapport.vue'
 import Infrastructure from '../../components/InfrastructureRapport.vue'
 import Performance from '../../components/Performance.vue'
-
+import { VueFinalModal } from 'vue-final-modal';
 export default {
     components: {
-        Base, Equipement, Infrastructure, Performance
+        Base, Equipement, Infrastructure, Performance, VueFinalModal
     },
     data() {
         return {
             index: 0,
             slots: ['Equipement', 'Infrastructure', 'Performance'],
             transitionDirection: 'left',
-            transitionDirection: 'right'
+            isModalVisible: false,
+            activeSlot: 'Equipement'
         }
     },
     computed: {
@@ -97,6 +142,12 @@ export default {
         prevSlot() {
             this.transitionDirection = 'right'
             this.index = (this.index - 1 + this.slots.length) % this.slots.length
+        },
+        changeSlot(newSlot) {
+            const newIndex = this.slots.indexOf(newSlot);
+            this.transitionDirection = newIndex > this.index ? 'left' : 'right';
+            this.index = newIndex;
+            this.activeSlot = newSlot;
         }
     }
 }
