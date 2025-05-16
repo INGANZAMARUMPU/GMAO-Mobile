@@ -1,6 +1,6 @@
 <template>
-    <div class=" h-screen flex flex-col overflow-y-hidden">
-        <div class=" ">
+    <div class=" relative h-screen flex flex-col overflow-y-hidden">
+        <div class="">
             <div class="flex h-full ">
                 <div class="w-1/2 ">
                     <img src="../assets/view/img/unnamed.jpg" alt="" class="w-[70%] ">
@@ -24,28 +24,19 @@
                 </div>
             </div>
         </div>
-        <div class="h-[100%] overflow-y-auto">
+        <div class="h-[90%] overflow-hidden">
             <slot v-if="activeSlot === 1" name="slot1"></slot>
             <slot v-else-if="activeSlot === 2" name="slot2"></slot>
             <slot v-else-if="activeSlot === 3" name="slot3"></slot>
         </div>
 
-        <div class=" bg-sky-900  ">
-            <div class="w-screen h-4 flex  justify-center border-t-[0.3px] border-white">
-                <div class="w-screen h-4 flex justify-center border-t-[0.3px] border-white">
+        <div class=" bottom-0 bg-sky-900  ">
+            <div class="w-screen flex items-center justify-center gap-x-18">
+                <div class="flex flex-col items-center py-2" @click="navigate('/equipement')">
                     <div :class="[
-                        'w-[69%] h-full flex items-center transition-all duration-1000 ease-in-out transform',
-                        activeSlot === 1 ? 'justify-start -translate-x-1' :
-                            activeSlot === 2 ? 'justify-center translate-x-0' :
-                                'justify-end translate-x-1'
-                    ]">
-                        <div class="w-[10%] h-[30%] bg-amber-50 rounded-2xl"></div>
-                    </div>
-                </div>
-
-            </div>
-            <div class=" flex gap-[17%] items-center justify-center ">
-                <div class="" @click="navigate('/equipement')">
+                        'w-7 h-1 rounded-2xl',
+                        activeSlot === 1 ? 'bg-amber-50' : ''
+                    ]"></div>
                     <div class=" flex w-full justify-center">
                         <svg width="40" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg"
                             class="">
@@ -62,8 +53,12 @@
                     </div>
                     <p class="font-segoe-ui-variable font-bold text-[10px] text-white ">Rapport</p>
                 </div>
-                <div class="" @click="navigate('/equipementSpecial')">
-                    <div class="mx-auto flex w-full justify-center">
+                <div class="flex flex-col items-center" @click="navigate('/equipementSpecial')">
+                    <div :class="[
+                        'w-7 h-1 rounded-2xl',
+                        activeSlot === 2 ? 'bg-amber-50' : ' translate-1 '
+                    ]"></div>
+                    <div class="">
                         <svg width="30" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <g clip-path="url(#clip0_186_1108)">
                                 <path
@@ -78,10 +73,13 @@
                         </svg>
                     </div>
                     <p class="font-segoe-ui-variable font-bold text-[10px] text-white ">Equipement</p>
-
                 </div>
-                <div class="" @click="navigate('/Infrastructure')">
-                    <div class="mx-auto flex w-full justify-center">
+                <div class="flex flex-col items-center py-2" @click="navigate('/Infrastructure')">
+                    <div :class="[
+                        'w-7 h-1 rounded-2xl',
+                        activeSlot === 3 ? 'bg-amber-50 ' : ''
+                    ]"></div>
+                    <div class="">
                         <svg width="30" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path fill-rule="evenodd" clip-rule="evenodd"
                                 d="M22.058 5.44343L12.8076 10.7863L22.058 16.1386L31.3084 10.7926L22.058 5.44343ZM36.02 8.06457L22.058 0L8.09601 8.06457L3.6043 5.47171C3.33613 5.30402 3.03696 5.19207 2.72463 5.14253C2.4123 5.09299 2.0932 5.10688 1.78634 5.18337C1.47949 5.25985 1.19117 5.39737 0.938559 5.58772C0.685953 5.77807 0.474235 6.01736 0.316025 6.29133C0.157814 6.5653 0.0563498 6.86833 0.0176799 7.18237C-0.02099 7.49641 0.00392596 7.81502 0.0909427 8.11922C0.177959 8.42342 0.325296 8.70697 0.524169 8.95298C0.723042 9.19899 0.969382 9.40242 1.2485 9.55114L5.73708 12.1471V28.2857L19.7022 36.3534V41.6429C19.7022 42.268 19.9504 42.8676 20.3922 43.3096C20.834 43.7517 21.4332 44 22.058 44C22.6828 44 23.282 43.7517 23.7238 43.3096C24.1656 42.8676 24.4138 42.268 24.4138 41.6429V36.3534L38.3789 28.2857V12.1471L42.8707 9.55114C43.3961 9.23058 43.7753 8.71702 43.9271 8.12032C44.079 7.52362 43.9915 6.89114 43.6833 6.35818C43.3751 5.82521 42.8707 5.43407 42.278 5.2684C41.6853 5.10274 41.0513 5.17571 40.5117 5.47171L36.02 8.06457ZM33.6674 14.8689L24.4138 20.218V30.91L33.6674 25.564V14.8689ZM10.4487 25.564L19.7022 30.9069V20.2211L10.4487 14.8657V25.564Z"

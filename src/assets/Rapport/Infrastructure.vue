@@ -51,7 +51,7 @@
         </div>
     </div>
 
-    <div class="relative h-7/8 overflow-y-auto" v-touch:swipe.left="nextSlot" v-touch:swipe.right="prevSlot">
+    <div class="relative h-7/8 overflow-y-auto">
         <transition :name="`fade-slide-${transitionDirection}`" mode="out-in">
             <component :is="currentSlot" :key="currentSlot" />
         </transition>

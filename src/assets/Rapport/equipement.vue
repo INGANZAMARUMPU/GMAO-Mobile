@@ -56,10 +56,10 @@
         </div>
     </div>
 
-    <div class="relative h-7/8 overflow-y-auto" v-touch:swipe.left="nextSlot" v-touch:swipe.right="prevSlot">
+    <div class="relative h-7/8 overflow-y-auto">
         <div class="w-screen h-12 relative">
             <button
-                class="fixed top-[] left-0 w-20 h-10 bg-sky-900 shadow-xl mx-4 my-4 rounded-xl flex justify-center items-center space-x-2 z-50"
+                class="fixed left-2 bg-sky-900 shadow-xl mx-4 my-4 rounded-xl flex justify-center items-center space-x-2 p-1 z-50"
                 @click="isModalVisible = true">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="32" viewBox="0 0 24 24">
                     <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
@@ -76,33 +76,32 @@
     </div>
     <VueFinalModal v-model="isModalVisible" :click-to-close="true" class="flex justify-center items-end"
         transition="vfm-fade-in-up">
-        <div class="w-[90vw] h-[48vh] bg-white rounded-t-xl shadow-lg  overflow-hidden">
-            <div class=" h-[8%]  flex justify-center items-center">
-                <div class="w-[13vw] h-[5px] rounded-xl bg-sky-950"></div>
+        <div class="bg-white rounded-t-4xl shadow-lg">
+            <div class=" p-2 flex justify-center items-center" >
+                <div class="w-[13vw] h-[5px] rounded-xl bg-sky-950"  @click="isModalVisible = false"></div>
             </div>
-            <div class="h-[14%]  flex space-x-3 items-center p-4">
-                <svg xmlns="http://www.w3.org/2000/svg" width="58" height="58" @click="isModalVisible = false"
-                    viewBox="0 0 24 24">
-                    <path fill="none" stroke="#014268" stroke-linecap="round" d="m6 6l12 12m0-12L6 18" />
-                </svg>
-                <p class="font-poppins text-4xl text-sky-900  font-extralight">Filtre</p>
-            </div>
-            <div class="h-[55%]  p-4 space-y-4">
+            <div class="p-4 pt-0 space-y-4">
+                <div class="flex items-center">
+                    <p class="font-poppins text-3xl text-sky-900  font-extralight">Filtre</p>
+                </div>
                 <input type="text"
-                    class="w-[100%] h-[36%] rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
-                    placeholder="Service et structure">
-                <div class="w-[100%] h-[36%] flex space-x-7 ">
+                    class="w-2/2  rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
+                    placeholder="Nomanclature">
+                <input type="text"
+                    class="w-2/2  rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
+                    placeholder="Description">
+                <div class="flex space-x-7 ">
                     <input type="date"
-                        class="w-[45%]  rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
+                        class="w-1/2  rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
                         placeholder="Nomanclature">
                     <input type="date"
-                        class="w-[45%]  rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
+                        class="w-1/2 rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
                         placeholder="Nomanclature">
                 </div>
-            </div>
-            <div class=" h-[18%] w-[100%]  flex justify-center items-center gap-9 ">
-                <button class="w-[40%] h-[90%] rounded-lg bg-sky-950 m-0 font-bold text-white">Vider</button>
-                <button class="w-[40%] h-[90%] rounded-lg bg-sky-950 font-bold text-white">Recherche</button>
+                <div class="flex gap-5 ">
+                    <button class="py-3 rounded-lg bg-sky-950 m-0 font-bold text-white grow basis-1">Vider</button>
+                    <button class="py-3 rounded-lg bg-sky-950 font-bold text-white grow basis-1">Recherche</button>
+                </div>
             </div>
         </div>
     </VueFinalModal>
