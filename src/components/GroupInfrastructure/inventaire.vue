@@ -26,7 +26,7 @@
         </div>
         <div class="w-screen h-[90%] flex flex-col items-center space-y-3 shadow-xl">
             <div v-for="item in items" :key="item.id"
-                class="w-[90%] rounded-2xl bg-sky-100 text-sky-900 overflow-hidden flex flex-col">
+                class="w-[90%] rounded-2xl bg-sky-100 text-sky-900 overflow-hidden flex flex-col"  @click="$emit('changer-index', 1, item.id)">
                 <div class="p-2">
                     <div class="w-full flex items-center justify-between">
                         <p class="font-poppins font-semibold text-sm tracking-wider">{{ item.id }}</p>
@@ -110,7 +110,16 @@ export default {
         const isModalVisible = ref(false);
         const items = [
             {
-                id: '[1.10658] 1.10658',
+                id: '1.10658',
+                date: '12-02-2023',
+                nom: 'LATRINE À FOSSE 1',
+                code: 'I.CDS.X.5',
+                coding: 'Latrine',
+                localisation: 'BI.KI.VU.BDSVUMBI-BDSVUMBI',
+                maj: '12-02-2023'
+            },
+            {
+                id: '1.10660',
                 date: '12-02-2023',
                 nom: 'LATRINE À FOSSE 2',
                 code: 'I.CDS.X.5',
@@ -119,18 +128,27 @@ export default {
                 maj: '12-02-2023'
             },
             {
-                id: '[1.10658] 1.10658',
+                id: '1.10644',
                 date: '12-02-2023',
-                nom: 'LATRINE À FOSSE 2',
+                nom: 'LATRINE À FOSSE 3',
                 code: 'I.CDS.X.5',
                 coding: 'Latrine',
                 localisation: 'BI.KI.VU.BDSVUMBI-BDSVUMBI',
                 maj: '12-02-2023'
             },
             {
-                id: '[1.10658] 1.10658',
+                id: '1.10648',
                 date: '12-02-2023',
-                nom: 'LATRINE À FOSSE 2',
+                nom: 'LATRINE À FOSSE 4',
+                code: 'I.CDS.X.5',
+                coding: 'Latrine',
+                localisation: 'BI.KI.VU.BDSVUMBI-BDSVUMBI',
+                maj: '12-02-2023'
+            },
+            {
+                id: '1.10648',
+                date: '12-02-2023',
+                nom: 'LATRINE À FOSSE 7',
                 code: 'I.CDS.X.5',
                 coding: 'Latrine',
                 localisation: 'BI.KI.VU.BDSVUMBI-BDSVUMBI',

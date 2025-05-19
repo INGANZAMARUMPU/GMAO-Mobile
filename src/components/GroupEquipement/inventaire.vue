@@ -12,7 +12,7 @@
                 </svg>
                 <p class="font-poppins font-medium text-[13px] text-white">Filtre</p>
             </button>
-            {{ decodedContent.p }}
+            <!-- {{ items[0].id }} -->
             <button
                 class="custom-box custom-right"
                 @click="isQRcode = true">
@@ -28,7 +28,7 @@
         </div>
         <div class="w-screen h-full flex flex-col items-center space-y-3 shadow-xl">
             <div v-for="item in items" :key="item.id"
-                class="w-[90%] rounded-2xl bg-sky-100 overflow-hidden flex flex-col text-sky-900">
+                class="w-[90%] rounded-2xl bg-sky-100 overflow-hidden flex flex-col text-sky-900" @click="$emit('changer-index', 1, item.id)">
                 <div class="p-2">
                     <div class="w-full flex items-center justify-between">
                         <p class="font-poppins font-semibold text-sm tracking-wider">{{ item.id }}</p>
@@ -130,7 +130,7 @@ export default {
                     maj: '12-02-2023'
                 },
                 {
-                    id: '1.10658',
+                    id: '1.10640',
                     date: '12-02-2023',
                     nom: 'centrifugeuse',
                     code: 'ERTF',
@@ -138,7 +138,7 @@ export default {
                     maj: '12-02-2023'
                 },
                 {
-                    id: '1.10658',
+                    id: '1.10660',
                     date: '12-02-2023',
                     nom: 'centrifugeuse',
                     code: 'ERTF',

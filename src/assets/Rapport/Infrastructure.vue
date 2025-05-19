@@ -53,7 +53,7 @@
 
     <div class="relative h-7/8 overflow-y-auto">
         <transition :name="`fade-slide-${transitionDirection}`" mode="out-in">
-            <component :is="currentSlot" :key="currentSlot" />
+            <component :is="currentSlot" :key="currentSlot" v-bind="slotProps" @changer-index="setSlot" />
         </transition>
     </div>
 
@@ -75,7 +75,9 @@ export default {
             index: 0,
             slots: ['Inventaire', 'PlansMaintenance', 'Operation'],
             transitionDirection: 'left',
-            activeSlot: 'Inventaire'
+            activeSlot: 'Inventaire',
+            slotProps: {}
+
         }
     },
     computed: {
@@ -97,6 +99,23 @@ export default {
             this.transitionDirection = newIndex > this.index ? 'left' : 'right';
             this.index = newIndex;
             this.activeSlot = newSlot;
+        },
+        setSlot(index, id, nom) {
+            console.log('Données reçues:', index, id, nom)
+
+            if (index < 0 || index >= this.slots.length) return
+
+            this.transitionDirection = index > this.index ? 'left' : 'right'
+            this.index = index
+
+            if (index === 1) {
+                this.slotProps = { equipementId: id }
+            } else if (index === 2) {
+                this.slotProps = { nom }
+
+            } else {
+                this.slotProps = {}
+            }
         }
     }
 }

@@ -45,6 +45,8 @@
   gap: 0.5rem;
   z-index: 50;
   padding: 5px;
+  padding-left: 12px;
+  padding-right: 12px;
 }
 
 .custom-left {

@@ -59,7 +59,7 @@
     <div class="relative h-7/8 overflow-y-auto">
         <div class="w-screen h-12 relative">
             <button
-                class="fixed left-2 bg-sky-900 shadow-xl mx-4 my-4 rounded-xl flex justify-center items-center space-x-2 p-1 z-50"
+                class="fixed left-6 my-2 custom-box"
                 @click="isModalVisible = true">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="32" viewBox="0 0 24 24">
                     <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"

@@ -1,8 +1,7 @@
 <template>
     <div class="w-screen h-screen" v-if="!showNewView">
         <div class="w-screen h-[10%] overflow-hidden flex items-center justify-center gap-[10%]">
-            <button class="custom-box custom-left"
-                @click="isModalVisible = true">
+            <button class="custom-box custom-left" @click="isModalVisible = true">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="32" viewBox="0 0 24 24">
                     <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                         stroke-width="1.5"
@@ -11,9 +10,7 @@
                 </svg>
                 <p class="font-poppins font-medium text-[13px] text-white">Filtre</p>
             </button>
-            <button
-                class="custom-box custom-right"
-                @click="handleNewItem">
+            <button class="custom-box custom-right" @click="handleNewItem">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="32"
                     viewBox="0 0 24 24"><!-- Icon from Lucide by Lucide Contributors - https://github.com/lucide-icons/lucide/blob/main/LICENSE -->
                     <path fill="none" stroke="#ffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -23,7 +20,7 @@
             </button>
         </div>
         <div class="w-screen h-screen flex flex-col items-center space-y-6 shadow-xl">
-            <div v-for="item in items" :key="item.id"
+            <div v-for="item in filteredItems" :key="item.id"
                 class="w-[90%] rounded-2xl bg-sky-100 overflow-hidden flex flex-col text-sky-900 p-2">
                 <div class="w-full flex items-center justify-between">
                     <p class="font-poppins font-semibold text-sm tracking-wider">{{ item.id }}</p>
@@ -99,8 +96,7 @@
                         d="m15 18l-6-6l6-6" />
                 </svg>
             </button>
-            <button
-                class="fixed right-4 p-2 bg-sky-900 rounded-xl flex justify-center items-center space-x-2 z-50"
+            <button class="fixed right-4 p-2 bg-sky-900 rounded-xl flex justify-center items-center space-x-2 z-50"
                 @click="handleNewItem">
                 <svg width="30" height="30" viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M29.1665 27.7084H11.6665M29.1665 17.5H5.83318M29.1665 7.29171H17.4998" stroke="white"
@@ -192,6 +188,18 @@ export default {
     components: {
         VueFinalModal
     },
+    props: {
+        nom: {
+            type: [String],
+            required: false
+        }
+    },
+    computed: {
+        filteredItems() {
+            if (!this.nom) return this.items
+            return this.items.filter(item => item.nom == this.nom)
+        }
+    },
     data() {
         return {
             isModalVisible: false,
@@ -201,7 +209,7 @@ export default {
                     id: '1.4',
                     idPlus: '04.trimestriel',
                     date: '12-02-2023',
-                    nom: 'LATRINE À FOSSE 2',
+                    nom: 'LATRINE À FOSSE 1',
                     code: 'I.CDS.X.5',
                     coding: 'Latrine',
                     codingPlus: 'Maintenance préventive',
@@ -223,7 +231,7 @@ export default {
                     id: '1.4',
                     idPlus: '04.trimestriel',
                     date: '12-02-2023',
-                    nom: 'LATRINE À FOSSE 2',
+                    nom: 'LATRINE À FOSSE 3',
                     code: 'I.CDS.X.5',
                     coding: 'Latrine',
                     codingPlus: 'Maintenance préventive',
@@ -240,6 +248,9 @@ export default {
         returnToMainView() {
             this.showNewView = false
         }
+    },
+    mounted() {
+        console.log("Nom reçu :", this.nom)
     }
 }
 </script>

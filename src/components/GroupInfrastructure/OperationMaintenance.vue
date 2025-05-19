@@ -20,7 +20,7 @@
             </button>
         </div>
         <div class="w-screen h-full flex flex-col items-center space-y-3 shadow-xl">
-            <div v-for="item in items" :key="item.id"
+            <div v-for="item in filteredItems" :key="item.id"
                 class="w-[90%] rounded-2xl bg-sky-100 overflow-hidden flex flex-col text-sky-900 p-2">
                 <div class="w-full flex items-center justify-between">
                     <p class="font-poppins font-semibold text-sm tracking-wider">{{ item.id }}</p>
@@ -188,6 +188,18 @@ export default {
     components: {
         VueFinalModal
     },
+    props: {
+        nom: {
+            type: [String],
+            required: false
+        }
+    },
+    computed: {
+        filteredItems() {
+            if (!this.nom) return this.items
+            return this.items.filter(item => item.nom == this.nom)
+        }
+    },
     data() {
         return {
             isModalVisible: false,
@@ -197,7 +209,7 @@ export default {
                     id: '1.4',
                     idPlus: '04.trimestriel',
                     date: '12-02-2023',
-                    nom: 'LATRINE À FOSSE 2',
+                    nom: 'LATRINE À FOSSE 3',
                     code: 'I.CDS.X.5',
                     coding: 'Latrine',
                     codingPlus: 'Maintenance préventive',
@@ -208,7 +220,7 @@ export default {
                     id: '1.4',
                     idPlus: '04.trimestriel',
                     date: '12-02-2023',
-                    nom: 'LATRINE À FOSSE 2',
+                    nom: 'LATRINE À FOSSE 1',
                     code: 'I.CDS.X.5',
                     coding: 'Latrine',
                     codingPlus: 'Maintenance préventive',
@@ -231,7 +243,7 @@ export default {
                     id: '1.4',
                     idPlus: '04.trimestriel',
                     date: '12-02-2023',
-                    nom: 'LATRINE À FOSSE 2',
+                    nom: 'LATRINE À FOSSE 4',
                     code: 'I.CDS.X.5',
                     coding: 'Latrine',
                     codingPlus: 'Maintenance préventive',
@@ -242,7 +254,7 @@ export default {
                     id: '1.4',
                     idPlus: '04.trimestriel',
                     date: '12-02-2023',
-                    nom: 'LATRINE À FOSSE 2',
+                    nom: 'LATRINE À FOSSE 7',
                     code: 'I.CDS.X.5',
                     coding: 'Latrine',
                     codingPlus: 'Maintenance préventive',
@@ -270,6 +282,9 @@ export default {
         returnToMainView() {
             this.showNewView = false
         }
+    },
+    mounted() {
+        console.log("Nom reçu :", this.nom)
     }
 }
 </script>

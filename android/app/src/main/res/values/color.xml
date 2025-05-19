@@ -1,0 +1,4 @@
+<resources>
+    <color name="status_bar_color">#FFFFFF</color> <!-- Blanc -->
+    <color name="navigation_bar_color">#0EA5E9</color> <!-- Sky -->
+</resources>

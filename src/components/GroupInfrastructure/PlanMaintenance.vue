@@ -20,8 +20,8 @@
             </button>
         </div>
         <div class="w-screen h-full flex flex-col items-center space-y-3 shadow-xl">
-            <div v-for="item in items" :key="item.id"
-                class="w-[90%] rounded-2xl bg-sky-100 overflow-hidden flex flex-col text-sky-900 p-2">
+            <div v-for="item in filteredItems" :key="item.id"
+                class="w-[90%] rounded-2xl bg-sky-100 overflow-hidden flex flex-col text-sky-900 p-2"  @click="$emit('changer-index', 2, item.equipementId, item.nom)">
                 <div class="w-full flex items-center justify-between">
                     <p class="font-poppins font-semibold text-sm tracking-wider">{{ item.id }}</p>
                     <p class="font-poppins  text-xs tracking-wider">{{ item.idPlus }}</p>
@@ -179,13 +179,25 @@ export default {
     components: {
         VueFinalModal
     },
+    props: {
+        equipementId: {
+            type: [String, Number],
+            required: false
+        }
+    },
+    computed: {
+        filteredItems() {
+            if (!this.equipementId) return this.items
+            return this.items.filter(item => item.id == this.equipementId)
+        }
+    },
     data() {
         return {
             isModalVisible: false,
             showNewView: false,
             items: [
                 {
-                    id: '[1.10658] 1.10658',
+                    id: '1.10658',
                     idPlus: '04.trimestriel',
                     date: '12-02-2023',
                     nom: 'LATRINE À FOSSE 2',
@@ -196,7 +208,40 @@ export default {
                     maj: '12-02-2023'
                 },
                 {
-                    id: '[1.10658] 1.10658',
+                    id: '1.10660',
+                    idPlus: '04.trimestriel',
+                    date: '12-02-2023',
+                    nom: 'LATRINE À FOSSE 1',
+                    code: 'I.CDS.X.5',
+                    coding: 'Latrine',
+                    codingPlus: 'Maintenance préventive',
+                    localisation: 'BI.KI.VU.BDSVUMBI-BDSVUMBI',
+                    maj: '12-02-2023'
+                },
+                {
+                    id: '1.10644',
+                    idPlus: '04.trimestriel',
+                    date: '12-02-2023',
+                    nom: 'LATRINE À FOSSE 4',
+                    code: 'I.CDS.X.5',
+                    coding: 'Latrine',
+                    codingPlus: 'Maintenance préventive',
+                    localisation: 'BI.KI.VU.BDSVUMBI-BDSVUMBI',
+                    maj: '12-02-2023'
+                },
+                {
+                    id: '1.10648',
+                    idPlus: '04.trimestriel',
+                    date: '12-02-2023',
+                    nom: 'LATRINE À FOSSE 7',
+                    code: 'I.CDS.X.5',
+                    coding: 'Latrine',
+                    codingPlus: 'Maintenance préventive',
+                    localisation: 'BI.KI.VU.BDSVUMBI-BDSVUMBI',
+                    maj: '12-02-2023'
+                },
+                {
+                    id: '1.10678',
                     idPlus: '04.trimestriel',
                     date: '12-02-2023',
                     nom: 'LATRINE À FOSSE 2',
@@ -207,43 +252,10 @@ export default {
                     maj: '12-02-2023'
                 },
                 {
-                    id: '[1.10658] 1.10658',
+                    id: '1.10638',
                     idPlus: '04.trimestriel',
                     date: '12-02-2023',
-                    nom: 'LATRINE À FOSSE 2',
-                    code: 'I.CDS.X.5',
-                    coding: 'Latrine',
-                    codingPlus: 'Maintenance préventive',
-                    localisation: 'BI.KI.VU.BDSVUMBI-BDSVUMBI',
-                    maj: '12-02-2023'
-                },
-                {
-                    id: '[1.10658] 1.10658',
-                    idPlus: '04.trimestriel',
-                    date: '12-02-2023',
-                    nom: 'LATRINE À FOSSE 2',
-                    code: 'I.CDS.X.5',
-                    coding: 'Latrine',
-                    codingPlus: 'Maintenance préventive',
-                    localisation: 'BI.KI.VU.BDSVUMBI-BDSVUMBI',
-                    maj: '12-02-2023'
-                },
-                {
-                    id: '[1.10658] 1.10658',
-                    idPlus: '04.trimestriel',
-                    date: '12-02-2023',
-                    nom: 'LATRINE À FOSSE 2',
-                    code: 'I.CDS.X.5',
-                    coding: 'Latrine',
-                    codingPlus: 'Maintenance préventive',
-                    localisation: 'BI.KI.VU.BDSVUMBI-BDSVUMBI',
-                    maj: '12-02-2023'
-                },
-                {
-                    id: '[1.10658] 1.10658',
-                    idPlus: '04.trimestriel',
-                    date: '12-02-2023',
-                    nom: 'LATRINE À FOSSE 2',
+                    nom: 'LATRINE À FOSSE 3',
                     code: 'I.CDS.X.5',
                     coding: 'Latrine',
                     codingPlus: 'Maintenance préventive',
@@ -266,6 +278,9 @@ export default {
         returnToMainView() {
             this.showNewView = false
         }
+    },
+    mounted() {
+        console.log("ID reçu :", this.equipementId)
     }
 }
 </script>

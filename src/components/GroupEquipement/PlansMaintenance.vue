@@ -20,8 +20,9 @@
             </button>
         </div>
         <div class="w-screen h-full flex flex-col items-center space-y-3 shadow-xl">
-            <div v-for="item in items" :key="item.id"
-                class="w-[90%] rounded-2xl bg-sky-100 overflow-hidden flex flex-col text-sky-900 p-2">
+            <div v-for="item in filteredItems" :key="item.id"
+                class="w-[90%] rounded-2xl bg-sky-100 overflow-hidden flex flex-col text-sky-900 p-2"
+                @click="$emit('changer-index', 2, item.equipementId, item.nom)">
                 <div class="w-full flex items-center justify-between">
                     <p class="font-poppins font-semibold text-sm tracking-wider">{{ item.id }}</p>
                     <p class="font-poppins  text-xs tracking-wider">{{ item.idPlus }}</p>
@@ -116,36 +117,37 @@
                 </div>
                 <input type="text"
                     class="w-[100%]  rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
-                    placeholder="Référence inventaire">
+                    placeholder="Référence inventaire" v-model="reference">
                 <input type="text"
                     class="w-[100%]  rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
-                    placeholder="Nomenclature">
+                    placeholder="Nomenclature" v-model="nomenclature">
                 <select name="" id=""
-                    class="w-[100%]  rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none p-2">
+                    class="w-[100%]  rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
+                    v-model="type">
                     <option value="">Type</option>
-                    <option value="">Maintenance préventive</option>
+                    <option value="preventive">Maintenance préventive</option>
                 </select>
                 <input type="date"
                     class="w-[100%]  rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
-                    placeholder="Fournisseur">
+                    placeholder="Fournisseur" v-model="fournisseur">
                 <div class="flex items-center content-between!">
                     <p class="font-poppins text-3xl text-sky-900  font-extralight">Coût</p>
                 </div>
                 <div class="w-[100%]  flex space-x-7 ">
                     <input type="number"
                         class="w-[45%]  rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
-                        placeholder="Transport">
+                        v-model="transport">
                     <input type="number"
                         class="w-[45%]  rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
-                        placeholder="Prestataire">
+                        placeholder="Prestataire" v-model="prestataire">
                 </div>
                 <div class="w-[100%]  flex space-x-7 ">
                     <input type="number"
                         class="w-[45%]  rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
-                        placeholder="Consommable">
+                        placeholder="Consommable" v-model="consommable">
                     <input type="number"
                         class="w-[45%]  rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
-                        placeholder="Autre">
+                        placeholder="Autre" v-model="Autre">
                 </div>
                 <div class="flex items-center content-between!">
                     <p class="font-poppins text-3xl text-sky-900  font-extralight">Info récentes</p>
@@ -164,7 +166,8 @@
                     </div>
                 </div>
                 <div class="flex gap-5 ">
-                    <button class="py-3 rounded-lg bg-sky-950 font-bold text-white grow basis-1">Sauvegarder</button>
+                    <button class="py-3 rounded-lg bg-sky-950 font-bold text-white grow basis-1"
+                        @click="postPlan">Sauvegarder</button>
                 </div>
             </div>
         </div>
@@ -173,19 +176,53 @@
 
 
 <script>
+import axios from 'axios'
 import { VueFinalModal } from 'vue-final-modal'
+import { openDB } from 'idb';
 
 export default {
     components: {
         VueFinalModal
     },
+    props: {
+        equipementId: {
+            type: [String, Number],
+            required: false
+        }
+    },
+    computed: {
+        filteredItems() {
+            if (!this.equipementId) return this.items
+            return this.items.filter(item => item.id == this.equipementId)
+        }
+    },
     data() {
         return {
             isModalVisible: false,
             showNewView: false,
+            Autre: '',
+            consommable: '',
+            prestataire: '',
+            transport: '',
+            fournisseur: '',
+            type: '',
+            nomenclature: '',
+            reference: '',
+            // equipementId:'',
             items: [
                 {
-                    id: '[1.10658] 1.10658',
+                    id: '1.10658',
+                    idPlus: '04.trimestriel',
+                    date: '12-02-2023',
+                    nom: 'LATRINE À FOSSE 1',
+                    code: 'I.CDS.X.5',
+                    coding: 'Latrine',
+                    codingPlus: 'Maintenance préventive',
+                    localisation: 'BI.KI.VU.BDSVUMBI-BDSVUMBI',
+                    maj: '12-02-2023'
+                },
+                {
+                    id: '1.10640',
                     idPlus: '04.trimestriel',
                     date: '12-02-2023',
                     nom: 'LATRINE À FOSSE 2',
@@ -196,10 +233,10 @@ export default {
                     maj: '12-02-2023'
                 },
                 {
-                    id: '[1.10658] 1.10658',
+                    id: '1.10658',
                     idPlus: '04.trimestriel',
                     date: '12-02-2023',
-                    nom: 'LATRINE À FOSSE 2',
+                    nom: 'LATRINE À FOSSE 3',
                     code: 'I.CDS.X.5',
                     coding: 'Latrine',
                     codingPlus: 'Maintenance préventive',
@@ -207,10 +244,10 @@ export default {
                     maj: '12-02-2023'
                 },
                 {
-                    id: '[1.10658] 1.10658',
+                    id: '1.10640',
                     idPlus: '04.trimestriel',
                     date: '12-02-2023',
-                    nom: 'LATRINE À FOSSE 2',
+                    nom: 'FOSSE 3',
                     code: 'I.CDS.X.5',
                     coding: 'Latrine',
                     codingPlus: 'Maintenance préventive',
@@ -218,38 +255,17 @@ export default {
                     maj: '12-02-2023'
                 },
                 {
-                    id: '[1.10658] 1.10658',
+                    id: '1.10660',
                     idPlus: '04.trimestriel',
                     date: '12-02-2023',
                     nom: 'LATRINE À FOSSE 2',
-                    code: 'I.CDS.X.5',
+                    code: 'I.CDS.X.4',
                     coding: 'Latrine',
                     codingPlus: 'Maintenance préventive',
                     localisation: 'BI.KI.VU.BDSVUMBI-BDSVUMBI',
                     maj: '12-02-2023'
                 },
-                {
-                    id: '[1.10658] 1.10658',
-                    idPlus: '04.trimestriel',
-                    date: '12-02-2023',
-                    nom: 'LATRINE À FOSSE 2',
-                    code: 'I.CDS.X.5',
-                    coding: 'Latrine',
-                    codingPlus: 'Maintenance préventive',
-                    localisation: 'BI.KI.VU.BDSVUMBI-BDSVUMBI',
-                    maj: '12-02-2023'
-                },
-                {
-                    id: '[1.10658] 1.10658',
-                    idPlus: '04.trimestriel',
-                    date: '12-02-2023',
-                    nom: 'LATRINE À FOSSE 2',
-                    code: 'I.CDS.X.5',
-                    coding: 'Latrine',
-                    codingPlus: 'Maintenance préventive',
-                    localisation: 'BI.KI.VU.BDSVUMBI-BDSVUMBI',
-                    maj: '12-02-2023'
-                }
+
             ]
         }
     },
@@ -265,8 +281,61 @@ export default {
         },
         returnToMainView() {
             this.showNewView = false
+        },
+        // postPlan() {
+        //     const data = {
+        //         id: this.equipementId,
+        //         Autre: this.Autre,
+        //         consommable: this.consommable,
+        //         prestataire: this.prestataire,
+        //         transport: this.transport,
+        //         fournisseur: this.fournisseur,
+        //         type: this.type,
+        //         nomenclature: this.nomenclature,
+        //         reference: this.reference,
+        //     }
+
+        //     localStorage.setItem('planData', JSON.stringify(data))
+        // }
+        async postPlan() {
+            console.log('equipementId =', this.equipementId); // Ajoute ça pour voir la valeur
+
+            if (!this.equipementId) {
+                console.error('equipementId est invalide. Il faut une valeur valide pour la clé.');
+                return; // stop la fonction si pas de clé valide
+            }
+
+            const db = await openDB('myDatabase', 1, {
+                upgrade(db) {
+                    if (!db.objectStoreNames.contains('plans')) {
+                        db.createObjectStore('plans', { keyPath: 'id' });
+                    }
+                },
+            });
+
+            const data = {
+                id: this.equipementId, // clé ici
+                Autre: this.Autre,
+                consommable: this.consommable,
+                prestataire: this.prestataire,
+                transport: this.transport,
+                fournisseur: this.fournisseur,
+                type: this.type,
+                nomenclature: this.nomenclature,
+                reference: this.reference,
+            };
+
+            
+            const reponse = await db.put('plans', data);
+            console.log('Données sauvegardées dans IndexedDB', reponse.data);
+            this.showNewView = false
         }
+
+    },
+    mounted() {
+        console.log("ID reçu :", this.equipementId)
     }
+
 }
 </script>
 
