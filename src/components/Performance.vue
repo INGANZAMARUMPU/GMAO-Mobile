@@ -1,28 +1,29 @@
 <template>
     <div class="space-y-4 my-4">
-        <div class="flex justify-center gap-3 ">
-            <div class="h-30 w-[43%] flex bg-sky-100 rounded-3xl justify-center items-center">
-                <div class="  space-y-1">
-                    <p class="font-poppins font-medium text-[17px] text-sky-900 p-2">N.I préventives à réaliser</p>
-                    <p class=" w-full  font-poppins font-bold text-[32px] text-sky-900 flex justify-center">19</p>
-                </div>
+        <p class="font-poppins font-bold text-base mx-6 text-sky-900">Temps entre introductions des bons</p>
+        <div class="flex gap-2 mx-3">
+            <div class="w-30 bg-sky-100 rounded-xl flex flex-col items-center gap-2 py-2 px-2 justify-center ">
+                <p class="font-poppins font-medium text-[13px] leading-none text-center text-sky-900">intervations</p>
+                <p class="font-poppins font-bold text-[20px] leading-none text-sky-900 ">0j</p>
             </div>
-            <div class="h-30 w-[43%] flex bg-sky-100 rounded-3xl justify-center items-center">
-                <div class="  space-y-1">
-                    <p class="font-poppins font-medium text-[17px] text-sky-900 p-2">T.I bons et intervations</p>
-                    <p class=" w-full  font-poppins font-bold text-[32px] text-sky-900 flex justify-center">0</p>
-                </div>
+            <div class=" w-30 bg-sky-100 rounded-xl flex flex-col  items-center gap-2 py-2 px-2 justify-center">
+                <p class="font-poppins font-medium text-[13px] leading-none text-center text-sky-900">Résolutions du prblème
+                </p>
+                <p class="font-poppins font-bold text-[20px] leading-none text-sky-900 ">0j</p>
             </div>
         </div>
-        <div class="flex justify-center ">
-            <div class="h-50 w-[89%] flex bg-sky-100 rounded-3xl ">
-                <p class="font-poppins font-medium text-[17px] text-sky-900 p-4">N.I préventives réaliser</p>
+        <p class="font-poppins font-bold text-base mx-6 text-sky-900">Fraction des opérations préventives</p>
+        <div class="flex gap-2 mx-3">
+            <div class="w-30 bg-sky-100 rounded-xl flex flex-col items-center gap-2 py-2 px-2 justify-center ">
+                <p class="font-poppins font-medium text-[13px] leading-none text-center text-sky-900">Réaliser</p>
+                <p class="font-poppins font-bold text-[20px] leading-none text-sky-900 ">90%</p>
             </div>
         </div>
-        <div class="h-40 w-[43%] flex bg-sky-100 rounded-3xl justify-center items-center mx-6">
-            <div class="  space-y-1">
-                <p class="font-poppins font-medium text-[17px] text-sky-900 p-4">T.I bons et intervations du probleme</p>
-                    <p class=" w-full  font-poppins font-bold text-[32px] text-sky-900 flex justify-center">0</p>
+        <p class="font-poppins font-bold text-base mx-6 text-sky-900">Nombre total d'intervation prévantives</p>
+        <div class="flex gap-2 mx-3">
+            <div class="w-30 bg-sky-100 rounded-xl flex flex-col items-center gap-2 py-2 px-2 justify-center ">
+                <p class="font-poppins font-medium text-[13px] leading-none text-center text-sky-900">Réaliser</p>
+                <p class="font-poppins font-bold text-[20px] leading-none text-sky-900 ">10</p>
             </div>
         </div>
     </div>

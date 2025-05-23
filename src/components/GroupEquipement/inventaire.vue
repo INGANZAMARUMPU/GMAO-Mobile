@@ -1,9 +1,8 @@
 <template>
-    <div class="w-screen h-screen">
-        <div class="w-screen h-[10%] overflow-hidden flex items-center justify-center gap-[10%]">
-            <button
-                class="custom-box custom-left"
-                @click="isModalVisible = true">
+    <Base #slot2>
+    <div class="w-screen h-screen overflow-auto mb-4">
+        <div class="w-screen overflow-hidden flex items-center justify-center gap-[10%] my-8 mb-5 pb-4">
+            <button class="custom-box custom-right" @click="isModalVisible = true">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="32" viewBox="0 0 24 24">
                     <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                         stroke-width="1.5"
@@ -12,195 +11,227 @@
                 </svg>
                 <p class="font-poppins font-medium text-[13px] text-white">Filtre</p>
             </button>
-            <!-- {{ items[0].id }} -->
-            <button
-                class="custom-box custom-right"
-                @click="isQRcode = true">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
-                    viewBox="0 0 24 24"><!-- Icon from Lucide by Lucide Contributors - https://github.com/lucide-icons/lucide/blob/main/LICENSE -->
-                    <g fill="none" stroke="#ffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-                        <path
-                            d="M17 12v4a1 1 0 0 1-1 1h-4m5-14h2a2 2 0 0 1 2 2v2m-4 1V7m4 10v2a2 2 0 0 1-2 2h-2M3 7V5a2 2 0 0 1 2-2h2m0 14h.01M7 21H5a2 2 0 0 1-2-2v-2" />
-                        <rect width="5" height="5" x="7" y="7" rx="1" />
-                    </g>
-                </svg>
-            </button>
         </div>
-        <div class="w-screen h-full flex flex-col items-center space-y-3 shadow-xl">
-            <div v-for="item in items" :key="item.id"
-                class="w-[90%] rounded-2xl bg-sky-100 overflow-hidden flex flex-col text-sky-900" @click="$emit('changer-index', 1, item.id)">
+        <div v-if="hasError"
+            class="flex flex-col items-center justify-center text-red-500 text-sm font-bold px-4 py-3 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                viewBox="0 0 24 24"><!-- Icon from Lucide by Lucide Contributors - https://github.com/lucide-icons/lucide/blob/main/LICENSE -->
+                <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="m21.73 18l-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3M12 9v4m0 4h.01" />
+            </svg>
+            <p>Une erreur est survenue</p>
+        </div>
+        <div class="w-screen flex flex-col items-center space-y-3 mb-10">
+            <div v-for="item in items" :key="item.oc_asset_objectid"
+                class="w-[90%] rounded-2xl bg-sky-100  flex flex-col text-sky-900 ">
                 <div class="p-2">
                     <div class="w-full flex items-center justify-between">
-                        <p class="font-poppins font-semibold text-sm tracking-wider">{{ item.id }}</p>
-                        <p class="font-segoe font-normal text-xs tracking-wider">{{ item.date }}</p>
+                        <p class="font-poppins font-semibold text-sm tracking-wider">{{ item.oc_asset_code }}</p>
+                        <p class="font-poppins font-semibold text-xs tracking-wider">{{ item.oc_asset_nomenclature }}
+                        </p>
+                        <p class="font-segoe font-normal text-xs tracking-wider">{{ item.oc_asset_comment12 }}</p>
                     </div>
                     <div class="w-full flex flex-col items-start justify-center">
-                        <div class=" w-full h-[50%] flex items-end">
+                        <div class=" w-full  flex items-end">
                             <div class="flex items-center space-x-2">
-                                <p class="font-poppins font-semibold text-lg tracking-wider">{{ item.nom }}</p>
-                                <p class="font-poppins font-semibold text-xs tracking-wider">({{ item.code }})</p>
+                                <p class="font-poppins font-semibold text-lg tracking-wider">{{
+                                    getShortDescription(item.oc_asset_description) }}</p>
                             </div>
                         </div>
                         <div class=" w-full flex items-end">
-                            <p class="font-poppins text-xs tracking-wider flex items-end ">{{ item.localisation }}</p>
+                            <p class="font-poppins text-xs tracking-wider flex items-end ">{{ item.oc_asset_service }}
+                            </p>
                         </div>
                     </div>
                 </div>
-                <div class="w-full bg-green-800 flex items-center justify-between p-2 text-white font-poppins font-normal text-xs tracking-wider">
+                <div
+                    class="w-full bg-green-800 flex items-center justify-between p-2 text-white font-poppins font-normal text-xs tracking-wider rounded-b-lg ">
                     <p class="">Mise à jour</p>
-                    <p class="">{{ item.maj }}</p>
+                    <p class="">{{ datetime(item.oc_asset_updatetime) }}</p>
                 </div>
             </div>
         </div>
         <VueFinalModal v-model="isModalVisible" :click-to-close="true" class="flex justify-center items-end"
             transition="vfm-fade-in-up">
-            <div class="bg-white rounded-t-4xl shadow-lg  overflow-hidden">
+            <div class="modal-inner bg-white rounded-t-4xl shadow-lg transition-transform duration-300 ease-in-out"
+                :style="{ transform: isKeyboardVisible ? `translateY(-${keyboardHeight}px)` : 'translateY(0)' }">
                 <div class=" p-2 flex justify-center items-center">
                     <div class="w-[13vw] h-[5px] rounded-xl bg-sky-950"></div>
                 </div>
                 <div class="p-4 pt-0 space-y-4">
-                    <div class="flex items-center content-between!">
+                    <div class="flex items-center gap-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" @click="isModalVisible = false"
+                            viewBox="0 0 24 24">
+                            <path fill="none" stroke="#0c4a6e" stroke-linecap="round" stroke-width="2"
+                                d="M20 20L4 4m16 0L4 20" />
+                        </svg>
                         <p class="font-poppins text-3xl text-sky-900  font-extralight">Filtre</p>
                     </div>
                     <input type="text"
                         class="w-[100%]  rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
-                        placeholder="Nomanclature">
+                        placeholder="Nomanclature" v-model="oc_asset_nomenclature">
                     <input type="text"
                         class="w-[100%]  rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
-                        placeholder="Description">
+                        placeholder="Description" v-model="oc_asset_description">
                     <input type="text"
                         class="w-[100%]  rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
-                        placeholder="Fournisseur">
+                        placeholder="Fournisseur" v-model="oc_asset_supplieruid">
                     <div class="w-[100%]  flex space-x-7 ">
                         <input type="number"
                             class="w-[45%]  rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
-                            placeholder="code">
+                            placeholder="code" v-model="oc_asset_code">
                         <input type="number"
                             class="w-[45%]  rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
-                            placeholder="Numéro de série">
+                            placeholder="Numéro de série" v-model="oc_asset_serial">
                     </div>
                     <div class="w-[100%]  flex space-x-7 ">
                         <input type="date"
                             class="w-[45%]  rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
-                            placeholder="Nomanclature">
+                            placeholder="Nomanclature" v-model="oc_asset_purchasedate__gte">
                         <input type="date"
                             class="w-[45%]  rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
-                            placeholder="Nomanclature">
+                            placeholder="Nomanclature" v-model="oc_asset_purchasedate__lte">
                     </div>
                     <div class="flex gap-5 ">
                         <button class="py-3 rounded-lg bg-sky-950 m-0 font-bold text-white grow basis-1">Vider</button>
-                        <button class="py-3 rounded-lg bg-sky-950 font-bold text-white grow basis-1">Recherche</button>
+                        <button class="py-3 rounded-lg bg-sky-950 font-bold text-white grow basis-1" @click="FiltrerEquipement">Recherche</button>
                     </div>
-                </div>
-            </div>
-        </VueFinalModal>
-        <VueFinalModal v-model="isQRcode" :click-to-close="true" class="flex items-center justify-center">
-            <div class="h-100 w-80 bg-white shadow-lg overflow-hidden flex flex-col justify-center items-center">
-                <video ref="video" class="w-full h-64 object-cover" autoplay></video>
-                <canvas ref="canvas" class="hidden"></canvas>
-                <div v-if="decodedContent" class="mt-4 text-green-600 font-semibold">
-                    QR Code détecté : {{ decodedContent }}
                 </div>
             </div>
         </VueFinalModal>
     </div>
+    </Base>
 </template>
 
 
 <script>
+import Base from '../Base.vue'
+import axios from '../../axios'
 import { VueFinalModal } from 'vue-final-modal'
-import jsQR from 'jsqr'
+import { Keyboard } from '@capacitor/keyboard'
 
 export default {
     components: {
-        VueFinalModal,
+        VueFinalModal, Base
     },
     data() {
         return {
             isModalVisible: false,
-            isQRcode: false,
             decodedContent: '',
-            items: [
-                {
-                    id: '1.10658',
-                    date: '12-02-2023',
-                    nom: 'centrifugeuse',
-                    code: 'ERTF',
-                    localisation: 'BI.BU.MUHDRWIBAGA.10 - LABORATOIRE',
-                    maj: '12-02-2023'
-                },
-                {
-                    id: '1.10640',
-                    date: '12-02-2023',
-                    nom: 'centrifugeuse',
-                    code: 'ERTF',
-                    localisation: 'BI.BU.MUHDRWIBAGA.10 - LABORATOIRE',
-                    maj: '12-02-2023'
-                },
-                {
-                    id: '1.10660',
-                    date: '12-02-2023',
-                    nom: 'centrifugeuse',
-                    code: 'ERTF',
-                    localisation: 'BI.BU.MUHDRWIBAGA.10 - LABORATOIRE',
-                    maj: '12-02-2023'
-                }
-            ],
+            isKeyboardVisible: false,
+            keyboardHeight: 0,
+            items: [],
             scanInterval: null,
-            stream: null
+            stream: null,
+            errorMessage: '',
+            hasError: false,
+            oc_asset_serial: '',
+            oc_asset_code: '',
+            oc_asset_purchasedate__lte: '',
+            oc_asset_nomenclature: '',
+            oc_asset_purchasedate__gte: '',
+            oc_asset_supplieruid: '',
+            oc_asset_description: ''
+
         }
     },
     methods: {
-        async startScanner() {
+        async FiltrerEquipement() {
             try {
-                this.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-                this.$refs.video.srcObject = this.stream
+                const params = {
+                    oc_asset_code: this.oc_asset_code || '',
+                    oc_asset_nomenclature: this.oc_asset_nomenclature || '',
+                    oc_asset_purchasedate__gte: this.oc_asset_purchasedate__gte || '',
+                    oc_asset_purchasedate__lte: this.oc_asset_purchasedate__lte || '',
+                    oc_asset_serial: this.oc_asset_serial || '',
+                    oc_asset_supplieruid: this.oc_asset_supplieruid || '',
+                    oc_asset_description: this.oc_asset_description || '',
+                };
 
-                this.scanInterval = setInterval(() => {
-                    const video = this.$refs.video
-                    const canvas = this.$refs.canvas
-                    const context = canvas.getContext('2d')
-                    canvas.width = video.videoWidth
-                    canvas.height = video.videoHeight
-                    context.drawImage(video, 0, 0, canvas.width, canvas.height)
-                    const imageData = context.getImageData(0, 0, canvas.width, canvas.height)
-                    const code = jsQR(imageData.data, canvas.width, canvas.height)
-                    if (code) {
-                        this.decodedContent = code.data
-                        this.stopScanner()
-                        this.isQRcode = false
-                    }
-                }, 500)
+                const response = await axios.get("/oc_assetshistory/", { params });
+                this.items = response.data.results;
+                this.isModalVisible = false
             } catch (error) {
-                console.error('Erreur lors de l’accès à la caméra :', error)
+                console.error("Erreur lors du filtrage :", error);
+                this.displayErrorOrRefreshToken(error, this.FiltrerEquipement);
             }
         },
-        stopScanner() {
-            if (this.scanInterval) {
-                clearInterval(this.scanInterval)
-                this.scanInterval = null
+        handleResize() {
+            const currentHeight = window.innerHeight;
+            const heightDiff = this.windowHeight - currentHeight;
+
+            if (heightDiff > 150) {
+                this.isKeyboardVisible = true;
+                this.keyboardHeight = heightDiff;
+            } else {
+                this.isKeyboardVisible = false;
+                this.keyboardHeight = 0;
             }
-            if (this.stream) {
-                this.stream.getTracks().forEach(track => track.stop())
-                this.stream = null
+        },
+        handleKeyboardShow(event) {
+            if (event?.keyboardHeight) {
+                this.keyboardHeight = event.keyboardHeight;
             }
+            this.isKeyboardVisible = true;
+        },
+        handleKeyboardHide() {
+            this.isKeyboardVisible = false;
+            this.keyboardHeight = 0;
+        },
+        Getinventaire() {
+            axios.get(`/oc_assetshistory/`)
+                .then((reponse) => {
+                    this.items = reponse.data.results
+                    this.$store.state.equipement_inventaire = reponse.data.results;
+                    // if (store.state.online !== false) {
+                    // }
+                    console.log(this.items)
+                })
+                .catch((error) => {
+                    console.error("Erreur lors de la récupération de l'inventaire :", error);
+                    this.hasError = true;
+                });
         }
     },
-    watch: {
-        isQRcode(newVal) {
-            if (newVal) {
-                this.startScanner()
-            } else {
-                this.stopScanner()
-            }
+    mounted() {
+        this.windowHeight = window.innerHeight;
+        window.addEventListener('resize', this.handleResize);
+        Keyboard.addListener('keyboardWillShow', this.handleKeyboardShow);
+        Keyboard.addListener('keyboardWillHide', this.handleKeyboardHide);
+        window.addEventListener('online', this.getOperation);
+        if (this.$store.state.equipement_inventaire.length === 0) {
+            this.Getinventaire()
+        } else {
+            this.items = this.$store.state.equipement_inventaire
         }
+        const numero = this.$route.query.numero
+        console.log('Numéro reçu en query :', numero)
     },
     beforeUnmount() {
-        this.stopScanner()
-    }
+        window.removeEventListener('resize', this.handleResize);
+        Keyboard.removeAllListeners();
+        window.removeEventListener('online', this.getOperation);
+    },
 }
 </script>
 
 
 
-<style scoped></style>
+<style scoped>
+.modal-inner.vfm-fade-in-up-enter-active,
+.modal-inner.vfm-fade-in-up-leave-active {
+    transition: opacity 2s ease, transform 2s ease;
+}
+
+.modal-inner.vfm-fade-in-up-enter-from,
+.modal-inner.vfm-fade-in-up-leave-to {
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+.modal-inner.vfm-fade-in-up-enter-to,
+.modal-inner.vfm-fade-in-up-leave-from {
+    opacity: 1;
+    transform: translateY(10);
+}
+</style>

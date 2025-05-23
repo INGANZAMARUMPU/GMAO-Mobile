@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">GmAo</string>
-    <string name="title_activity_main">GmAo</string>
+    <string name="app_name">GMAO</string>
+    <string name="title_activity_main">GMAO</string>
     <string name="package_name">com.openclinic.app</string>
     <string name="custom_url_scheme">com.openclinic.app</string>
 </resources>
