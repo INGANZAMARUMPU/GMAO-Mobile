@@ -16,5 +16,10 @@ export default {
         timeStyle: "short",
       }).format(date);
     },
+    getDecimalPart(number) {
+      const str = number.toString();
+      const parts = str.split('.');
+      return parts.length > 1 ? parts[1] : null;
+    }
   },
 };

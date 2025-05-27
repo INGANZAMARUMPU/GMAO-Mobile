@@ -26,8 +26,6 @@ axios.interceptors.request.use(
     return Promise.reject(error);
   }
 );
-
-// Intercepteur de réponse
 axios.interceptors.response.use(
   (response) => {
     store.state.is_loading = false;

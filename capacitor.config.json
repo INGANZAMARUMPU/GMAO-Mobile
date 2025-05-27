@@ -1,5 +1,13 @@
 {
   "appId": "com.openclinic.app",
   "appName": "GMAO",
-  "webDir": "dist"
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "plugins": {
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#ffffFF",
+      "overlaysWebView": false
+    }
+  }
 }

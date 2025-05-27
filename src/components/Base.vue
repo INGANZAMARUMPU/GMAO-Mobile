@@ -7,14 +7,14 @@
                 </div>
                 <div class="justify-between items-center flex gap-3 p-5">
                     <div class="">
-                        <p class="font-segoe-ui-variable font-semibold text-[12px] ">Nzeyimana Jean
+                        <p class="font-segoe-ui-variable font-semibold text-[10px] "> {{ this.$store.state.user.fullname }}
                         </p>
-                        <p for="" class="font-segoe-ui-variable font-light text-[10px] sm:text-[10px]">Technicien
+                        <p for="" class="font-segoe-ui-variable font-light text-[10px] sm:text-[10px]"> {{ this.$store.state.user.businessfunction }}
                             Electronique</p>
                     </div>
                     <div class="">
                         <div class=" w-full h-full  flex items-center justify-center bg-white rounded-2xl"
-                            @click="navigate('/')">
+                            @click="logout">
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
                                 <path fill="none" stroke="#014268" stroke-linecap="round" stroke-linejoin="round"
                                     stroke-width="2" d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4m7 14l5-5l-5-5m5 5H9" />
@@ -24,31 +24,33 @@
                 </div>
             </div>
             <div class="relative flex justify-center items-center">
-                <input type="text" name="" id="" placeholder="Recherche par numero"
-                    class="w-84 rounded-sm outline-2 outline-sky-800 text-[13px] font-poppins font-normal px-4 py-3.5 "
-                    v-model="search_equipement">
-                <div class="absolute right-5 mx-2 flex bg-sky-900 p-2  justify-center items-center rounded-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" @click="Getinventaire"
-                        viewBox="0 0 24 24"><!-- Icon from Lucide by Lucide Contributors - https://github.com/lucide-icons/lucide/blob/main/LICENSE -->
-                        <g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-                            <circle cx="11" cy="11" r="8" />
-                            <path d="m21 21l-4.3-4.3" />
-                        </g>
-                    </svg>
+                <div class="flex justify-end items-center">
+                    <input type="number" name="" id="" placeholder="Recherche par numero"
+                        class="w-84 rounded-sm outline-2 outline-sky-800 text-[13px] font-poppins font-normal px-4 py-3.5 "
+                        v-model="search_equipement">
+                    <div class="absolute  mx-2 flex bg-sky-900 p-2  justify-center items-center rounded-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" @click="Getinventaire"
+                            viewBox="0 0 24 24">
+                            <g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                                <circle cx="11" cy="11" r="8" />
+                                <path d="m21 21l-4.3-4.3" />
+                            </g>
+                        </svg>
+                    </div>
                 </div>
-                <button class="custom-box custom-bottom" @click="isQRcode = true">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
-                        viewBox="0 0 24 24"><!-- Icon from Lucide by Lucide Contributors - https://github.com/lucide-icons/lucide/blob/main/LICENSE -->
-                        <g fill="none" stroke="#ffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-                            <path
-                                d="M17 12v4a1 1 0 0 1-1 1h-4m5-14h2a2 2 0 0 1 2 2v2m-4 1V7m4 10v2a2 2 0 0 1-2 2h-2M3 7V5a2 2 0 0 1 2-2h2m0 14h.01M7 21H5a2 2 0 0 1-2-2v-2" />
-                            <rect width="5" height="5" x="7" y="7" rx="1" />
-                        </g>
-                    </svg>
-                </button>
             </div>
+            <button class="custom-box custom-bottom" @click="isQRcode = true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                    viewBox="0 0 24 24">
+                    <g fill="none" stroke="#ffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                        <path
+                            d="M17 12v4a1 1 0 0 1-1 1h-4m5-14h2a2 2 0 0 1 2 2v2m-4 1V7m4 10v2a2 2 0 0 1-2 2h-2M3 7V5a2 2 0 0 1 2-2h2m0 14h.01M7 21H5a2 2 0 0 1-2-2v-2" />
+                        <rect width="5" height="5" x="7" y="7" rx="1" />
+                    </g>
+                </svg>
+            </button>
         </div>
-        <div class="h-[90%] overflow-hidden">
+        <div class="h-[90%] overflow-auto">
             <slot v-if="activeSlot === 1" name="slot1"></slot>
             <slot v-else-if="activeSlot === 2" name="slot2"></slot>
             <slot v-else-if="activeSlot === 3" name="slot3"></slot>
@@ -57,7 +59,7 @@
 
         <div class=" bottom-0 bg-sky-900  ">
             <div class="w-screen flex items-end justify-between px-6">
-                <div class="flex flex-col items-center gap-1" @click="navigate('/equipement')">
+                <div class="flex flex-col items-center gap-1" @click="navigate('/')">
                     <div :class="[
                         'w-7 h-1 rounded-2xl mt-0.5 ',
                         activeSlot === 1 ? 'bg-amber-50' : ''
@@ -139,6 +141,7 @@
 </template>
 
 <script>
+import axios from '../axios';
 import { VueFinalModal } from 'vue-final-modal'
 import jsQR from 'jsqr'
 export default {
@@ -171,23 +174,30 @@ export default {
         }
     },
     methods: {
+        logout() {
+            this.$store.state.user = null;
+            window.localStorage.removeItem("user");
+
+        },
         Getinventaire() {
-            axios.get(`/oc_assetshistory/?oc_asset_code=${this.search_equipement}`)
+            console.log('bonjour')
+            axios.get(`/oc_assetshistory/?search=${this.search_equipement}`)
                 .then((reponse) => {
                     this.$store.state.equipement_inventaire = reponse.data.results
                     this.$router.push({ path: '/Inventaire' })
                     console.log(this.items)
                 })
-            axios.get(`/oc_maintenanceoperations/?oc_asset_code=${this.search_equipement}`)
+            axios.get(`/oc_maintenanceoperations/?search=${this.search_equipement}`)
                 .then((reponse) => {
                     this.$store.state.Operation = reponse.data.results
                     console.log(this.items)
                 })
-            axios.get(`/oc_maintenanceplanshistory/?oc_maintenanceplan_assetuid=${this.search_equipement}`)
+            axios.get(`/oc_maintenanceplanshistory/?search=${this.search_equipement}`)
                 .then((reponse) => {
                     this.$store.state.PlanMaintance = reponse.data.results
                     console.log(this.items)
                 })
+                
         },
         navigate(path) {
             if (this.$route.path !== path) {

@@ -20,14 +20,18 @@
                 <p class="font-poppins font-medium text-[13px] text-white">Nouveau</p>
             </button>
         </div>
-        <div v-if="hasError"
-            class="flex flex-col items-center justify-center text-red-500 text-sm font-bold px-4 py-3 mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
-                viewBox="0 0 24 24"><!-- Icon from Lucide by Lucide Contributors - https://github.com/lucide-icons/lucide/blob/main/LICENSE -->
-                <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="m21.73 18l-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3M12 9v4m0 4h.01" />
-            </svg>
-            <p>Une erreur est survenue</p>
+        <div v-if="hasError" class="erreur">
+            <div class="message">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                    viewBox="0 0 24 24"><!-- Icon from Lucide by Lucide Contributors - https://github.com/lucide-icons/lucide/blob/main/LICENSE -->
+                    <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                        stroke-width="2"
+                        d="m21.73 18l-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3M12 9v4m0 4h.01" />
+                </svg>
+                <p>Une erreur est survenue</p>
+                <p class="text-[8px]">veuillez contacter la direction s'il vous plait</p>
+                <p class="text-[8px]">ou veuiller vérifier l'état de votre connexion</p>
+            </div>
         </div>
         <div v-if="items.length" class="w-screen flex flex-col items-center space-y-3 mb-4">
             <div v-for="item in items" :key="item.oc_maintenanceoperation_objectid"
@@ -78,7 +82,7 @@
                             v-html="formatInstructions(plus.oc_maintenanceoperation_comment)"></p>
                     </div>
                     <div class="flex gap-5">
-                        <button class="font-normal text-red-500 grow basis-1" @click="isInfo = false">Fermer</button>
+                        <button class="font-normal text-slate-300 grow basis-1" @click="isInfo = false">Fermer</button>
                     </div>
                 </div>
             </div>
@@ -100,7 +104,7 @@
                         <p class="font-poppins text-3xl text-sky-900  font-extralight">Filtre</p>
                     </div>
                     <!-- <input type="text"
-                        class="w-[100%]  rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
+                        class="w-full  rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
                         placeholder="Service et structure"> -->
                     <input type="text"
                         class="w-[100%]  rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
@@ -151,7 +155,7 @@
                             d="M12 9v2m0 4h.01M4.93 4.93a10 10 0 0114.14 0 10 10 0 010 14.14 10 10 0 01-14.14 0 10 10 0 010-14.14z">
                         </path>
                     </svg>
-                    <p>Une erreur est survenue</p>
+                    <p>Une erreur de frappe</p>
                 </div>
     </div>
     </VueFinalModal>
@@ -160,8 +164,7 @@
         <div class="w-screen flex items-center justify-center gap-[10%] my-8">
             <button class="fixed left-4 p-2 bg-sky-900 rounded-xl flex justify-center items-center space-x-2 z-50"
                 @click="showNewView = false">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
-                    viewBox="0 0 24 24"><!-- Icon from Lucide by Lucide Contributors - https://github.com/lucide-icons/lucide/blob/main/LICENSE -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
                     <path fill="none" stroke="#ffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="m15 18l-6-6l6-6" />
                 </svg>
@@ -174,10 +177,10 @@
                 </svg>
             </button>
         </div>
-        <div class="overflow-auto p-4">
-            <div class="p-4 pt-0 space-y-4">
+        <div class="overflow-auto">
+            <div class="px-3 pt-0 space-y-4 my-4">
                 <div class="flex items-center content-between!">
-                    <p class="font-poppins text-3xl text-sky-900  font-extralight">Opération de maintenance</p>
+                    <p class="font-poppins text-[26px] text-sky-900  font-extralight">Opération de maintenance</p>
                 </div>
                 <div class="">
                     <p class="m-0 ">Référence inventaire</p>
@@ -192,53 +195,47 @@
                     </div>
                 </div>
                 <input type="text"
-                    class="w-[100%]  rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
+                    class="w-full  rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
                     placeholder="Plan de maintenance">
-                <input type="text"
-                    class="w-[100%]  rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
-                    placeholder="Prestataire externe">
-                <input type="date"
-                    class="w-[100%]  rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none p-2 mb-1"
-                    placeholder="Technicien interne">
-                <p class="m-0">Période d'intervention</p>
-                <div class="w-[100%]  flex space-x-7 ">
-                    <input type="date"
-                        class="w-[45%]  rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
-                        placeholder="">
-                    <input type="date"
-                        class="w-[45%]  rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
-                        placeholder="">
-                </div>
+
                 <select name="" id=""
-                    class="w-[100%]  rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none p-2">
-                    <option value="">Type</option>
-                    <option value="">Maintenance préventive</option>
+                    class="w-full rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
+                    v-model="frequency">
+                    <option value="">Frequency</option>
+                    <option value="defect">Défectueux</option>
+                    <option value="ok">ok</option>
+                    <option value="revsion">Révision nécessaire</option>
                 </select>
+                <div class="relative flex justify-center items-center">
+                    <div class="w-full flex justify-end items-center">
+                        <input type="date"
+                            class="w-full  rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none p-2">
+                            <div class="absolute flex justify-center items-center rounded-sm px-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                                    viewBox="0 0 24 24"><!-- Icon from Material Symbols by Google - https://github.com/google/material-design-icons/blob/master/LICENSE -->
+                                    <path fill="#014268"
+                                        d="M12 14q-.425 0-.712-.288T11 13t.288-.712T12 12t.713.288T13 13t-.288.713T12 14m-4 0q-.425 0-.712-.288T7 13t.288-.712T8 12t.713.288T9 13t-.288.713T8 14m8 0q-.425 0-.712-.288T15 13t.288-.712T16 12t.713.288T17 13t-.288.713T16 14m-4 4q-.425 0-.712-.288T11 17t.288-.712T12 16t.713.288T13 17t-.288.713T12 18m-4 0q-.425 0-.712-.288T7 17t.288-.712T8 16t.713.288T9 17t-.288.713T8 18m8 0q-.425 0-.712-.288T15 17t.288-.712T16 16t.713.288T17 17t-.288.713T16 18M5 22q-.825 0-1.412-.587T3 20V6q0-.825.588-1.412T5 4h1V2h2v2h8V2h2v2h1q.825 0 1.413.588T21 6v14q0 .825-.587 1.413T19 22zm0-2h14V10H5z" />
+                                </svg>
+                            </div>
+                    </div>
+                </div>
                 <textarea v-model="commentaire" rows="6" placeholder="Écrivez votre commentaire ici..."
                     class="w-full p-3 border-2 border-sky-900 rounded-lg resize-y  focus:border-3 focus:border-sky-900 focus:outline-none   text-gray-800" />
-
-                <input type="date"
-                    class="w-[100%]  rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
-                    placeholder="Fournisseur">
                 <div class="flex items-center content-between!">
                     <p class="font-poppins text-3xl text-sky-900  font-extralight">Coût</p>
                 </div>
-                <div class="w-[100%]  flex space-x-7 ">
-                    <input type="number"
-                        class="w-[45%]  rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
-                        placeholder="Transport">
-                    <input type="number"
-                        class="w-[45%]  rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
-                        placeholder="Prestataire">
-                </div>
-                <div class="w-[100%]  flex space-x-7 ">
-                    <input type="number"
-                        class="w-[45%]  rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
-                        placeholder="Consommable">
-                    <input type="number"
-                        class="w-[45%]  rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
-                        placeholder="Autre">
-                </div>
+                <input type="number" v-model="transport"
+                    class="w-full rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none py-2 pl-3"
+                    placeholder="Transport">
+                <input type="number" v-model="prestataire"
+                    class="w-full rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none py-2 pl-3"
+                    placeholder="Préstataire">
+                <input type="number" v-model="consommable"
+                    class="w-full rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none py-2 pl-3"
+                    placeholder="Consommable">
+                <input type="number" v-model="Autre"
+                    class="w-full rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none py-2 pl-3"
+                    placeholder="Autre">
                 <div class="flex items-center content-between!">
                     <p class="font-poppins text-3xl text-sky-900  font-extralight">Info récentes</p>
                 </div>
@@ -287,6 +284,7 @@ export default {
             oc_maintenanceoperation_date__gte: "",
             oc_maintenanceoperation_date__lte: "",
             oc_maintenanceoperation_operator: "",
+            previousOperationSnapshot: null,
         }
     },
     methods: {
@@ -317,7 +315,6 @@ export default {
             axios.get(`/oc_maintenanceoperations/`)
                 .then((reponse) => {
                     this.items = reponse.data.results
-                    // this.hasError = true;
                     this.$store.state.Operation = reponse.data.results
                     console.log(this.items)
                 }).catch((error) => {
@@ -364,6 +361,7 @@ export default {
             this.getOperation()
         } else {
             this.items = this.$store.state.Operation
+            this.previousOperationSnapshot = JSON.stringify(this.$store.state.Operation);
             console.log(this.$store.state.Operation)
         }
     },
@@ -371,6 +369,27 @@ export default {
         window.removeEventListener('resize', this.handleResize);
         Keyboard.removeAllListeners();
     },
+    computed: {
+        equipementInventaire() {
+            return this.$store.state.equipement_inventaire;
+        }
+    },
+    watch: {
+        equipementInventaire: {
+            handler(newVal) {
+                const newSnapshot = JSON.stringify(newVal);
+                if (newSnapshot === this.previousInventaireSnapshot) {
+                    console.log("Aucun changement détecté.");
+                } else {
+                    console.log("🎉 Nouvelle(s) donnée(s) détectée(s) !");
+                    console.log("Nouvelles données :", newVal);
+                    this.items = newVal;
+                    this.previousInventaireSnapshot = newSnapshot;
+                }
+            },
+            deep: true
+        }
+    }
 }
 </script>
 

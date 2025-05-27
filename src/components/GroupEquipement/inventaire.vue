@@ -12,18 +12,22 @@
                 <p class="font-poppins font-medium text-[13px] text-white">Filtre</p>
             </button>
         </div>
-        <div v-if="hasError"
-            class="flex flex-col items-center justify-center text-red-500 text-sm font-bold px-4 py-3 mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
-                viewBox="0 0 24 24"><!-- Icon from Lucide by Lucide Contributors - https://github.com/lucide-icons/lucide/blob/main/LICENSE -->
-                <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="m21.73 18l-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3M12 9v4m0 4h.01" />
-            </svg>
-            <p>Une erreur est survenue</p>
+        <div v-if="hasError" class="erreur">
+            <div class="message">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                    viewBox="0 0 24 24"><!-- Icon from Lucide by Lucide Contributors - https://github.com/lucide-icons/lucide/blob/main/LICENSE -->
+                    <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                        stroke-width="2"
+                        d="m21.73 18l-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3M12 9v4m0 4h.01" />
+                </svg>
+                <p>Une erreur est survenue</p>
+                <p class="text-[8px]">veuillez contacter la direction s'il vous plait</p>
+                <p class="text-[8px]">ou veuiller vérifier l'état de votre connexion</p>
+            </div>
         </div>
         <div class="w-screen flex flex-col items-center space-y-3 mb-10">
             <div v-for="item in items" :key="item.oc_asset_objectid"
-                class="w-[90%] rounded-2xl bg-sky-100  flex flex-col text-sky-900 ">
+                class="w-[90%] rounded-2xl bg-sky-100  flex flex-col text-sky-900 " @click="selectItem(item)">
                 <div class="p-2">
                     <div class="w-full flex items-center justify-between">
                         <p class="font-poppins font-semibold text-sm tracking-wider">{{ item.oc_asset_code }}</p>
@@ -84,17 +88,30 @@
                             class="w-[45%]  rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
                             placeholder="Numéro de série" v-model="oc_asset_serial">
                     </div>
-                    <div class="w-[100%]  flex space-x-7 ">
-                        <input type="date"
-                            class="w-[45%]  rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
-                            placeholder="Nomanclature" v-model="oc_asset_purchasedate__gte">
-                        <input type="date"
-                            class="w-[45%]  rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
-                            placeholder="Nomanclature" v-model="oc_asset_purchasedate__lte">
+                    <div class="w-[100%] flex space-x-7 ">
+                        <div class="relatif flex overflow-hideen items-center justify-end">
+                            <input type="date" name="" id="" v-model="oc_asset_purchasedate__gte"
+                                class="rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2 grow basis-1">
+                            <span class="absolute p-1"> <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                                    viewBox="0 0 24 24"><!-- Icon from Material Symbols by Google - https://github.com/google/material-design-icons/blob/master/LICENSE -->
+                                    <path fill="#014268"
+                                        d="M12 14q-.425 0-.712-.288T11 13t.288-.712T12 12t.713.288T13 13t-.288.713T12 14m-4 0q-.425 0-.712-.288T7 13t.288-.712T8 12t.713.288T9 13t-.288.713T8 14m8 0q-.425 0-.712-.288T15 13t.288-.712T16 12t.713.288T17 13t-.288.713T16 14m-4 4q-.425 0-.712-.288T11 17t.288-.712T12 16t.713.288T13 17t-.288.713T12 18m-4 0q-.425 0-.712-.288T7 17t.288-.712T8 16t.713.288T9 17t-.288.713T8 18m8 0q-.425 0-.712-.288T15 17t.288-.712T16 16t.713.288T17 17t-.288.713T16 18M5 22q-.825 0-1.412-.587T3 20V6q0-.825.588-1.412T5 4h1V2h2v2h8V2h2v2h1q.825 0 1.413.588T21 6v14q0 .825-.587 1.413T19 22zm0-2h14V10H5z" />
+                                </svg></span>
+                        </div>
+                        <div class="relatif flex overflow-hideen items-center justify-end">
+                            <input type="date" name="" id="" v-model="oc_asset_purchasedate__lte"
+                                class="rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2 grow basis-1">
+                            <span class="absolute p-1"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                                    viewBox="0 0 24 24"><!-- Icon from Material Symbols by Google - https://github.com/google/material-design-icons/blob/master/LICENSE -->
+                                    <path fill="#014268"
+                                        d="M12 14q-.425 0-.712-.288T11 13t.288-.712T12 12t.713.288T13 13t-.288.713T12 14m-4 0q-.425 0-.712-.288T7 13t.288-.712T8 12t.713.288T9 13t-.288.713T8 14m8 0q-.425 0-.712-.288T15 13t.288-.712T16 12t.713.288T17 13t-.288.713T16 14m-4 4q-.425 0-.712-.288T11 17t.288-.712T12 16t.713.288T13 17t-.288.713T12 18m-4 0q-.425 0-.712-.288T7 17t.288-.712T8 16t.713.288T9 17t-.288.713T8 18m8 0q-.425 0-.712-.288T15 17t.288-.712T16 16t.713.288T17 17t-.288.713T16 18M5 22q-.825 0-1.412-.587T3 20V6q0-.825.588-1.412T5 4h1V2h2v2h8V2h2v2h1q.825 0 1.413.588T21 6v14q0 .825-.587 1.413T19 22zm0-2h14V10H5z" />
+                                </svg></span>
+                        </div>
                     </div>
                     <div class="flex gap-5 ">
                         <button class="py-3 rounded-lg bg-sky-950 m-0 font-bold text-white grow basis-1">Vider</button>
-                        <button class="py-3 rounded-lg bg-sky-950 font-bold text-white grow basis-1" @click="FiltrerEquipement">Recherche</button>
+                        <button class="py-3 rounded-lg bg-sky-950 font-bold text-white grow basis-1"
+                            @click="FiltrerEquipement">Recherche</button>
                     </div>
                 </div>
             </div>
@@ -131,11 +148,15 @@ export default {
             oc_asset_nomenclature: '',
             oc_asset_purchasedate__gte: '',
             oc_asset_supplieruid: '',
-            oc_asset_description: ''
-
+            oc_asset_description: '',
+            previousInventaireSnapshot: null,
         }
     },
     methods: {
+        selectItem(item) {
+            this.$store.state.code_inventaire = item
+            this.$router.push('/Plan')
+        },
         async FiltrerEquipement() {
             try {
                 const params = {
@@ -203,6 +224,7 @@ export default {
             this.Getinventaire()
         } else {
             this.items = this.$store.state.equipement_inventaire
+            this.previousInventaireSnapshot = JSON.stringify(this.$store.state.equipement_inventaire);
         }
         const numero = this.$route.query.numero
         console.log('Numéro reçu en query :', numero)
@@ -212,6 +234,27 @@ export default {
         Keyboard.removeAllListeners();
         window.removeEventListener('online', this.getOperation);
     },
+    computed: {
+        equipementInventaire() {
+            return this.$store.state.equipement_inventaire;
+        }
+    },
+    watch: {
+        equipementInventaire: {
+            handler(newVal) {
+                const newSnapshot = JSON.stringify(newVal);
+                if (newSnapshot === this.previousInventaireSnapshot) {
+                    console.log("Aucun changement détecté.");
+                } else {
+                    console.log("🎉 Nouvelle(s) donnée(s) détectée(s) !");
+                    console.log("Nouvelles données :", newVal);
+                    this.items = newVal;
+                    this.previousInventaireSnapshot = newSnapshot;
+                }
+            },
+            deep: true
+        }
+    }
 }
 </script>
 

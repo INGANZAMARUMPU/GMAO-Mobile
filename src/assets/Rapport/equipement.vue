@@ -94,7 +94,6 @@ export default {
             transitionDirection: 'left',
             isModalVisible: false,
             activeSlot: 'Equipement',
-            isQRcode: false,
             isKeyboardVisible: false,
             keyboardHeight: 0,
             search_equipement: '',
@@ -121,24 +120,6 @@ export default {
         prevSlot() {
             this.transitionDirection = 'right'
             this.index = (this.index - 1 + this.slots.length) % this.slots.length
-        },
-        Getinventaire() {
-            axios.get(`/oc_assets/?oc_asset_code=${this.search_equipement}`)
-                .then((reponse) => {
-                    this.$store.state.equipement_inventaire = reponse.data.results
-                    this.$router.push({ path: '/Inventaire' })
-                    console.log(this.items)
-                })
-            axios.get(`/oc_assetshistory/?oc_asset_code=${this.search_equipement}`)
-                .then((reponse) => {
-                    this.$store.state.Operation = reponse.data.results
-                    console.log(this.items)
-                })
-            axios.get(`/oc_maintenanceplanshistory/?oc_maintenanceplan_assetuid=${this.search_equipement}`)
-                .then((reponse) => {
-                    this.$store.state.PlanMaintance = reponse.data.results
-                    console.log(this.items)
-                })
         },
         handleResize() {
             const currentHeight = window.innerHeight;

@@ -9,7 +9,10 @@ const store = createStore({
       equipement_inventaire:[],
       PlanMaintance:[],
       Operation:[],
+      code_inventaire: [],
+      user: null,
       is_loading : false,
+      static:[]
 
     }
   },
@@ -24,7 +27,14 @@ const store = createStore({
     getSearchEquipement(state) {
       return state.search_equipement
     }
+  },
+  setUser(state, user) {
+    state.user = user;
+  },
+  setLoading(state, status) {
+    state.is_loading = status;
   }
+
 })
 
 export default store
