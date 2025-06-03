@@ -8,7 +8,7 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().setNavigationBarColor(Color.parseColor("#024973"));
+        getWindow().setNavigationBarColor(Color.parseColor("#014268"));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
     }

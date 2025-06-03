@@ -20,10 +20,10 @@
                 <p class="font-poppins font-medium text-[13px] text-white">Nouveau</p>
             </button>
         </div>
-        <div v-if="hasError" class="erreur">
+        <!-- <div v-if="hasError" class="erreur">
             <div class="message">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
-                    viewBox="0 0 24 24"><!-- Icon from Lucide by Lucide Contributors - https://github.com/lucide-icons/lucide/blob/main/LICENSE -->
+                    viewBox="0 0 24 24">
                     <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                         stroke-width="2"
                         d="m21.73 18l-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3M12 9v4m0 4h.01" />
@@ -32,27 +32,28 @@
                 <p class="text-[8px]">veuillez contacter la direction s'il vous plait</p>
                 <p class="text-[8px]">ou veuiller vérifier l'état de votre connexion</p>
             </div>
-        </div>
+        </div> -->
         <div v-if="items.length" class="w-screen flex flex-col items-center space-y-3 mb-4">
-            <div v-for="item in items" :key="item.oc_maintenanceoperation_objectid"
-                class="w-[90%] rounded-2xl bg-sky-100 flex flex-col text-sky-900 p-2" @click="PlusInfo(item)">
+            <div v-if="this.$store.state.code_plan[0]?.oc_maintenanceplan_assetuid" v-for="item in filteredItems"
+                :key="item.oc_maintenanceoperation_objectid"
+                class="w-[95%] rounded-2xl bg-sky-100 flex flex-col text-sky-900 p-2" @click="PlusInfo(item)">
                 <div class="w-full flex items-center justify-between">
                     <p class="font-poppins font-semibold text-sm tracking-wider">{{
                         item.oc_maintenanceoperation_maintenanceplanuid }}</p>
                     <!-- <p class="font-poppins font-semibold text-xs tracking-wider">{{ item.oc_asset_nomenclature
                     }}</p> -->
                     <p class="font-poppins font-normal text-xs tracking-wider">{{
-                        datetime(item.oc_maintenanceoperation_date) }}</p>
+                        datetime(item.oc_maintenanceoperation_historydate) }}</p>
                 </div>
                 <div class="w-full flex flex-col items-start justify-center">
                     <div class=" w-full  flex  flex-col">
                         <div class="flex items-center space-x-2">
-                            <p class="font-poppins font-semibold text-lg tracking-wider">{{
-                                item.oc_maintenanceoperation_name }}
+                            <p class="font-poppins text-[11px] tracking-wider description">{{
+                                item.oc_maintenanceoperation_comment || `(Aucun commentaire)` }}
                             </p>
                         </div>
                         <div class="flex space-x-32">
-                            <p class="font-poppins font-normal text-xs tracking-wider">{{ item.coding }}</p>
+                            <p class="font-poppins font-normal text-xs tracking-wider ">{{ item.coding }}</p>
                         </div>
                     </div>
                 </div>
@@ -62,6 +63,9 @@
                     <p class="font-poppins font-normal text-xs tracking-wider">{{ item.oc_maintenanceoperation_result }}
                     </p>
                 </div>
+            </div>
+            <div v-else class="">
+                <p class="text-sky-900 text-[12px]">veuillez tout d'abord choisir un plan de maintenance</p>
             </div>
         </div>
         <VueFinalModal v-model="isInfo" :click-to-close="true" class="flex justify-center items-center"
@@ -77,88 +81,80 @@
                         </svg>
                         <p class="font-poppins text-3xl text-sky-900  font-extralight">Plus d'infos</p>
                     </div>
-                    <div class="overflow-auto max-h-50 rounded p-2">
+                    <div class="overflow-auto max-h-90 rounded p-2 py-[12px]">
                         <p class="font-poppins leading-5 font-base"
                             v-html="formatInstructions(plus.oc_maintenanceoperation_comment)"></p>
                     </div>
-                    <div class="flex gap-5">
-                        <button class="font-normal text-slate-300 grow basis-1" @click="isInfo = false">Fermer</button>
+                    <div class="flex justify-center px-4 pt-3 pb-0 gap-9">
+                        <button
+                            class="font-normal text-slate-300 py-1 text-slate-500 active:text-sky-800 active:bg-sky-500/30 active:border-1 active:border-sky-500/30  rounded-md grow basis-1 max-w-30"
+                            @click="isInfo = false">Fermer</button>
                     </div>
                 </div>
             </div>
         </VueFinalModal>
-        <VueFinalModal v-model="isModalVisible" :click-to-close="true" class="flex justify-center items-end"
+        <VueFinalModal v-model="isModalVisible" :click-to-close="true" class=" !w-full flex flex-col justify-end"
             transition="vfm-fade-in-up">
-            < <div class="bg-white rounded-t-4xl shadow-lg transition-transform duration-300 ease-in-out"
+            <div class="w-full bg-white rounded-t-4xl shadow-lg transition-transform duration-300 ease-in-out"
                 :style="{ transform: isKeyboardVisible ? `translateY(-${keyboardHeight}px)` : 'translateY(0)' }">
                 <div class=" p-2 flex justify-center items-center">
-                    <div class="w-[13vw] h-[5px] rounded-xl bg-sky-950"></div>
+                    <div class="w-[13vw] h-[5px] rounded-xl bg-sky-950" @click="isModalVisible = false"></div>
                 </div>
-                <div class="p-4 pt-0 space-y-4">
-                    <div class="flex items-center gap-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" @click="isModalVisible = false"
-                            viewBox="0 0 24 24"><!-- Icon from Akar Icons by Arturo Wibawa - https://github.com/artcoholic/akar-icons/blob/master/LICENSE -->
+                <div class="px-2 pt-0 space-y-2">
+                    <div class="flex items-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="27" height="27" @click="isModalVisible = false"
+                            viewBox="0 0 24 24">
                             <path fill="none" stroke="#0c4a6e" stroke-linecap="round" stroke-width="2"
                                 d="M20 20L4 4m16 0L4 20" />
                         </svg>
                         <p class="font-poppins text-3xl text-sky-900  font-extralight">Filtre</p>
                     </div>
-                    <!-- <input type="text"
-                        class="w-full  rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
-                        placeholder="Service et structure"> -->
                     <input type="text"
-                        class="w-[100%]  rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
-                        placeholder="Référence inventaire" v-model="oc_maintenanceoperation_maintenanceplanuid">
-                    <!-- <input type="text"
-                        class="w-[100%]  rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
-                        placeholder="Plan de maintenance"> -->
-                    <input type="text"
-                        class="w-[100%]  rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
-                        placeholder="Technicien interne" v-model="oc_maintenanceoperation_operator">
+                        class="w-[100%]  rounded-lg border-2 border-[rgb(116,175,209)] focus:border-2 focus:border-sky-900 focus:outline-none py-1 px-2"
+                        placeholder="Nomanclature" v-model="oc_maintenanceoperation_maintenanceplanuid">
+                    <input type="text" v-model="oc_maintenanceoperation_operator"
+                        class="w-[100%]  rounded-lg border-2 border-[rgb(116,175,209)] focus:border-2 focus:border-sky-900 focus:outline-none py-1 px-2"
+                        placeholder="Opérateur">
                     <select name="" id=""
-                        class="w-[100%]  rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2">
-                        <option value="">-------</option>
-                        <option value="">Révision necessaire</option>
+                        class="w-[100%]  rounded-lg border-2 border-[rgb(116,175,209)] focus:border-2 focus:border-sky-900 focus:outline-none py-1 px-2"
+                        v-model="oc_maintenanceoperation_result__icontains">
+                        <option value="">Frequency</option>
+                        <option value="defect">Défectueux</option>
+                        <option value="ok">ok</option>
+                        <option value="revsion">Révision nécessaire</option>
                     </select>
-                    <div class="w-[100%] flex space-x-7 ">
-                        <div class="relatif flex overflow-hideen items-center justify-end">
-                            <input type="date" name="" id="" v-model="oc_maintenanceoperation_date__gte"
-                                class="rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2 grow basis-1">
-                            <span class="absolute p-1"> <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
-                                    viewBox="0 0 24 24"><!-- Icon from Material Symbols by Google - https://github.com/google/material-design-icons/blob/master/LICENSE -->
-                                    <path fill="#014268"
-                                        d="M12 14q-.425 0-.712-.288T11 13t.288-.712T12 12t.713.288T13 13t-.288.713T12 14m-4 0q-.425 0-.712-.288T7 13t.288-.712T8 12t.713.288T9 13t-.288.713T8 14m8 0q-.425 0-.712-.288T15 13t.288-.712T16 12t.713.288T17 13t-.288.713T16 14m-4 4q-.425 0-.712-.288T11 17t.288-.712T12 16t.713.288T13 17t-.288.713T12 18m-4 0q-.425 0-.712-.288T7 17t.288-.712T8 16t.713.288T9 17t-.288.713T8 18m8 0q-.425 0-.712-.288T15 17t.288-.712T16 16t.713.288T17 17t-.288.713T16 18M5 22q-.825 0-1.412-.587T3 20V6q0-.825.588-1.412T5 4h1V2h2v2h8V2h2v2h1q.825 0 1.413.588T21 6v14q0 .825-.587 1.413T19 22zm0-2h14V10H5z" />
-                                </svg></span>
+                    <div class="w-[100%]  flex justify-between ">
+                        <div class="w-[48%] relative flex items-center">
+                            <input type="date" v-model="oc_maintenanceoperation_date__gte"
+                                class="relative w-full rounded-lg border-2 border-[rgb(116,175,209)] focus:border-2 focus:border-sky-900 focus:outline-none py-1 "
+                                placeholder="code">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" class="absolute right-[2px]"
+                                viewBox="0 0 24 24">
+                                <path fill="#014268"
+                                    d="M12 14q-.425 0-.712-.288T11 13t.288-.712T12 12t.713.288T13 13t-.288.713T12 14m-4 0q-.425 0-.712-.288T7 13t.288-.712T8 12t.713.288T9 13t-.288.713T8 14m8 0q-.425 0-.712-.288T15 13t.288-.712T16 12t.713.288T17 13t-.288.713T16 14m-4 4q-.425 0-.712-.288T11 17t.288-.712T12 16t.713.288T13 17t-.288.713T12 18m-4 0q-.425 0-.712-.288T7 17t.288-.712T8 16t.713.288T9 17t-.288.713T8 18m8 0q-.425 0-.712-.288T15 17t.288-.712T16 16t.713.288T17 17t-.288.713T16 18M5 22q-.825 0-1.412-.587T3 20V6q0-.825.588-1.412T5 4h1V2h2v2h8V2h2v2h1q.825 0 1.413.588T21 6v14q0 .825-.587 1.413T19 22zm0-2h14V10H5z" />
+                            </svg>
                         </div>
-                        <div class="relatif flex overflow-hideen items-center justify-end">
-                            <input type="date" name="" id="" v-model="oc_maintenanceoperation_date__lte"
-                                class="rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2 grow basis-1">
-                            <span class="absolute p-1"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
-                                    viewBox="0 0 24 24"><!-- Icon from Material Symbols by Google - https://github.com/google/material-design-icons/blob/master/LICENSE -->
-                                    <path fill="#014268"
-                                        d="M12 14q-.425 0-.712-.288T11 13t.288-.712T12 12t.713.288T13 13t-.288.713T12 14m-4 0q-.425 0-.712-.288T7 13t.288-.712T8 12t.713.288T9 13t-.288.713T8 14m8 0q-.425 0-.712-.288T15 13t.288-.712T16 12t.713.288T17 13t-.288.713T16 14m-4 4q-.425 0-.712-.288T11 17t.288-.712T12 16t.713.288T13 17t-.288.713T12 18m-4 0q-.425 0-.712-.288T7 17t.288-.712T8 16t.713.288T9 17t-.288.713T8 18m8 0q-.425 0-.712-.288T15 17t.288-.712T16 16t.713.288T17 17t-.288.713T16 18M5 22q-.825 0-1.412-.587T3 20V6q0-.825.588-1.412T5 4h1V2h2v2h8V2h2v2h1q.825 0 1.413.588T21 6v14q0 .825-.587 1.413T19 22zm0-2h14V10H5z" />
-                                </svg></span>
+                        <div class="w-[48%] relative flex items-center">
+                            <input type="date" v-model="oc_maintenanceoperation_date__lte"
+                                class="relative w-full rounded-lg border-2 border-[rgb(116,175,209)] focus:border-2 focus:border-sky-900 focus:outline-none py-1 "
+                                placeholder="code">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" class="absolute right-[2px]"
+                                viewBox="0 0 24 24">
+                                <path fill="#014268"
+                                    d="M12 14q-.425 0-.712-.288T11 13t.288-.712T12 12t.713.288T13 13t-.288.713T12 14m-4 0q-.425 0-.712-.288T7 13t.288-.712T8 12t.713.288T9 13t-.288.713T8 14m8 0q-.425 0-.712-.288T15 13t.288-.712T16 12t.713.288T17 13t-.288.713T16 14m-4 4q-.425 0-.712-.288T11 17t.288-.712T12 16t.713.288T13 17t-.288.713T12 18m-4 0q-.425 0-.712-.288T7 17t.288-.712T8 16t.713.288T9 17t-.288.713T8 18m8 0q-.425 0-.712-.288T15 17t.288-.712T16 16t.713.288T17 17t-.288.713T16 18M5 22q-.825 0-1.412-.587T3 20V6q0-.825.588-1.412T5 4h1V2h2v2h8V2h2v2h1q.825 0 1.413.588T21 6v14q0 .825-.587 1.413T19 22zm0-2h14V10H5z" />
+                            </svg>
                         </div>
                     </div>
                     <div class="flex gap-5 ">
-                        <button class="py-3 rounded-lg bg-sky-950 m-0 font-bold text-white grow basis-1">Vider</button>
-                        <button class="py-3 rounded-lg bg-sky-950 font-bold text-white grow basis-1"
+                        <button
+                            class="py-1.5 my-1 rounded-lg border-1 border-[#014268] m-0 font-bold text-[#014268] active:text-[#fff] active:bg-[#014268] grow basis-1">Vider</button>
+                        <button
+                            class="py-1.5 my-1 rounded-lg bg-[#014268] font-bold text-white grow basis-1 active:text-[#014268] active:bg-[#ffff] active:border-1 active:border-[#014268]"
                             @click="FiltrerMaintenanceOperations">Recherche</button>
                     </div>
                 </div>
-                <div v-if="hasError"
-                    class="flex items-center bg-red-500 text-white text-sm font-bold px-4 py-3 rounded mb-4"
-                    role="alert">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M12 9v2m0 4h.01M4.93 4.93a10 10 0 0114.14 0 10 10 0 010 14.14 10 10 0 01-14.14 0 10 10 0 010-14.14z">
-                        </path>
-                    </svg>
-                    <p>Une erreur de frappe</p>
-                </div>
-    </div>
-    </VueFinalModal>
+            </div>
+        </VueFinalModal>
     </div>
     <div class="w-screen" v-else>
         <div class="w-screen flex items-center justify-center gap-[10%] my-8">
@@ -167,13 +163,6 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
                     <path fill="none" stroke="#ffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="m15 18l-6-6l6-6" />
-                </svg>
-            </button>
-            <button class="fixed right-4 p-2 bg-sky-900 rounded-xl flex justify-center items-center space-x-2 z-50"
-                @click="handleNewItem">
-                <svg width="30" height="30" viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M29.1665 27.7084H11.6665M29.1665 17.5H5.83318M29.1665 7.29171H17.4998" stroke="white"
-                        stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
             </button>
         </div>
@@ -185,62 +174,67 @@
                 <div class="">
                     <p class="m-0 ">Référence inventaire</p>
                     <div class="flex ">
-                        <p class="m-0 font-semibold">1.32479</p>
+                        <!-- <p class="ml-2 font-semibold">{{ this.$store.state.code_plan.oc_maintenanceplan_assetuid }}</p> -->
+                        <input type="text" name="" id="" v-model="refe" placeholder="Référence inventaire"
+                            class="w-full  rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none p-2 mt-2">
                     </div>
                 </div>
                 <div class="">
                     <p class="m-0 ">Date plan comptable</p>
                     <div class="flex ">
-                        <p class="ml-2 font-semibold">1-02-2019</p>
+                        <p class="ml-2 font-semibold">{{
+                            datetime(this.$store.state.code_plan[0]?.oc_maintenanceplan_historydate) }}</p>
                     </div>
                 </div>
                 <input type="text"
                     class="w-full  rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
-                    placeholder="Plan de maintenance">
+                    placeholder="Supplier" v-model="oc_maintenanceoperation_supplier">
 
                 <select name="" id=""
                     class="w-full rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
-                    v-model="frequency">
-                    <option value="">Frequency</option>
+                    v-model="oc_maintenanceoperation_result">
+                    <option value="">Resultat</option>
                     <option value="defect">Défectueux</option>
                     <option value="ok">ok</option>
                     <option value="revsion">Révision nécessaire</option>
                 </select>
-                <div class="relative flex justify-center items-center">
+                <!-- <div class="relative flex justify-center items-center">
                     <div class="w-full flex justify-end items-center">
                         <input type="date"
                             class="w-full  rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none p-2">
-                            <div class="absolute flex justify-center items-center rounded-sm px-1">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
-                                    viewBox="0 0 24 24"><!-- Icon from Material Symbols by Google - https://github.com/google/material-design-icons/blob/master/LICENSE -->
-                                    <path fill="#014268"
-                                        d="M12 14q-.425 0-.712-.288T11 13t.288-.712T12 12t.713.288T13 13t-.288.713T12 14m-4 0q-.425 0-.712-.288T7 13t.288-.712T8 12t.713.288T9 13t-.288.713T8 14m8 0q-.425 0-.712-.288T15 13t.288-.712T16 12t.713.288T17 13t-.288.713T16 14m-4 4q-.425 0-.712-.288T11 17t.288-.712T12 16t.713.288T13 17t-.288.713T12 18m-4 0q-.425 0-.712-.288T7 17t.288-.712T8 16t.713.288T9 17t-.288.713T8 18m8 0q-.425 0-.712-.288T15 17t.288-.712T16 16t.713.288T17 17t-.288.713T16 18M5 22q-.825 0-1.412-.587T3 20V6q0-.825.588-1.412T5 4h1V2h2v2h8V2h2v2h1q.825 0 1.413.588T21 6v14q0 .825-.587 1.413T19 22zm0-2h14V10H5z" />
-                                </svg>
-                            </div>
+                        <div class="absolute flex justify-center items-center rounded-sm px-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                                viewBox="0 0 24 24">
+                                <path fill="#014268"
+                                    d="M12 14q-.425 0-.712-.288T11 13t.288-.712T12 12t.713.288T13 13t-.288.713T12 14m-4 0q-.425 0-.712-.288T7 13t.288-.712T8 12t.713.288T9 13t-.288.713T8 14m8 0q-.425 0-.712-.288T15 13t.288-.712T16 12t.713.288T17 13t-.288.713T16 14m-4 4q-.425 0-.712-.288T11 17t.288-.712T12 16t.713.288T13 17t-.288.713T12 18m-4 0q-.425 0-.712-.288T7 17t.288-.712T8 16t.713.288T9 17t-.288.713T8 18m8 0q-.425 0-.712-.288T15 17t.288-.712T16 16t.713.288T17 17t-.288.713T16 18M5 22q-.825 0-1.412-.587T3 20V6q0-.825.588-1.412T5 4h1V2h2v2h8V2h2v2h1q.825 0 1.413.588T21 6v14q0 .825-.587 1.413T19 22zm0-2h14V10H5z" />
+                            </svg>
+                        </div>
                     </div>
-                </div>
-                <textarea v-model="commentaire" rows="6" placeholder="Écrivez votre commentaire ici..."
+                </div> -->
+                <textarea v-model="oc_maintenanceoperation_comment" rows="6"
+                    placeholder="Écrivez votre commentaire ici..."
                     class="w-full p-3 border-2 border-sky-900 rounded-lg resize-y  focus:border-3 focus:border-sky-900 focus:outline-none   text-gray-800" />
                 <div class="flex items-center content-between!">
                     <p class="font-poppins text-3xl text-sky-900  font-extralight">Coût</p>
                 </div>
-                <input type="number" v-model="transport"
+                <input type="number" v-model="oc_maintenanceoperation_comment1"
                     class="w-full rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none py-2 pl-3"
                     placeholder="Transport">
-                <input type="number" v-model="prestataire"
+                <input type="number" v-model="oc_maintenanceoperation_comment5"
                     class="w-full rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none py-2 pl-3"
                     placeholder="Préstataire">
-                <input type="number" v-model="consommable"
+                <input type="number" v-model="oc_maintenanceoperation_comment2"
                     class="w-full rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none py-2 pl-3"
                     placeholder="Consommable">
-                <input type="number" v-model="Autre"
+                <input type="number" v-model="oc_maintenanceoperation_comment3"
                     class="w-full rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none py-2 pl-3"
                     placeholder="Autre">
                 <div class="flex items-center content-between!">
                     <p class="font-poppins text-3xl text-sky-900  font-extralight">Info récentes</p>
                 </div>
                 <div class="flex gap-5 ">
-                    <button class="py-3 rounded-lg bg-sky-950 font-bold text-white grow basis-1">Sauvegarder</button>
+                    <button class="py-3 rounded-lg bg-sky-950 font-bold text-white grow basis-1"
+                        @click="postPlan">Sauvegarder</button>
                 </div>
             </div>
         </div>
@@ -267,8 +261,32 @@ export default {
     },
     computed: {
         filteredItems() {
-            if (!this.nom) return this.items
-            return this.items.filter(item => item.nom == this.nom)
+            const code = this.$store.state.code_plan[0]?.oc_maintenanceplan_assetuid
+            if (!code) {
+                return this.items
+            }
+            return this.items.filter(item =>
+                item.oc_maintenanceoperation_maintenanceplanuid = code
+            )
+        },
+        equipementInventaire() {
+            return this.$store.state.equipement_inventaire;
+        }
+    },
+    watch: {
+        equipementInventaire: {
+            handler(newVal) {
+                const newSnapshot = JSON.stringify(newVal);
+                if (newSnapshot === this.previousInventaireSnapshot) {
+                    console.log("Aucun changement détecté.");
+                } else {
+                    console.log("🎉 Nouvelle(s) donnée(s) détectée(s) !");
+                    console.log("Nouvelles données :", newVal);
+                    this.items = newVal;
+                    this.previousInventaireSnapshot = newSnapshot;
+                }
+            },
+            deep: true
         }
     },
     data() {
@@ -285,6 +303,15 @@ export default {
             oc_maintenanceoperation_date__lte: "",
             oc_maintenanceoperation_operator: "",
             previousOperationSnapshot: null,
+            oc_maintenanceoperation_supplier: '',
+            oc_maintenanceoperation_result: '',
+            oc_maintenanceoperation_comment1: '',
+            oc_maintenanceoperation_comment2: '',
+            oc_maintenanceoperation_comment3: '',
+            oc_maintenanceoperation_comment5: '',
+            oc_maintenanceoperation_comment: '',
+            refe: this.$store.state.code_plan[0]?.oc_maintenanceplan_assetuid,
+
         }
     },
     methods: {
@@ -341,15 +368,52 @@ export default {
             }
         },
         handleKeyboardShow(event) {
-            if (event?.keyboardHeight) {
-                this.keyboardHeight = event.keyboardHeight;
-            }
             this.isKeyboardVisible = true;
+            this.keyboardHeight = event.keyboardHeight;
         },
         handleKeyboardHide() {
             this.isKeyboardVisible = false;
             this.keyboardHeight = 0;
         },
+        async postPlan() {
+            const data = {
+                'oc_maintenanceoperation_maintenanceplanuid': this.refe,
+                'oc_maintenanceoperation_operator': this.$store.state.code_plan.oc_maintenanceplan_operator,
+                'oc_maintenanceoperation_result': this.oc_maintenanceoperation_result,
+                'oc_maintenanceoperation_comment': this.oc_maintenanceoperation_comment,
+                'oc_maintenanceoperation_comment1': this.oc_maintenanceoperation_comment1,
+                'oc_maintenanceoperation_comment2': this.oc_maintenanceoperation_comment2,
+                'oc_maintenanceoperation_comment3': this.oc_maintenanceoperation_comment3,
+                'oc_maintenanceoperation_comment5': this.oc_maintenanceoperation_comment5,
+            };
+            const url = '/oc_maintenanceoperations/';
+            if (!navigator.onLine) {
+                const stored = JSON.parse(localStorage.getItem('offlineRequests') || '[]');
+                stored.push({
+                    method: 'post',
+                    url,
+                    data
+                });
+                localStorage.setItem('offlineRequests', JSON.stringify(stored));
+                console.log("Requête stockée hors ligne :", data);
+                this.items.unshift(data);
+                this.showNewView = false;
+                localStorage.setItem('operation_temp', JSON.stringify(data));
+
+                console.warn("Requête enregistrée localement. Elle sera envoyée une fois la connexion rétablie.");
+                return;
+            }
+            try {
+                const response = await axios.post(url, data);
+                this.items.unshift(response.data);
+                this.showNewView = false;
+                localStorage.setItem('operation', JSON.stringify(response.data));
+            } catch (error) {
+                console.error("Erreur lors de l'envoi de l'opération :", error);
+                this.hasError = true;
+            }
+        }
+
 
     },
     mounted() {
@@ -366,30 +430,9 @@ export default {
         }
     },
     beforeUnmount() {
-        window.removeEventListener('resize', this.handleResize);
         Keyboard.removeAllListeners();
     },
-    computed: {
-        equipementInventaire() {
-            return this.$store.state.equipement_inventaire;
-        }
-    },
-    watch: {
-        equipementInventaire: {
-            handler(newVal) {
-                const newSnapshot = JSON.stringify(newVal);
-                if (newSnapshot === this.previousInventaireSnapshot) {
-                    console.log("Aucun changement détecté.");
-                } else {
-                    console.log("🎉 Nouvelle(s) donnée(s) détectée(s) !");
-                    console.log("Nouvelles données :", newVal);
-                    this.items = newVal;
-                    this.previousInventaireSnapshot = newSnapshot;
-                }
-            },
-            deep: true
-        }
-    }
+
 }
 </script>
 

@@ -1,27 +1,29 @@
 <template>
-    <div class="w-screen h-screen overflow-hidden bg-sky-950 flex justify-center items-center"
-        >
+    <div class="w-screen h-screen overflow-hidden bg-[#014268] flex justify-center items-center">
         <img src="../assets/view/img/Frame 38.png" alt="" class="fixed">
         <div class="w-80 h-100 bg-white relative rounded-2xl shadow-black shadow-2xl flex overflow-hidden flex-col"
-        :style="{ transform: isKeyboardVisible ? `translateY(-100px)` : 'translateY(0)' }">
-            <div class="w-full h-[40%] flex justify-center items-center">
+            :style="{ transform: isKeyboardVisible ? `translateY(-100px)` : 'translateY(0)' }">
+            <div class="w-full flex justify-center items-center">
                 <img src="../assets/view/img/unnamed.jpg" alt="" class="w-[50%]">
             </div>
-            <div class="w-full h-[35%] flex flex-col items-center space-y-5 justify-center text-sm"
-            >
+            <div class="w-full flex flex-col items-center space-y-5 justify-center text-sm">
                 <input type="number" v-model="userid"
-                    class="w-[90%] h-[35%] rounded-lg bg-sky-200 p-2 font-bold active:border-sky-800 outline-none"
+                    class="w-[90%] py-3 rounded-lg bg-sky-200 p-2 font-bold active:border-sky-800 outline-none"
                     placeholder="Nom de l'utilisateur">
                 <input type="password" v-model="password"
-                    class="w-[90%] h-[35%] rounded-lg bg-sky-200 p-2 font-bold text-sm active:border-sky-800 outline-none"
+                    class="w-[90%] py-3 rounded-lg bg-sky-200 p-2 font-bold text-sm active:border-sky-800 outline-none"
                     placeholder="Mot de passe">
             </div>
-            <div class=" w-full h-[25%] flex justify-center items-center">
+            <div class=" w-full flex justify-center items-center mt-10">
                 <button
-                    class="w-[50%] h-[50%] bg-sky-950 rounded-lg font-Orbitron text-white tracking-wider shadow-slate-400 shadow-xl"
+                    class="w-[50%] py-3 bg-sky-950 rounded-lg font-Orbitron text-white tracking-wider shadow-slate-400 shadow-xl"
                     @click="postLogin">connecter</button>
             </div>
+        <div class="py-9">
+            <loading v-if="this.$store.state.is_loading" />
         </div>
+        </div>
+        {{ this.$store.state.user }}
     </div>
 
 </template>
@@ -29,7 +31,12 @@
 <script>
 import { Keyboard } from '@capacitor/keyboard'
 import axios from '../axios';
+import loading from '../components/loading.vue'
+
 export default {
+    components:{
+        loading
+    },
     data() {
         return {
             isKeyboardVisible: false,

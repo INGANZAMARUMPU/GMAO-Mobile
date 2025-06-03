@@ -19,7 +19,7 @@
                 <p class="font-poppins font-medium text-[13px] text-white">Nouveau</p>
             </button>
         </div>
-        <div v-if="hasError" class="erreur">
+        <!-- <div v-if="hasError" class="erreur">
             <div class="message">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
                     <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
@@ -30,14 +30,15 @@
                 <p class="text-[8px]">veuillez contacter la direction s'il vous plait</p>
                 <p class="text-[8px]">ou veuiller vérifier l'état de votre connexion</p>
             </div>
-        </div>
+        </div> -->
         <div class="w-screen flex flex-col items-center space-y-3 mb-4">
             <div v-for="item in filteredItems" :key="item.oc_maintenanceplan_objectid"
-                class="w-[90%] rounded-2xl bg-sky-100  flex flex-col text-sky-900 p-2" @click="PlusInfo(item)">
+                class="w-[95%] rounded-2xl bg-sky-100  flex flex-col text-sky-900 p-2" @click="PlusInfo(item)">
                 <div class="w-full flex items-center justify-between">
                     <p class="font-poppins font-semibold text-sm tracking-wider">{{ item.oc_maintenanceplan_assetuid }}
                     </p>
-                    <p class="font-poppins font-normal text-xs tracking-wider">{{ item.oc_maintenanceplan_comment1 }}
+                    <p class="font-poppins font-normal text-xs tracking-wider">{{
+                        datetime(item.oc_maintenanceplan_updatetime) }}
                     </p>
                 </div>
                 <div class="w-full flex flex-col items-start justify-center">
@@ -53,21 +54,23 @@
                                 </svg></p>
                         </div>
                         <div class="flex justify-between">
+                            <p class="font-poppins text-[10px] tracking-wider description">{{
+                                item.oc_maintenanceplan_instructions || `(Aucune instruction)` }}</p>
                         </div>
                     </div>
                 </div>
                 <div class="w-full flex items-center justify-between font-poppins font-normal text-[12px]">
                     <p class="font-poppins">{{ item.oc_maintenanceplan_operator }}</p>
-                    <p class="font-poppins">{{ datetime(item.oc_maintenanceplan_updatetime) }}</p>
+                    <p class="font-poppins">{{ datetime(item.oc_maintenanceplan_historydate) }}</p>
                 </div>
             </div>
         </div>
         <VueFinalModal v-model="isInfo" :click-to-close="true" class="flex justify-center items-center"
             transition="vfm-fade-in-up">
-            <div class="w-80 max-h-80 bg-white rounded-xl shadow-lg transition-transform duration-300 ease-in-out overflow-hidden"
+            <div class="w-80 max-h-full bg-white rounded-xl shadow-lg transition-transform duration-300 ease-in-out overflow-hidden"
                 :style="{ transform: isKeyboardVisible ? `translateY(-${keyboardHeight}px)` : 'translateY(0)' }">
                 <div class="py-4 px-4 ">
-                    <div class="flex items-center gap-3 pb-3">
+                    <div class="flex items-center pb-2 gap-3">
                         <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
                             viewBox="0 0 24 24"><!-- Icon from Material Symbols by Google - https://github.com/google/material-design-icons/blob/master/LICENSE -->
                             <path fill="#014268"
@@ -75,100 +78,91 @@
                         </svg>
                         <p class="font-poppins text-3xl text-sky-900  font-extralight">Plus d'infos</p>
                     </div>
-                    <div class="overflow-auto max-h-50 rounded p-2">
+                    <div class="overflow-auto max-h-90 rounded p-2 py-[12px]">
                         <p class="font-poppins leading-5 font-base"
                             v-html="formatInstructions(plus.oc_maintenanceplan_instructions)"></p>
                     </div>
-                    <div class="flex gap-5">
-                        <button class="font-normal text-slate-300 grow basis-1" @click="isInfo = false">Fermer</button>
-                        <button class="font-normal text-sky-900 grow basis-1"
-                            @click="$router.push('/Operation')">Opération</button>
+                    <div class="flex justify-between px-4 pt-3 pb-0 gap-9">
+                        <button
+                            class="font-normal py-1 text-slate-500 active:text-sky-800 active:bg-sky-500/30 active:border-1 active:border-sky-500/30  rounded-md grow basis-1"
+                            @click="isInfo = false">Fermer</button>
+                        <button
+                            class="font-normal py-1 text-white bg-sky-800  rounded-md active:bg-sky-500/30  active:border-sky-800 active:text-sky-800 grow basis-1"
+                            @click="selectItem(items)">Opération</button>
                     </div>
                 </div>
             </div>
         </VueFinalModal>
-        <VueFinalModal v-model="isModalVisible" :click-to-close="true" class="flex justify-center items-end"
+        <VueFinalModal v-model="isModalVisible" :click-to-close="true" class=" !w-full flex flex-col justify-end"
             transition="vfm-fade-in-up">
-            < <div class="bg-white rounded-t-4xl shadow-lg transition-transform duration-300 ease-in-out"
+            <div class="w-full bg-white rounded-t-4xl shadow-lg transition-transform duration-300 ease-in-out"
                 :style="{ transform: isKeyboardVisible ? `translateY(-${keyboardHeight}px)` : 'translateY(0)' }">
                 <div class=" p-2 flex justify-center items-center">
-                    <div class="w-[13vw] h-[5px] rounded-xl bg-sky-950"></div>
+                    <div class="w-[13vw] h-[5px] rounded-xl bg-sky-950" @click="isModalVisible = false"></div>
                 </div>
-                <div class="p-4 pt-0 space-y-4">
-                    <div class="flex items-center gap-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" @click="isModalVisible = false"
-                            viewBox="0 0 24 24"><!-- Icon from Akar Icons by Arturo Wibawa - https://github.com/artcoholic/akar-icons/blob/master/LICENSE -->
+                <div class="px-2 pt-0 space-y-2">
+                    <div class="flex items-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="27" height="27" @click="isModalVisible = false"
+                            viewBox="0 0 24 24">
                             <path fill="none" stroke="#0c4a6e" stroke-linecap="round" stroke-width="2"
                                 d="M20 20L4 4m16 0L4 20" />
                         </svg>
                         <p class="font-poppins text-3xl text-sky-900  font-extralight">Filtre</p>
                     </div>
                     <!-- <input type="text"
-                        class="w-full  rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
-                        placeholder="Service et structure"> -->
-                    <input type="text"
-                        class="w-[100%]  rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
-                        placeholder="Nom" v-model="oc_maintenanceoperation_maintenanceplanuid">
-                    <!-- <input type="text"
-                        class="w-[100%]  rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
-                        placeholder="Plan de maintenance"> -->
-                    <input type="text"
-                        class="w-[100%]  rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
-                        placeholder="Opérateur" v-model="oc_maintenanceoperation_operator">
-                    <input type="text"
-                        class="w-[100%]  rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
-                        placeholder="Service ou structure" v-model="oc_maintenanceoperation_operator">
+                    class="w-[100%]  rounded-lg border-2 border-[rgb(116,175,209)] focus:border-2 focus:border-sky-900 focus:outline-none py-1 px-2"
+                    placeholder="Nomanclature" v-model="nomenclature"> -->
+                    <input type="text" v-model="oc_maintenanceplan_operator"
+                        class="w-[100%]  rounded-lg border-2 border-[rgb(116,175,209)] focus:border-2 focus:border-sky-900 focus:outline-none py-1 px-2"
+                        placeholder="Opérateur">
                     <select name="" id=""
-                        class="w-[100%]  rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2">
-                        <option value="">-------</option>
-                        <option value="">Révision necessaire</option>
+                        class="w-[100%]  rounded-lg border-2 border-[rgb(116,175,209)] focus:border-2 focus:border-sky-900 focus:outline-none py-1 px-2"
+                        v-model="oc_maintenanceplan_type__icontains">
+                        <option value="">Types</option>
+                        <option value="1">Contrôle</option>
+                        <option value="2">Maintenance</option>
+                        <option value="3">Curatif</option>
+                        <option value="99">Autre</option>
                     </select>
-                    <div class="w-[100%] flex space-x-7 ">
-                        <div class="relatif flex overflow-hideen items-center justify-end">
-                            <input type="date" name="" id="" v-model="oc_maintenanceoperation_date__gte"
-                                class="rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2 grow basis-1">
-                            <span class="absolute p-1"> <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
-                                    viewBox="0 0 24 24"><!-- Icon from Material Symbols by Google - https://github.com/google/material-design-icons/blob/master/LICENSE -->
-                                    <path fill="#014268"
-                                        d="M12 14q-.425 0-.712-.288T11 13t.288-.712T12 12t.713.288T13 13t-.288.713T12 14m-4 0q-.425 0-.712-.288T7 13t.288-.712T8 12t.713.288T9 13t-.288.713T8 14m8 0q-.425 0-.712-.288T15 13t.288-.712T16 12t.713.288T17 13t-.288.713T16 14m-4 4q-.425 0-.712-.288T11 17t.288-.712T12 16t.713.288T13 17t-.288.713T12 18m-4 0q-.425 0-.712-.288T7 17t.288-.712T8 16t.713.288T9 17t-.288.713T8 18m8 0q-.425 0-.712-.288T15 17t.288-.712T16 16t.713.288T17 17t-.288.713T16 18M5 22q-.825 0-1.412-.587T3 20V6q0-.825.588-1.412T5 4h1V2h2v2h8V2h2v2h1q.825 0 1.413.588T21 6v14q0 .825-.587 1.413T19 22zm0-2h14V10H5z" />
-                                </svg></span>
+                    <div class="w-[100%]  flex justify-between ">
+                        <div class="w-[48%] relative flex items-center">
+                            <input type="date" v-model="oc_maintenanceplan_historydate__gte"
+                                class="relative w-full rounded-lg border-2 border-[rgb(116,175,209)] focus:border-2 focus:border-sky-900 focus:outline-none py-1 "
+                                placeholder="code">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" class="absolute right-[2px]"
+                                viewBox="0 0 24 24">
+                                <path fill="#014268"
+                                    d="M12 14q-.425 0-.712-.288T11 13t.288-.712T12 12t.713.288T13 13t-.288.713T12 14m-4 0q-.425 0-.712-.288T7 13t.288-.712T8 12t.713.288T9 13t-.288.713T8 14m8 0q-.425 0-.712-.288T15 13t.288-.712T16 12t.713.288T17 13t-.288.713T16 14m-4 4q-.425 0-.712-.288T11 17t.288-.712T12 16t.713.288T13 17t-.288.713T12 18m-4 0q-.425 0-.712-.288T7 17t.288-.712T8 16t.713.288T9 17t-.288.713T8 18m8 0q-.425 0-.712-.288T15 17t.288-.712T16 16t.713.288T17 17t-.288.713T16 18M5 22q-.825 0-1.412-.587T3 20V6q0-.825.588-1.412T5 4h1V2h2v2h8V2h2v2h1q.825 0 1.413.588T21 6v14q0 .825-.587 1.413T19 22zm0-2h14V10H5z" />
+                            </svg>
                         </div>
-                        <div class="relatif flex overflow-hideen items-center justify-end">
-                            <input type="date" name="" id="" v-model="oc_maintenanceoperation_date__lte"
-                                class="rounded-lg border-2 border-sky-900 focus:border-3 focus:border-sky-900 focus:outline-none p-2 grow basis-1">
-                            <span class="absolute p-1"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
-                                    viewBox="0 0 24 24"><!-- Icon from Material Symbols by Google - https://github.com/google/material-design-icons/blob/master/LICENSE -->
-                                    <path fill="#014268"
-                                        d="M12 14q-.425 0-.712-.288T11 13t.288-.712T12 12t.713.288T13 13t-.288.713T12 14m-4 0q-.425 0-.712-.288T7 13t.288-.712T8 12t.713.288T9 13t-.288.713T8 14m8 0q-.425 0-.712-.288T15 13t.288-.712T16 12t.713.288T17 13t-.288.713T16 14m-4 4q-.425 0-.712-.288T11 17t.288-.712T12 16t.713.288T13 17t-.288.713T12 18m-4 0q-.425 0-.712-.288T7 17t.288-.712T8 16t.713.288T9 17t-.288.713T8 18m8 0q-.425 0-.712-.288T15 17t.288-.712T16 16t.713.288T17 17t-.288.713T16 18M5 22q-.825 0-1.412-.587T3 20V6q0-.825.588-1.412T5 4h1V2h2v2h8V2h2v2h1q.825 0 1.413.588T21 6v14q0 .825-.587 1.413T19 22zm0-2h14V10H5z" />
-                                </svg></span>
+                        <div class="w-[48%] relative flex items-center">
+                            <input type="date" v-model="oc_maintenanceplan_historydate__lte"
+                                class="relative w-full rounded-lg border-2 border-[rgb(116,175,209)] focus:border-2 focus:border-sky-900 focus:outline-none py-1 "
+                                placeholder="code">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" class="absolute right-[2px]"
+                                viewBox="0 0 24 24">
+                                <path fill="#014268"
+                                    d="M12 14q-.425 0-.712-.288T11 13t.288-.712T12 12t.713.288T13 13t-.288.713T12 14m-4 0q-.425 0-.712-.288T7 13t.288-.712T8 12t.713.288T9 13t-.288.713T8 14m8 0q-.425 0-.712-.288T15 13t.288-.712T16 12t.713.288T17 13t-.288.713T16 14m-4 4q-.425 0-.712-.288T11 17t.288-.712T12 16t.713.288T13 17t-.288.713T12 18m-4 0q-.425 0-.712-.288T7 17t.288-.712T8 16t.713.288T9 17t-.288.713T8 18m8 0q-.425 0-.712-.288T15 17t.288-.712T16 16t.713.288T17 17t-.288.713T16 18M5 22q-.825 0-1.412-.587T3 20V6q0-.825.588-1.412T5 4h1V2h2v2h8V2h2v2h1q.825 0 1.413.588T21 6v14q0 .825-.587 1.413T19 22zm0-2h14V10H5z" />
+                            </svg>
                         </div>
                     </div>
                     <div class="flex gap-5 ">
-                        <button class="py-3 rounded-lg bg-sky-950 m-0 font-bold text-white grow basis-1">Vider</button>
-                        <button class="py-3 rounded-lg bg-sky-950 font-bold text-white grow basis-1"
-                            @click="FiltrerMaintenanceOperations">Recherche</button>
+                        <button
+                            class="py-1.5 my-1 rounded-lg border-1 border-[#014268] m-0 font-bold text-[#014268] active:text-[#fff] active:bg-[#014268] grow basis-1">Vider</button>
+                        <button
+                            class="py-1.5 my-1 rounded-lg bg-[#014268] font-bold text-white grow basis-1 active:text-[#014268] active:bg-[#ffff] active:border-1 active:border-[#014268]"
+                            @click="FiltrerMaintenancePlan">Recherche</button>
                     </div>
                 </div>
-                <div v-if="hasError"
-                    class="flex items-center bg-red-500 text-white text-sm font-bold px-4 py-3 rounded mb-4"
-                    role="alert">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M12 9v2m0 4h.01M4.93 4.93a10 10 0 0114.14 0 10 10 0 010 14.14 10 10 0 01-14.14 0 10 10 0 010-14.14z">
-                        </path>
-                    </svg>
-                    <p>Une erreur de frappe</p>
-                </div>
-    </div>
-    </VueFinalModal>
+            </div>
+        </VueFinalModal>
 
     </div>
     <div class="" v-else>
-        <div v-if="hasError" class="erreur">
+        <!-- <div v-if="hasError" class="erreur">
             <div class="message">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
-                    viewBox="0 0 24 24"><!-- Icon from Lucide by Lucide Contributors - https://github.com/lucide-icons/lucide/blob/main/LICENSE -->
+                    viewBox="0 0 24 24">
                     <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                         stroke-width="2"
                         d="m21.73 18l-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3M12 9v4m0 4h.01" />
@@ -177,7 +171,7 @@
                 <p class="text-[8px]">veuillez contacter la direction s'il vous plait</p>
                 <p class="text-[8px]">ou veuiller vérifier l'état de votre connexion</p>
             </div>
-        </div>
+        </div> -->
         <div class="w-screen flex items-center justify-center gap-[10%] my-8">
             <button class="fixed left-4 p-2  bg-sky-900 rounded-xl flex justify-center items-center space-x-2 z-50"
                 @click="showNewView = false">
@@ -186,15 +180,9 @@
                         d="m15 18l-6-6l6-6" />
                 </svg>
             </button>
-            <button class="fixed right-4 p-2 bg-sky-900 rounded-xl flex justify-center items-center space-x-2 z-50"
-                @click="handleNewItem">
-                <svg width="30" height="30" viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M29.1665 27.7084H11.6665M29.1665 17.5H5.83318M29.1665 7.29171H17.4998" stroke="white"
-                        stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-            </button>
         </div>
         <div class="overflow-auto ">
+            {{ onLineStatus }}
             <div class="px-3 pt-0 space-y-4 my-4">
                 <div class="flex items-center content-between!">
                     <p class="font-poppins text-[29px] text-sky-900  font-extralight">Plan de maintenance</p>
@@ -239,14 +227,13 @@
                 <div class="">
                     <p class="m-0 ">Dernière modification par</p>
                     <div class="flex ">
-                        <p class="m-0 font-semibold">HAVYARIMANA LIBERE</p>
-                        <p class="ml-2">{{ items[0].maj }}</p>
+                        <!-- <p class="ml-2">{{ items[0].maj }}</p> -->
                     </div>
                 </div>
                 <div class="">
                     <p class="m-0 ">Date et heure de création</p>
                     <div class="flex ">
-                        <p class="ml-2">{{ items[0].maj }}</p>
+                        <!-- <p class="ml-2">{{ items[0].maj }}</p> -->
                     </div>
                 </div>
                 <div class="flex gap-5 ">
@@ -265,6 +252,8 @@ import axios from 'axios'
 import { VueFinalModal } from 'vue-final-modal'
 import { openDB } from 'idb';
 import { Keyboard } from '@capacitor/keyboard'
+import { addOfflineRequest, getAllRequests, deleteRequest } from '../../indexDb';
+
 
 export default {
     components: {
@@ -280,11 +269,14 @@ export default {
         filteredItems() {
             const code = this.$store.state.code_inventaire.oc_asset_code
             if (!code) {
-                return this.items 
+                return this.items
             }
             return this.items.filter(item =>
                 item.oc_maintenanceplan_assetuid = code
             )
+        },
+        onLineStatus() {
+            return navigator.onLine
         }
     },
     data() {
@@ -305,7 +297,10 @@ export default {
             items: [],
             isInfo: false,
             hasError: false,
-
+            oc_maintenanceplan_operator: '',
+            oc_maintenanceplan_type__icontains: '',
+            oc_maintenanceplan_historydate__gte: '',
+            oc_maintenanceplan_historydate__lte: ''
         }
     },
     methods: {
@@ -331,6 +326,10 @@ export default {
             this.isInfo = true
             this.plus = info
             console.log(this.plus)
+        },
+        selectItem(plus) {
+            this.$store.state.code_plan = plus
+            this.$router.push('/Operation')
         },
         openModal() {
             this.isModalVisible = true
@@ -359,79 +358,147 @@ export default {
                 console.log('Aucun plan trouvé pour cet ID');
             }
         },
+        // async postPlan() {
+        //     const data = {
+        //         'oc_maintenanceplan_assetuid': this.$store.state.code_inventaire.oc_asset_code,
+        //         'oc_maintenanceplan_operator': this.$store.state.user.fullname,
+        //         'oc_maintenanceplan_comment4': this.Autre,
+        //         'oc_maintenanceplan_comment1': this.consommable,
+        //         'oc_maintenanceplan_comment3': this.prestataire,
+        //         'oc_maintenanceplan_comment2': this.transport,
+        //         'oc_maintenanceplan_name': this.nom,
+        //         'oc_maintenanceplan_type': this.type,
+        //         'oc_maintenanceplan_instructions': this.commentaire,
+        //         'oc_maintenanceplan_frequency': this.frequency,
+        //     };
+        //     const url = '/oc_maintenanceplanshistory/';
+        //     if (!navigator.onLine) {
+        //         const stored = JSON.parse(localStorage.getItem('offlineRequests') || '[]');
+        //         stored.push({
+        //             method: 'post',
+        //             url,
+        //             data
+        //         });
+        //         localStorage.setItem('offlineRequests', JSON.stringify(stored));
+        //         this.items.unshift(data);
+        //         this.showNewView = false;
+        //         localStorage.setItem('plan_temp', JSON.stringify(data));
+
+        //         console.warn("Requête enregistrée localement. Elle sera envoyée quand la connexion sera rétablie.");
+        //         return;
+        //     }
+
+        //     try {
+        //         const response = await axios.post(url, data);
+        //         this.items.unshift(response.data);
+        //         this.showNewView = false;
+        //         localStorage.setItem('plan', JSON.stringify(response.data));
+        //     } catch (error) {
+        //         console.error("Erreur lors de la récupération de l'inventaire :", error);
+        //         this.hasError = true;
+        //     }
+        // },
         async postPlan() {
             const data = {
-                'oc_maintenanceplan_assetuid': this.$store.state.code_inventaire.oc_asset_code,
-                'oc_maintenanceplan_operator': this.$store.state.user.fullname,
-                'oc_maintenanceplan_comment4': this.Autre,
-                'oc_maintenanceplan_comment1': this.consommable,
-                'oc_maintenanceplan_comment3': this.prestataire,
-                'oc_maintenanceplan_comment2': this.transport,
-                'oc_maintenanceplan_name': this.nom,
-                'oc_maintenanceplan_type': this.type,
-                'oc_maintenanceplan_instructions': this.commentaire,
-                'oc_maintenanceplan_frequency': this.frequency,
+                oc_maintenanceplan_assetuid: this.$store.state.code_inventaire.oc_asset_code,
+                oc_maintenanceplan_operator: this.$store.state.user.fullname,
+                oc_maintenanceplan_comment4: this.Autre,
+                oc_maintenanceplan_comment1: this.consommable,
+                oc_maintenanceplan_comment3: this.prestataire,
+                oc_maintenanceplan_comment2: this.transport,
+                oc_maintenanceplan_name: this.nom,
+                oc_maintenanceplan_type: this.type,
+                oc_maintenanceplan_instructions: this.commentaire,
+                oc_maintenanceplan_frequency: this.frequency,
             };
-            axios.post('/oc_maintenanceplanshistory/', data)
-                .then((reponse) => {
-                    this.items.unshift(reponse.data)
-                    this.showNewView = false
-                    console.log(this.items)
-                }).catch((error) => {
-                    console.error("Erreur lors de la récupération de l'inventaire :", error);
-                    this.hasError = true;
-                });
-        },
-        handleResize() {
-            const currentHeight = window.innerHeight;
-            const heightDiff = this.windowHeight - currentHeight;
 
-            if (heightDiff > 150) {
-                this.isKeyboardVisible = true;
-                this.keyboardHeight = heightDiff;
-            } else {
-                this.isKeyboardVisible = false;
-                this.keyboardHeight = 0;
+            const url = '/oc_maintenanceplanshistory/';
+
+            console.log("CLICKED ")
+            console.log("ONLINE STATUS : ", this.onLineStatus)
+
+            if (!navigator.onLine) {
+                await addOfflineRequest({ method: 'post', url, data });
+                this.items.unshift(data);
+                this.showNewView = false;
+                console.warn("📦 Requête enregistrée dans IndexedDB (offline).");
+                return;
+            }
+
+            try {
+                const response = await axios.post(url, data);
+                this.items.unshift(response.data);
+                this.showNewView = false;
+                localStorage.setItem('plan', JSON.stringify(response.data));
+            } catch (error) {
+                console.error("❌ Erreur lors de l'envoi :", error);
+                this.hasError = true;
             }
         },
-        handleKeyboardShow(event) {
-            if (event?.keyboardHeight) {
-                this.keyboardHeight = event.keyboardHeight;
+
+        async resendOfflineRequests() {
+            const requests = await getAllRequests();
+
+            for (const req of requests) {
+                try {
+                    await axios.post(req.url, req.data);
+                    await deleteRequest(req.id);
+                    console.log('✅ Requête offline envoyée avec succès.');
+                } catch (err) {
+                    console.error('⚠️ Erreur lors de l’envoi offline :', err);
+                }
             }
+        },
+    handleResize() {
+        const currentHeight = window.innerHeight;
+        const heightDiff = this.windowHeight - currentHeight;
+
+        if (heightDiff > 150) {
             this.isKeyboardVisible = true;
-        },
-        handleKeyboardHide() {
+            this.keyboardHeight = heightDiff;
+        } else {
             this.isKeyboardVisible = false;
             this.keyboardHeight = 0;
-        },
-        getPlan() {
-            axios.get(`/oc_maintenanceplanshistory/`)
-                .then((reponse) => {
-                    this.items = reponse.data.results
-                    this.$store.state.PlanMaintance = reponse.data.results
-                    console.log(this.items)
-                }).catch((error) => {
-                    console.error("Erreur lors de la récupération de l'inventaire :", error);
-                    this.hasError = true;
-                });
         }
+    },
+    handleKeyboardShow(event) {
+        this.isKeyboardVisible = true;
+        this.keyboardHeight = event.keyboardHeight;
+    },
+    handleKeyboardHide() {
+        this.isKeyboardVisible = false;
+        this.keyboardHeight = 0;
+    },
+    getPlan() {
+        axios.get(`/oc_maintenanceplanshistory/`)
+            .then((reponse) => {
+                this.items = reponse.data.results
+                this.$store.state.PlanMaintance = reponse.data.results
+                console.log(this.items)
+            }).catch((error) => {
+                console.error("Erreur lors de la récupération de l'inventaire :", error);
+                this.hasError = true;
+            });
+    }
 
-    },
-    mounted() {
-        this.windowHeight = window.innerHeight;
-        window.addEventListener('resize', this.handleResize);
-        Keyboard.addListener('keyboardWillShow', this.handleKeyboardShow);
-        Keyboard.addListener('keyboardWillHide', this.handleKeyboardHide);
-        if (this.$store.state.PlanMaintance.length === 0) {
-            this.getPlan()
-        } else {
-            this.items = this.$store.state.PlanMaintance
-        }
-    },
-    beforeUnmount() {
-        window.removeEventListener('resize', this.handleResize);
-        Keyboard.removeAllListeners();
-    },
+},
+mounted() {
+    this.windowHeight = window.innerHeight;
+    window.addEventListener('resize', this.handleResize);
+    Keyboard.addListener('keyboardWillShow', this.handleKeyboardShow);
+    Keyboard.addListener('keyboardWillHide', this.handleKeyboardHide);
+    window.addEventListener('online', this.resendOfflineRequests);
+    if (this.$store.state.PlanMaintance.length === 0) {
+        this.getPlan()
+    } else {
+        this.items = this.$store.state.PlanMaintance
+    }
+},
+beforeUnmount() {
+    Keyboard.removeAllListeners();
+    window.removeEventListener('online', this.resendOfflineRequests);
+
+},
 
 }
 </script>

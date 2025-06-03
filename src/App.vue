@@ -1,10 +1,10 @@
 <script>
-import loading from './components/loading.vue'
+// import loading from './components/loading.vue'
 import Login from './components/Login.vue';
 import { StatusBar, Style } from '@capacitor/status-bar'
 export default {
   components: {
-    loading, Login
+     Login
   },
   mounted() {
     let user = JSON.parse(window.localStorage.getItem('user'))
@@ -23,7 +23,7 @@ export default {
 </script>
 
 <template>
-  <loading v-if="this.$store.state.is_loading" />
+  <!-- <loading v-if="this.$store.state.is_loading" /> -->
   <router-view v-if="this.$store.state.user" />
   <Login v-else />
 </template>

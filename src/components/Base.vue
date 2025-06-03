@@ -3,14 +3,19 @@
         <div class="py-1">
             <div class="flex justify-between">
                 <div class="">
-                    <img src="../assets/view/img/unnamed.jpg" alt="" class="w-40 ">
+                    <img src="../assets/view/img/unnamed.jpg" alt="" class="w-25 px-1.5 ">
                 </div>
-                <div class="justify-between items-center flex gap-3 p-5">
+                <div class="justify-between items-center flex gap-3 p-4">
                     <div class="">
-                        <p class="font-segoe-ui-variable font-semibold text-[10px] "> {{ this.$store.state.user.fullname }}
+                        <p class="font-segoe-ui-variable font-semibold text-[10px] "> {{ this.$store.state.user.fullname
+                            }}
                         </p>
-                        <p for="" class="font-segoe-ui-variable font-light text-[10px] sm:text-[10px]"> {{ this.$store.state.user.businessfunction }}
-                            Electronique</p>
+                        <p for="" class="font-segoe-ui-variable font-light text-[10px] sm:text-[10px]"> {{
+                            this.$store.state.user.businessfunction }}
+                        </p>
+                        <p for="" class="font-segoe-ui-variable font-light text-[10px] sm:text-[10px]"> {{
+                            this.$store.state.user.zipcode }}
+                        </p>
                     </div>
                     <div class="">
                         <div class=" w-full h-full  flex items-center justify-center bg-white rounded-2xl"
@@ -26,12 +31,13 @@
             <div class="relative flex justify-center items-center">
                 <div class="flex justify-end items-center">
                     <input type="number" name="" id="" placeholder="Recherche par numero"
-                        class="w-84 rounded-sm outline-2 outline-sky-800 text-[13px] font-poppins font-normal px-4 py-3.5 "
+                        class="w-80 rounded-sm outline-2 outline-sky-800 text-[13px] font-poppins font-normal px-4 py-2 "
                         v-model="search_equipement">
-                    <div class="absolute  mx-2 flex bg-sky-900 p-2  justify-center items-center rounded-sm">
+                    <div class="absolute  mx-1 flex bg-sky-900 p-1  justify-center items-center rounded-sm">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" @click="Getinventaire"
                             viewBox="0 0 24 24">
-                            <g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                            <g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round"
+                                stroke-width="2">
                                 <circle cx="11" cy="11" r="8" />
                                 <path d="m21 21l-4.3-4.3" />
                             </g>
@@ -40,8 +46,7 @@
                 </div>
             </div>
             <button class="custom-box custom-bottom" @click="isQRcode = true">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
-                    viewBox="0 0 24 24">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
                     <g fill="none" stroke="#ffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
                         <path
                             d="M17 12v4a1 1 0 0 1-1 1h-4m5-14h2a2 2 0 0 1 2 2v2m-4 1V7m4 10v2a2 2 0 0 1-2 2h-2M3 7V5a2 2 0 0 1 2-2h2m0 14h.01M7 21H5a2 2 0 0 1-2-2v-2" />
@@ -49,15 +54,20 @@
                     </g>
                 </svg>
             </button>
+            <div class="py-2">
+                <loading v-if="this.$store.state.is_loading" />
+            </div>
         </div>
         <div class="h-[90%] overflow-auto">
             <slot v-if="activeSlot === 1" name="slot1"></slot>
             <slot v-else-if="activeSlot === 2" name="slot2"></slot>
             <slot v-else-if="activeSlot === 3" name="slot3"></slot>
             <slot v-else-if="activeSlot === 4" name="slot4"></slot>
+            <slot v-else-if="activeSlot === 5" name="slot5"></slot>
         </div>
 
-        <div class=" bottom-0 bg-sky-900  ">
+
+        <div class=" bottom-0 bg-[#014268]  ">
             <div class="w-screen flex items-end justify-between px-6">
                 <div class="flex flex-col items-center gap-1" @click="navigate('/')">
                     <div :class="[
@@ -84,6 +94,27 @@
                     <div :class="[
                         'w-7 h-1 rounded-2xl',
                         activeSlot === 2 ? 'bg-amber-50' : ''
+                    ]"></div>
+                    <div class="">
+                        <svg width="25" height="25" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <g clip-path="url(#clip0_186_1108)">
+                                <path
+                                    d="M2.222 0L0 2.222L3.91431 8.99123L6.45277 8.61892L21.9475 24.1154L20.6258 25.3846C19.9489 26.0615 19.9489 27.0871 20.6258 27.764L21.3129 28.4528C21.9898 29.1297 23.0255 29.1297 23.5332 28.4528L25.5437 30.4615C25.3745 31.4769 25.5437 32.6835 26.3898 33.5297L35.5384 42.6259C37.4 44.4874 40.4461 44.4874 42.3077 42.6259C44.5077 40.5951 44.4874 37.5591 42.6258 35.6975L33.5297 26.5472C32.6835 25.7011 31.4769 25.3626 30.4615 25.7011L28.2395 23.6923C28.7472 23.0154 28.7472 21.9797 28.2395 21.4703L27.6049 20.8374C27.4511 20.677 27.2664 20.5493 27.0619 20.4621C26.8575 20.3749 26.6375 20.3299 26.4152 20.3299C26.1929 20.3299 25.973 20.3749 25.7685 20.4621C25.5641 20.5493 25.3794 20.677 25.2255 20.8374L24.1154 21.9475L8.62061 6.45277L8.98954 3.91431L2.222 0ZM35.222 0.0524615C31.8831 -0.225077 27.456 1.98846 25.3846 3.91262C22.836 6.46123 23.2523 9.79339 25.278 13.0105L21.6835 16.6066L24.222 19.4615C25.5758 18.2769 27.5728 18.2769 28.9266 19.4615L29.6154 20.1486L29.7745 20.3077L31.2552 18.8269C34.3149 20.6258 37.4998 20.8848 39.9283 18.4563C42.2975 16.2563 44.8664 10.8308 43.6818 7.61539L38.9231 12.5332C38.2461 13.2102 37.2206 13.2102 36.5437 12.5332L31.6241 7.61539C31.4637 7.46154 31.3361 7.27684 31.2489 7.07239C31.1616 6.86794 31.1167 6.64796 31.1167 6.42569C31.1167 6.20342 31.1616 5.98344 31.2489 5.77899C31.3361 5.57454 31.4637 5.38984 31.6241 5.236L36.5454 0.318154C36.1223 0.169231 35.6992 0.0930769 35.222 0.0524615ZM16.6066 21.1538L10.4703 27.2885C9.81081 27.1425 9.13695 27.0716 8.46154 27.0769C3.72308 27.0769 0 30.8 0 35.5385C0 40.2769 3.72308 44 8.46154 44C13.2 44 16.9231 40.2769 16.9231 35.5385C16.9231 34.6703 16.786 33.836 16.5525 33.0525L20.1486 29.4563L19.6206 28.7692C18.2668 27.4154 18.2769 25.3643 19.4615 24.0088L16.6066 21.1538ZM29.722 28.8758C29.9335 28.8758 30.1332 28.9165 30.3025 29.0874L40.2989 39.0822C40.6374 39.4206 40.6374 39.9588 40.2989 40.2972C39.9604 40.6357 39.4189 40.6357 39.0804 40.2972L29.0874 30.3025C28.7489 29.964 28.7489 29.4258 29.0874 29.0874C29.2566 28.9182 29.5105 28.8758 29.722 28.8758ZM9.62584 31.1469L12.8514 34.3742L11.6871 38.7623L7.29892 39.9266L4.07169 36.6994L5.236 32.3112L9.62584 31.1469Z"
+                                    fill="#fff" />
+                            </g>
+                            <defs>
+                                <clipPath id="clip0_186_1108">
+                                    <rect width="44" height="44" fill="white" />
+                                </clipPath>
+                            </defs>
+                        </svg>
+                    </div>
+                    <p class="font-segoe-ui-variable font-bold text-[10px] text-white ">Equipement</p>
+                </div>
+                <div class="flex flex-col items-center gap-1" @click="navigate('/Infrastructure')">
+                    <div :class="[
+                        'w-7 h-1 rounded-2xl',
+                        activeSlot === 5 ? 'bg-amber-50' : ''
                     ]"></div>
                     <div class="">
                         <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"
@@ -131,8 +162,8 @@
             <div class="h-100 w-80 bg-white shadow-lg overflow-hidden flex flex-col justify-center items-center">
                 <video ref="video" class="w-full h-64 object-cover" autoplay></video>
                 <canvas ref="canvas" class="hidden"></canvas>
-                <div v-if="decodedContent" class="mt-4 text-green-600 font-semibold">
-                    QR Code détecté : {{ decodedContent }}
+                <div v-if="search_equipement" class="mt-4 text-green-600 font-semibold">
+                    QR Code détecté : {{ search_equipement }}
                 </div>
             </div>
         </VueFinalModal>
@@ -144,9 +175,10 @@
 import axios from '../axios';
 import { VueFinalModal } from 'vue-final-modal'
 import jsQR from 'jsqr'
+import loading from './loading.vue'
 export default {
     components: {
-        VueFinalModal
+        VueFinalModal, loading
     },
     computed: {
         activeSlot() {
@@ -159,6 +191,8 @@ export default {
                     return 3;
                 case '/Operation':
                     return 4;
+                case '/Infrastructure':
+                    return 5;
                 default:
                     return 1;
             }
@@ -169,7 +203,10 @@ export default {
             flipped: false,
             isModalVisible: false,
             isQRcode: false,
-            search_equipement: ''
+            search_equipement: '',
+            startY: 0,
+            pulling: false,
+            refreshing: false,
 
         }
     },
@@ -179,11 +216,35 @@ export default {
             window.localStorage.removeItem("user");
 
         },
+        onTouchStart(event) {
+            this.startY = event.touches[0].clientY;
+        },
+        onTouchMove(event) {
+            const currentY = event.touches[0].clientY;
+            if (currentY - this.startY > 60 && !this.refreshing) {
+                this.pulling = true;
+            }
+        },
+        onTouchEnd() {
+            if (this.pulling) {
+                this.refreshing = true;
+                this.Getinventaire().finally(() => {
+                    this.refreshing = false;
+                    this.pulling = false;
+                });
+            }
+        },
         Getinventaire() {
             console.log('bonjour')
-            axios.get(`/oc_assetshistory/?search=${this.search_equipement}`)
+            axios.get(`/oc_assetshistory/?search=${this.search_equipement}&oc_asset_service__icontains= ${this.$store.state.user.zipcode}&oc_asset_nomenclature__icontains=E`)
                 .then((reponse) => {
                     this.$store.state.equipement_inventaire = reponse.data.results
+                    this.$router.push({ path: '/Inventaire' })
+                    console.log(this.items)
+                })
+            axios.get(`/oc_assetshistory/?search=${this.search_equipement}&oc_asset_service__icontains=${this.$store.state.user.zipcode}&oc_asset_nomenclature=I`)
+                .then((reponse) => {
+                    this.$store.state.infrastructure_inventaire = reponse.data.results
                     this.$router.push({ path: '/Inventaire' })
                     console.log(this.items)
                 })
@@ -197,7 +258,7 @@ export default {
                     this.$store.state.PlanMaintance = reponse.data.results
                     console.log(this.items)
                 })
-                
+
         },
         navigate(path) {
             if (this.$route.path !== path) {
@@ -222,7 +283,8 @@ export default {
                     const imageData = context.getImageData(0, 0, canvas.width, canvas.height)
                     const code = jsQR(imageData.data, canvas.width, canvas.height)
                     if (code) {
-                        this.decodedContent = code.data
+                        this.search_equipement = code.data
+                        this.Getinventaire()
                         this.stopScanner()
                         this.isQRcode = false
                     }

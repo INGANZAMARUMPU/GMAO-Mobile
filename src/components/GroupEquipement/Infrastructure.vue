@@ -1,6 +1,5 @@
 <template>
-    <Base #slot2>
-    <!-- <loading v-if="this.$store.state.is_loading" />  -->
+    <Base #slot5>
     <div class="w-screen h-screen overflow-auto mb-4">
         <div class="w-screen overflow-hidden flex items-center justify-center gap-[10%] my-8 mb-5 pb-4">
             <button class="custom-box custom-right" @click="isModalVisible = true">
@@ -13,7 +12,7 @@
                 <p class="font-poppins font-medium text-[13px] text-white">Filtre</p>
             </button>
         </div>
-        <!-- {{ filteredItems }} -->
+
         <div v-if="hasError" class="erreur">
             <div class="message">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
@@ -27,26 +26,27 @@
                 <p class="text-[8px]">ou veuiller vérifier l'état de votre connexion</p>
             </div>
         </div>
-        <div class="w-screen flex flex-col items-center space-y-3 mb-10">
+        <div class="flex flex-col items-center space-y-3 mb-10">
             <div v-for="item in items" :key="item.oc_asset_objectid"
                 class="w-[95%] rounded-2xl bg-sky-100  flex flex-col text-sky-900 " @click="selectItem(item)">
                 <div class="p-2">
                     <div class="w-full flex items-center justify-between">
-                        <p class="font-poppins font-semibold text-[12px] tracking-wider">{{ item.oc_asset_code }}</p>
-                        <p class="font-poppins font-semibold text-[9px] tracking-wider">{{ item.oc_asset_nomenclature }}
+                        <p class="font-poppins font-semibold text-[12px] tracking-wider">{{ item?.oc_asset_code }}</p>
+                        <p class="font-poppins font-semibold text-[9px] tracking-wider">{{ item?.oc_asset_nomenclature
+                        }}
                         </p>
-                        <p class="font-segoe font-normal text-[11px] tracking-wider">{{ item.oc_asset_comment12 }}</p>
+                        <p class="font-segoe font-normal text-[11px] tracking-wider">{{ item?.oc_asset_comment12 }}</p>
                     </div>
                     <div class="w-full flex flex-col items-start justify-center">
                         <div class=" w-full  flex items-end">
                             <div class="flex items-center">
                                 <p class="font-poppins font-semibold text-sm tracking-wider">{{
-                                    getShortDescription(item.oc_asset_description) }}</p>
+                                    getShortDescription(item?.oc_asset_description) }}</p>
                             </div>
                         </div>
                         <div class=" w-full flex items-end">
-                            <p class="font-poppins text-[12px] tracking-wider flex items-end ">{{ item.oc_asset_service
-                            }}
+                            <p class="font-poppins text-[12px] tracking-wider flex items-end ">{{ item?.oc_asset_service
+                                }}
                             </p>
                         </div>
                     </div>
@@ -54,9 +54,20 @@
                 <div
                     class="w-full bg-green-800 flex items-center justify-between p-2 text-white font-poppins font-normal text-[10px] tracking-wider rounded-b-lg ">
                     <p class="">Mise à jour</p>
-                    <p class="">{{ datetime(item.oc_asset_updatetime) }}</p>
+                    <p class="">{{ datetime(item?.oc_asset_updatetime) }}</p>
                 </div>
             </div>
+            <!-- <div class="flex gap-1" v-if="filteredItems = 0">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                    viewBox="0 0 24 24">
+                    <g fill="none" stroke="#0c4a6e" stroke-linecap="round" stroke-linejoin="round"
+                        stroke-width="1.5">
+                        <path d="M9 16c.85-.63 1.885-1 3-1s2.15.37 3 1m-5.5-5.5V10m5 .5V10" />
+                        <path d="M21 12a9 9 0 1 1-18 0a9 9 0 0 1 18 0" />
+                    </g>
+                </svg>
+                <p>Aucun éléments trouvés</p>
+            </div> -->
         </div>
         <VueFinalModal v-model="isModalVisible" :click-to-close="true" class="flex justify-center items-end"
             transition="vfm-fade-in-up">
@@ -126,8 +137,6 @@
     </div>
     </Base>
 </template>
-
-
 <script>
 import Base from '../Base.vue'
 import axios from '../../axios'
@@ -206,12 +215,10 @@ export default {
             this.keyboardHeight = 0;
         },
         Getinventaire() {
-            axios.get(`/oc_assetshistory/?oc_asset_service__icontains= ${this.$store.state.user.zipcode}&oc_asset_nomenclature__icontains=E`)
+            axios.get(`/oc_assetshistory/?oc_asset_service__icontains=${this.$store.state.user.zipcode}&oc_asset_nomenclature=I`)
                 .then((reponse) => {
                     this.items = reponse.data.results
-                    this.$store.state.equipement_inventaire = reponse.data.results;
-                    // if (store.state.online !== false) {
-                    // }
+                    this.$store.state.infrastructure_inventaire = reponse.data.results;
                     console.log(this.items)
                 })
                 .catch((error) => {
@@ -225,12 +232,12 @@ export default {
         window.addEventListener('resize', this.handleResize);
         Keyboard.addListener('keyboardWillShow', this.handleKeyboardShow);
         Keyboard.addListener('keyboardWillHide', this.handleKeyboardHide);
-        window.addEventListener('online', this.getOperation);
-        if (this.$store.state.equipement_inventaire.length === 0) {
+        window.addEventListener('online', this.Getinventaire);
+        if (this.$store.state.infrastructure_inventaire.length === 0) {
             this.Getinventaire()
         } else {
-            this.items = this.$store.state.equipement_inventaire
-            this.previousInventaireSnapshot = JSON.stringify(this.$store.state.equipement_inventaire);
+            this.items = this.$store.state.infrastructure_inventaire
+            this.previousInventaireSnapshot = JSON.stringify(this.$store.state.infrastructure_inventaire);
         }
         const numero = this.$route.query.numero
         console.log('Numéro reçu en query :', numero)
@@ -241,7 +248,7 @@ export default {
     },
     computed: {
         equipementInventaire() {
-            return this.$store.state.equipement_inventaire;
+            return this.$store.state.infrastructure_inventaire;
         },
     },
     watch: {
@@ -263,23 +270,4 @@ export default {
 }
 </script>
 
-
-
-<style scoped>
-.modal-inner.vfm-fade-in-up-enter-active,
-.modal-inner.vfm-fade-in-up-leave-active {
-    transition: opacity 2s ease, transform 2s ease;
-}
-
-.modal-inner.vfm-fade-in-up-enter-from,
-.modal-inner.vfm-fade-in-up-leave-to {
-    opacity: 0;
-    transform: translateY(30px);
-}
-
-.modal-inner.vfm-fade-in-up-enter-to,
-.modal-inner.vfm-fade-in-up-leave-from {
-    opacity: 1;
-    transform: translateY(10);
-}
-</style>
+<style></style>

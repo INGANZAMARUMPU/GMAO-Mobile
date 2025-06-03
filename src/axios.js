@@ -11,9 +11,7 @@ axios.interceptors.request.use(
       store.state.online = false;
       return Promise.reject(new Error('Vous êtes hors ligne.'));
     }
-
     store.state.is_loading = true;
-
     const token = store.state.user?.access;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
