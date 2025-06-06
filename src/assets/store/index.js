@@ -4,8 +4,8 @@ const store = createStore({
   state() {
     return {
       plan: [],
-      search_equipement: "",
-      equipement_inventaire: [],
+      keyword: "",
+      equipements: [],
       PlanMaintance: [],
       Operation: [],
       code_inventaire: [],
@@ -13,40 +13,28 @@ const store = createStore({
       user: null,
       is_loading: false,
       static: [],
-      infrastructure_inventaire: [],
+      infrastructures: [],
+      choice: '',
     };
   },
 
   mutations: {
-    SET_SEARCH_EQUIPEMENT(state, value) {
-      state.search_equipement = value;
+    SET_keyword(state, value) {
+      state.keyword = value;
     },
-    clearStore() {
-      state.plan = [];
-      state.search_equipement = "";
-      state.equipement_inventaire = [];
-      state.PlanMaintance = [];
-      state.Operation = [];
-      state.code_inventaire = [];
-      state.code_plan = [];
-      state.static = [];
-      state.infrastructure_inventaire = [];
-      state.is_loading = false;
-    },
-
     setUser(state, user) {
       state.user = user;
 
       if (user === null) {
         state.plan = [];
-        state.search_equipement = "";
-        state.equipement_inventaire = [];
+        state.keyword = "";
+        state.equipements = [];
         state.PlanMaintance = [];
         state.Operation = [];
         state.code_inventaire = [];
         state.code_plan = [];
         state.static = [];
-        state.infrastructure_inventaire = [];
+        state.infrastructures = [];
         state.is_loading = false;
       }
     },
@@ -58,9 +46,12 @@ const store = createStore({
 
   getters: {
     getSearchEquipement(state) {
-      return state.search_equipement;
+      return state.keyword;
     },
   },
+  setChoice(state, payload) {
+    state.choice = payload;
+  }
 });
 
 export default store;

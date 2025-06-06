@@ -1,7 +1,7 @@
 <template>
     <Base #slot3>
     <div class="h-full mb-4 overflow-auto" v-if="!showNewView">
-        <div class="flex items-center justify-center gap-[10%] my-8 mb-5 pb-4">
+        <div class="flex items-center justify-center  my-2 mb-2 pb-3">
             <button @click="isModalVisible = true" class="custom-box custom-left">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="32" viewBox="0 0 24 24">
                     <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
@@ -11,12 +11,23 @@
                 </svg>
                 <p class="font-poppins font-medium text-[13px] text-white">Filtre</p>
             </button>
-            <button class="custom-box custom-right" @click="handleNewItem">
+            <button class="custom-box custom-right" @click="handleNewItem"
+                v-if="$store.state.user.default_page === 'maintenance'">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="32" viewBox="0 0 24 24">
                     <path fill="none" stroke="#ffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M5 12h14m-7-7v14" />
                 </svg>
                 <p class="font-poppins font-medium text-[13px] text-white">Nouveau</p>
+            </button>
+        </div>
+        <div class="w-screen relative flex justify-center my-2" v-if="$store.state.user.default_page === 'maintenance'">
+            <button
+                class="w-12 h-12 flex justify-center items-center bg-sky-900 rounded-xl fixed bottom-30 right-6 shadow-[1px_1px_5px_1px_rgba(0,0,0,0.5)]"
+                @click="this.$router.go('/plan')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
+                    <path fill="#ffffff"
+                        d="M5.53 17.506q-.978-1.142-1.504-2.558T3.5 12q0-3.616 2.664-6.058T12.5 3.5V2l3.673 2.75L12.5 7.5V6Q9.86 6 7.93 7.718T6 12q0 1.13.399 2.15t1.13 1.846zM11.5 22l-3.673-2.75L11.5 16.5V18q2.64 0 4.57-1.718T18 12q0-1.13-.399-2.16q-.399-1.028-1.13-1.855l1.998-1.51q.979 1.142 1.505 2.558T20.5 12q0 3.616-2.664 6.058T11.5 20.5z" />
+                </svg>
             </button>
         </div>
         <!-- <div v-if="hasError" class="erreur">
@@ -35,8 +46,8 @@
             <div v-for="item in filteredItems" :key="item.oc_maintenanceplan_objectid"
                 class="w-[95%] rounded-2xl bg-sky-100  flex flex-col text-sky-900 p-2" @click="PlusInfo(item)">
                 <div class="w-full flex items-center justify-between">
-                    <p class="font-poppins font-semibold text-sm tracking-wider">{{ item.oc_maintenanceplan_assetuid }}
-                    </p>
+                    <p v-if="!$store.state.code_inventaire.oc_asset_description " class="font-poppins font-semibold text-sm tracking-wider">{{ item.oc_maintenanceplan_assetuid }}</p>
+                    <p v-else class="font-poppins font-semibold text-[10px] tracking-wider">{{ this.$store.state.code_inventaire.oc_asset_description  }}</p>
                     <p class="font-poppins font-normal text-xs tracking-wider">{{
                         datetime(item.oc_maintenanceplan_updatetime) }}
                     </p>
@@ -63,6 +74,9 @@
                     <p class="font-poppins">{{ item.oc_maintenanceplan_operator }}</p>
                     <p class="font-poppins">{{ datetime(item.oc_maintenanceplan_historydate) }}</p>
                 </div>
+            </div>
+            <div v-if="this.items.length === 0" class="">
+                <p class="text-sky-900 text-[12px]">Aucun plans</p>
             </div>
         </div>
         <VueFinalModal v-model="isInfo" :click-to-close="true" class="flex justify-center items-center"
@@ -113,11 +127,11 @@
                     class="w-[100%]  rounded-lg border-2 border-[rgb(116,175,209)] focus:border-2 focus:border-sky-900 focus:outline-none py-1 px-2"
                     placeholder="Nomanclature" v-model="nomenclature"> -->
                     <input type="text" v-model="oc_maintenanceplan_operator"
-                        class="w-[100%]  rounded-lg border-2 border-[rgb(116,175,209)] focus:border-2 focus:border-sky-900 focus:outline-none py-1 px-2"
+                        class="w-[100%]  rounded-lg "
                         placeholder="Opérateur">
                     <select name="" id=""
                         class="w-[100%]  rounded-lg border-2 border-[rgb(116,175,209)] focus:border-2 focus:border-sky-900 focus:outline-none py-1 px-2"
-                        v-model="oc_maintenanceplan_type__icontains">
+                        v-model="oc_maintenanceplan_type">
                         <option value="">Types</option>
                         <option value="1">Contrôle</option>
                         <option value="2">Maintenance</option>
@@ -182,10 +196,17 @@
             </button>
         </div>
         <div class="overflow-auto ">
-            {{ onLineStatus }}
-            <div class="px-3 pt-0 space-y-4 my-4">
+            <form class="px-3 pt-0 space-y-4 my-4" @submit.prevent="postPlan">
                 <div class="flex items-center content-between!">
                     <p class="font-poppins text-[29px] text-sky-900  font-extralight">Plan de maintenance</p>
+                </div>
+                <div class="">
+                    <p class="m-0 ">Référence inventaire</p>
+                    <div class="flex ">
+                        <input type="text" name="" id="" v-model="oc_maintenanceplan_assetuid"
+                            placeholder="Référence inventaire" required
+                            class="w-full  rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none p-2 mt-2">
+                    </div>
                 </div>
                 <input type="text" v-model="nom"
                     class="w-full rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none py-2 pl-3"
@@ -197,15 +218,7 @@
                     <option value="1">Contrôle</option>
                     <option value="2">Maintenance</option>
                     <option value="3">Curatif</option>
-                    <option value="99">Autre</option>
-                </select>
-                <select name="" id=""
-                    class="w-full rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
-                    v-model="frequency">
-                    <option value="">Frequency</option>
-                    <option value="defect">Défectueux</option>
-                    <option value="ok">ok</option>
-                    <option value="revsion">Révision nécessaire</option>
+                    <option value="99">Autre</option> 1.6485
                 </select>
                 <textarea v-model="commentaire" rows="6" placeholder="Écrivez votre commentaire ici..."
                     class="w-full p-3 border-2 border-sky-900 rounded-lg resize-y  focus:border-3 focus:border-sky-900 focus:outline-none   text-gray-800" />
@@ -238,9 +251,9 @@
                 </div>
                 <div class="flex gap-5 ">
                     <button class="py-3 rounded-lg bg-sky-950 font-bold text-white grow basis-1"
-                        @click="postPlan">Sauvegarder</button>
+                        type="submit">Sauvegarder</button>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
     </Base>
@@ -250,7 +263,6 @@
 import Base from '../Base.vue';
 import axios from 'axios'
 import { VueFinalModal } from 'vue-final-modal'
-import { openDB } from 'idb';
 import { Keyboard } from '@capacitor/keyboard'
 import { addOfflineRequest, getAllRequests, deleteRequest } from '../../indexDb';
 
@@ -272,7 +284,7 @@ export default {
                 return this.items
             }
             return this.items.filter(item =>
-                item.oc_maintenanceplan_assetuid = code
+                item.oc_maintenanceplan_assetuid === code
             )
         },
         onLineStatus() {
@@ -289,7 +301,6 @@ export default {
             transport: '',
             nom: '',
             type: '',
-            frequency: '',
             commentaire: '',
             plan: [],
             isKeyboardVisible: false,
@@ -298,9 +309,12 @@ export default {
             isInfo: false,
             hasError: false,
             oc_maintenanceplan_operator: '',
-            oc_maintenanceplan_type__icontains: '',
+            oc_maintenanceplan_type: '',
             oc_maintenanceplan_historydate__gte: '',
-            oc_maintenanceplan_historydate__lte: ''
+            oc_maintenanceplan_historydate__lte: '',
+            isReallyOnline: false,
+            oc_maintenanceplan_assetuid: this.$store.state.code_inventaire.oc_asset_code
+
         }
     },
     methods: {
@@ -344,63 +358,9 @@ export default {
         returnToMainView() {
             this.showNewView = false
         },
-        async afficherUnPlan() {
-            const db = await openDB('myDatabase', 1);
-            if (!this.equipementId) {
-                console.warn('Pas d\'equipementId fourni en props.');
-                return;
-            }
-            const plan = await db.get('plans', this.equipementId);
-            if (plan) {
-                console.log('Plan trouvé :', plan);
-                this.plan = plan;
-            } else {
-                console.log('Aucun plan trouvé pour cet ID');
-            }
-        },
-        // async postPlan() {
-        //     const data = {
-        //         'oc_maintenanceplan_assetuid': this.$store.state.code_inventaire.oc_asset_code,
-        //         'oc_maintenanceplan_operator': this.$store.state.user.fullname,
-        //         'oc_maintenanceplan_comment4': this.Autre,
-        //         'oc_maintenanceplan_comment1': this.consommable,
-        //         'oc_maintenanceplan_comment3': this.prestataire,
-        //         'oc_maintenanceplan_comment2': this.transport,
-        //         'oc_maintenanceplan_name': this.nom,
-        //         'oc_maintenanceplan_type': this.type,
-        //         'oc_maintenanceplan_instructions': this.commentaire,
-        //         'oc_maintenanceplan_frequency': this.frequency,
-        //     };
-        //     const url = '/oc_maintenanceplanshistory/';
-        //     if (!navigator.onLine) {
-        //         const stored = JSON.parse(localStorage.getItem('offlineRequests') || '[]');
-        //         stored.push({
-        //             method: 'post',
-        //             url,
-        //             data
-        //         });
-        //         localStorage.setItem('offlineRequests', JSON.stringify(stored));
-        //         this.items.unshift(data);
-        //         this.showNewView = false;
-        //         localStorage.setItem('plan_temp', JSON.stringify(data));
-
-        //         console.warn("Requête enregistrée localement. Elle sera envoyée quand la connexion sera rétablie.");
-        //         return;
-        //     }
-
-        //     try {
-        //         const response = await axios.post(url, data);
-        //         this.items.unshift(response.data);
-        //         this.showNewView = false;
-        //         localStorage.setItem('plan', JSON.stringify(response.data));
-        //     } catch (error) {
-        //         console.error("Erreur lors de la récupération de l'inventaire :", error);
-        //         this.hasError = true;
-        //     }
-        // },
         async postPlan() {
             const data = {
-                oc_maintenanceplan_assetuid: this.$store.state.code_inventaire.oc_asset_code,
+                oc_maintenanceplan_assetuid: this.oc_maintenanceplan_assetuid,
                 oc_maintenanceplan_operator: this.$store.state.user.fullname,
                 oc_maintenanceplan_comment4: this.Autre,
                 oc_maintenanceplan_comment1: this.consommable,
@@ -409,19 +369,17 @@ export default {
                 oc_maintenanceplan_name: this.nom,
                 oc_maintenanceplan_type: this.type,
                 oc_maintenanceplan_instructions: this.commentaire,
-                oc_maintenanceplan_frequency: this.frequency,
             };
 
             const url = '/oc_maintenanceplanshistory/';
 
-            console.log("CLICKED ")
-            console.log("ONLINE STATUS : ", this.onLineStatus)
-
-            if (!navigator.onLine) {
+            console.log("CLICKED");
+            if (!this.isReallyOnline) {
                 await addOfflineRequest({ method: 'post', url, data });
                 this.items.unshift(data);
                 this.showNewView = false;
-                console.warn("📦 Requête enregistrée dans IndexedDB (offline).");
+                console.log(data)
+                console.warn("Requête enregistrée dans IndexedDB (offline).");
                 return;
             }
 
@@ -429,9 +387,8 @@ export default {
                 const response = await axios.post(url, data);
                 this.items.unshift(response.data);
                 this.showNewView = false;
-                localStorage.setItem('plan', JSON.stringify(response.data));
             } catch (error) {
-                console.error("❌ Erreur lors de l'envoi :", error);
+                console.error("Erreur lors de l'envoi :", error);
                 this.hasError = true;
             }
         },
@@ -443,63 +400,97 @@ export default {
                 try {
                     await axios.post(req.url, req.data);
                     await deleteRequest(req.id);
-                    console.log('✅ Requête offline envoyée avec succès.');
+                    console.log('Requête offline envoyée avec succès.');
                 } catch (err) {
-                    console.error('⚠️ Erreur lors de l’envoi offline :', err);
+                    console.error('Erreur lors de l’envoi offline :', err);
                 }
             }
         },
-    handleResize() {
-        const currentHeight = window.innerHeight;
-        const heightDiff = this.windowHeight - currentHeight;
 
-        if (heightDiff > 150) {
+        async verifyConnection() {
+            try {
+                const res = await fetch('https://gmao.amidev.bi/api/', {
+                    method: 'GET',
+                    cache: 'no-store',
+                });
+                this.isReallyOnline = res.ok;
+                console.log('🌐 Connexion réelle :', res.ok);
+
+                if (res.ok) {
+                    this.resendOfflineRequests();
+                }
+            } catch (err) {
+                console.warn('🚫 Connexion réelle impossible :', err);
+                this.isReallyOnline = false;
+            }
+        },
+
+        monitorNetworkStatus() {
+            window.addEventListener('online', this.verifyConnection);
+            window.addEventListener('offline', () => {
+                this.isReallyOnline = false;
+                console.warn('📴 Mode hors-ligne détecté.');
+            });
+
+            this.verifyConnection(); // Vérifie dès le démarrage
+        },
+        handleResize() {
+            const currentHeight = window.innerHeight;
+            const heightDiff = this.windowHeight - currentHeight;
+
+            if (heightDiff > 150) {
+                this.isKeyboardVisible = true;
+                this.keyboardHeight = heightDiff;
+            } else {
+                this.isKeyboardVisible = false;
+                this.keyboardHeight = 0;
+            }
+        },
+        handleKeyboardShow(event) {
             this.isKeyboardVisible = true;
-            this.keyboardHeight = heightDiff;
-        } else {
+            this.keyboardHeight = event.keyboardHeight;
+        },
+        handleKeyboardHide() {
             this.isKeyboardVisible = false;
             this.keyboardHeight = 0;
+        },
+        getPlan() {
+            axios.get(`/oc_maintenanceplanshistory/?oc_maintenanceplan_assetuid__oc_asset_code=${this.$store.state.code_inventaire.oc_asset_code || ''}&oc_maintenanceplan_assetuid__oc_asset_service__startswith=${this.$store.state.user.default_service_id}`)
+                .then((reponse) => {
+                    this.items = reponse.data.results
+                    this.$store.state.PlanMaintance = reponse.data.results
+                    console.log(this.items)
+                    window.localStorage.setItem('plan', JSON.stringify(reponse.data.results))
+
+                }).catch((error) => {
+                    console.error("Erreur lors de la récupération de l'inventaire :", error);
+                    this.hasError = true;
+                    this.$store.state.PlanMaintance = JSON.parse(window.localStorage.getItem('plan'))
+                    console.log('en attente')
+                    getAllRequests().then((reponse) => {
+                        console.log(reponse)
+                        for (let item of reponse) {
+                            if (item.url == "/oc_maintenanceplanshistory/")
+                                this.items.unshift(item.data)
+                        }
+                    })
+                });
         }
     },
-    handleKeyboardShow(event) {
-        this.isKeyboardVisible = true;
-        this.keyboardHeight = event.keyboardHeight;
-    },
-    handleKeyboardHide() {
-        this.isKeyboardVisible = false;
-        this.keyboardHeight = 0;
-    },
-    getPlan() {
-        axios.get(`/oc_maintenanceplanshistory/`)
-            .then((reponse) => {
-                this.items = reponse.data.results
-                this.$store.state.PlanMaintance = reponse.data.results
-                console.log(this.items)
-            }).catch((error) => {
-                console.error("Erreur lors de la récupération de l'inventaire :", error);
-                this.hasError = true;
-            });
-    }
-
-},
-mounted() {
-    this.windowHeight = window.innerHeight;
-    window.addEventListener('resize', this.handleResize);
-    Keyboard.addListener('keyboardWillShow', this.handleKeyboardShow);
-    Keyboard.addListener('keyboardWillHide', this.handleKeyboardHide);
-    window.addEventListener('online', this.resendOfflineRequests);
-    if (this.$store.state.PlanMaintance.length === 0) {
+    mounted() {
+        this.windowHeight = window.innerHeight;
+        window.addEventListener('resize', this.handleResize);
+        Keyboard.addListener('keyboardWillShow', this.handleKeyboardShow);
+        Keyboard.addListener('keyboardWillHide', this.handleKeyboardHide);
+        window.addEventListener('online', this.resendOfflineRequests);
         this.getPlan()
-    } else {
-        this.items = this.$store.state.PlanMaintance
-    }
-},
-beforeUnmount() {
-    Keyboard.removeAllListeners();
-    window.removeEventListener('online', this.resendOfflineRequests);
 
-},
+    },
+    beforeUnmount() {
+        Keyboard.removeAllListeners();
+        window.removeEventListener('online', this.resendOfflineRequests);
 
+    },
 }
 </script>
 

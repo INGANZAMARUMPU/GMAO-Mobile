@@ -1,8 +1,9 @@
 <template>
     <Base #slot2>
     <!-- <loading v-if="this.$store.state.is_loading" />  -->
-    <div class="w-screen h-screen overflow-auto mb-4">
-        <div class="w-screen overflow-hidden flex items-center justify-center gap-[10%] my-8 mb-5 pb-4">
+    <div class="w-screen h-[100vh] overflow-auto mb-4 scroll-touch" ref="scrollContainer" @touchstart="onTouchStart"
+        @touchmove="onTouchMove" @touchend="onTouchEnd">
+        <div class="w-screen overflow-hidden flex items-center justify-center gap-[10%] my-2 mb-5 pb-3">
             <button class="custom-box custom-right" @click="isModalVisible = true">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="32" viewBox="0 0 24 24">
                     <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
@@ -13,7 +14,6 @@
                 <p class="font-poppins font-medium text-[13px] text-white">Filtre</p>
             </button>
         </div>
-        <!-- {{ filteredItems }} -->
         <div v-if="hasError" class="erreur">
             <div class="message">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
@@ -39,23 +39,21 @@
                     </div>
                     <div class="w-full flex flex-col items-start justify-center">
                         <div class=" w-full  flex items-end">
-                            <div class="flex items-center">
-                                <p class="font-poppins font-semibold text-sm tracking-wider">{{
-                                    getShortDescription(item.oc_asset_description) }}</p>
-                            </div>
+                            <p class="w-full font-poppins font-semibold text-sm tracking-wider description">{{item.oc_asset_description }}</p>
                         </div>
                         <div class=" w-full flex items-end">
-                            <p class="font-poppins text-[12px] tracking-wider flex items-end ">{{ item.oc_asset_service
-                            }}
-                            </p>
+                            <p class="font-poppins text-[12px] tracking-wider flex items-end ">{{ item.oc_asset_service}}</p>
                         </div>
                     </div>
                 </div>
                 <div
                     class="w-full bg-green-800 flex items-center justify-between p-2 text-white font-poppins font-normal text-[10px] tracking-wider rounded-b-lg ">
-                    <p class="">Mise à jour</p>
+                    <p class="">Date de mise à jour</p>
                     <p class="">{{ datetime(item.oc_asset_updatetime) }}</p>
                 </div>
+            </div>
+            <div v-if="this.items.length === 0" class="">
+                <p class="text-sky-900 text-[12px]">Aucune équipement</p>
             </div>
         </div>
         <VueFinalModal v-model="isModalVisible" :click-to-close="true" class="flex justify-center items-end"
@@ -74,9 +72,9 @@
                         </svg>
                         <p class="font-poppins text-3xl text-sky-900  font-extralight">Filtre</p>
                     </div>
-                    <input type="text"
+                    <!-- <input type="text"
                         class="w-[100%]  rounded-lg border-2 border-[rgb(116,175,209)] focus:border-2 focus:border-sky-900 focus:outline-none py-1 px-2"
-                        placeholder="Nomanclature" v-model="oc_asset_nomenclature">
+                        placeholder="Nomanclature" v-model="oc_asset_nomenclature"> -->
                     <input type="text"
                         class="w-[100%]  rounded-lg border-2 border-[rgb(116,175,209)] focus:border-2 focus:border-sky-900 focus:outline-none py-1 px-2"
                         placeholder="Description" v-model="oc_asset_description">
@@ -158,9 +156,43 @@ export default {
             oc_asset_supplieruid: '',
             oc_asset_description: '',
             previousInventaireSnapshot: null,
+            startY: 0,
+            pulling: false,
+            refreshing: false,
         }
     },
     methods: {
+        onTouchStart(event) {
+            console.log("touch start");
+            this.startY = event.touches[0].clientY;
+            this.pulling = false;
+        },
+
+        onTouchMove(event) {
+            console.log("touch move");
+            const currentY = event.touches[0].clientY;
+            const deltaY = currentY - this.startY;
+
+            const scrollTop = this.$refs.scrollContainer.scrollTop;
+            const isAtTop = scrollTop === 0;
+
+            if (deltaY > 40 && isAtTop && !this.refreshing) {
+                this.pulling = true;
+            }
+        },
+
+        onTouchEnd() {
+            console.log("touch end");
+            if (this.pulling) {
+                // this.refreshing = true;
+                // this.getInventaire().finally(() => {
+                //     this.refreshing = false;
+                //     this.pulling = false;
+                //     console.log('bok');
+                // });
+                this.$router.go('/Inventaire')
+            }
+        },
         selectItem(item) {
             this.$store.state.code_inventaire = item
             this.$router.push('/Plan')
@@ -170,6 +202,7 @@ export default {
                 const params = {
                     oc_asset_code: this.oc_asset_code || '',
                     oc_asset_nomenclature: this.oc_asset_nomenclature || '',
+                    oc_asset_service__startswith: this.$store.state.user.default_service_id,
                     oc_asset_purchasedate__gte: this.oc_asset_purchasedate__gte || '',
                     oc_asset_purchasedate__lte: this.oc_asset_purchasedate__lte || '',
                     oc_asset_serial: this.oc_asset_serial || '',
@@ -177,12 +210,17 @@ export default {
                     oc_asset_description: this.oc_asset_description || '',
                 };
 
-                const response = await axios.get("/oc_assetshistory/", { params });
+                const response = await axios.get("/oc_assets/", { params });
                 this.items = response.data.results;
+                this.$store.state.equipements = response.data.results
                 this.isModalVisible = false
             } catch (error) {
                 console.error("Erreur lors du filtrage :", error);
-                this.displayErrorOrRefreshToken(error, this.FiltrerEquipement);
+                const vyose = JSON.parse(window.localStorage.getItem('equipement'))
+                this.$store.state.equipements = vyose.filter(item => (item === this.params))
+                this.$router.push({ path: '/Inventaire' })
+                this.isModalVisible = false
+
             }
         },
         handleResize() {
@@ -205,20 +243,18 @@ export default {
             this.isKeyboardVisible = false;
             this.keyboardHeight = 0;
         },
-        Getinventaire() {
-            axios.get(`/oc_assetshistory/?oc_asset_service__icontains= ${this.$store.state.user.zipcode}&oc_asset_nomenclature__icontains=E`)
+        getInventaire() {
+            axios.get(`/oc_assets/?oc_asset_service__startswith=${this.$store.state.user.default_service_id}&oc_asset_nomenclature__startswith=E`)
                 .then((reponse) => {
-                    this.items = reponse.data.results
-                    this.$store.state.equipement_inventaire = reponse.data.results;
-                    // if (store.state.online !== false) {
-                    // }
-                    console.log(this.items)
+                    this.items = reponse.data.results;
+                    this.$store.state.equipements = reponse.data.results
+                    window.localStorage.setItem('equipement', JSON.stringify(reponse.data.results))
+                }).catch((error) => {
+                    this.$store.state.equipements = JSON.parse(window.localStorage.getItem('equipement'))
+
                 })
-                .catch((error) => {
-                    console.error("Erreur lors de la récupération de l'inventaire :", error);
-                    this.hasError = true;
-                });
         }
+
     },
     mounted() {
         this.windowHeight = window.innerHeight;
@@ -226,12 +262,16 @@ export default {
         Keyboard.addListener('keyboardWillShow', this.handleKeyboardShow);
         Keyboard.addListener('keyboardWillHide', this.handleKeyboardHide);
         window.addEventListener('online', this.getOperation);
-        if (this.$store.state.equipement_inventaire.length === 0) {
-            this.Getinventaire()
+
+        if (!this.$store.state.keyword && this.$store.state.equipements.length === 0) {
+            console.log('Aucun inventaire en cache, on appelle Getinventaire()')
+            this.getInventaire()
         } else {
-            this.items = this.$store.state.equipement_inventaire
-            this.previousInventaireSnapshot = JSON.stringify(this.$store.state.equipement_inventaire);
+            console.log('Chargement depuis le cache')
+            this.items = this.$store.state.equipements
+            console.log('Items affectés:', this.items)
         }
+
         const numero = this.$route.query.numero
         console.log('Numéro reçu en query :', numero)
     },
@@ -239,23 +279,15 @@ export default {
         Keyboard.removeAllListeners();
         window.removeEventListener('online', this.getOperation);
     },
-    computed: {
-        equipementInventaire() {
-            return this.$store.state.equipement_inventaire;
-        },
-    },
+    // computed: {
+    //     equipementInventaire() {
+    //         return this.$store.state.equipements;
+    //     },
+    // },
     watch: {
-        equipementInventaire: {
+        "$store.state.equipements": {
             handler(newVal) {
-                const newSnapshot = JSON.stringify(newVal);
-                if (newSnapshot === this.previousInventaireSnapshot) {
-                    console.log("Aucun changement détecté.");
-                } else {
-                    console.log("🎉 Nouvelle(s) donnée(s) détectée(s) !");
-                    console.log("Nouvelles données :", newVal);
-                    this.items = newVal;
-                    this.previousInventaireSnapshot = newSnapshot;
-                }
+                this.items = newVal
             },
             deep: true
         }

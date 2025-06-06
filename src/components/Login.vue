@@ -1,10 +1,10 @@
 <template>
     <div class="w-screen h-screen overflow-hidden bg-[#014268] flex justify-center items-center">
-        <img src="../assets/view/img/Frame 38.png" alt="" class="fixed">
+        <!-- <img src="../assets/view/img/Frame 38.png" alt="" class="fixed"> -->
         <div class="w-80 h-100 bg-white relative rounded-2xl shadow-black shadow-2xl flex overflow-hidden flex-col"
-            :style="{ transform: isKeyboardVisible ? `translateY(-100px)` : 'translateY(0)' }">
+            :style="{ transform: isKeyboardVisible ? `translateY(-${keyboardHeight})` : 'translateY(0)' }">
             <div class="w-full flex justify-center items-center">
-                <img src="../assets/view/img/unnamed.jpg" alt="" class="w-[50%]">
+                <img src="../assets/view/img/gmao (2).webp" alt="" class="w-[50%]">
             </div>
             <div class="w-full flex flex-col items-center space-y-5 justify-center text-sm">
                 <input type="number" v-model="userid"
@@ -12,16 +12,16 @@
                     placeholder="Nom de l'utilisateur">
                 <input type="password" v-model="password"
                     class="w-[90%] py-3 rounded-lg bg-sky-200 p-2 font-bold text-sm active:border-sky-800 outline-none"
-                    placeholder="Mot de passe">
+                    placeholder="Mot de passe"  @keyup.enter="postLogin">
             </div>
             <div class=" w-full flex justify-center items-center mt-10">
                 <button
                     class="w-[50%] py-3 bg-sky-950 rounded-lg font-Orbitron text-white tracking-wider shadow-slate-400 shadow-xl"
                     @click="postLogin">connecter</button>
             </div>
-        <div class="py-9">
-            <loading v-if="this.$store.state.is_loading" />
-        </div>
+            <div class="py-9">
+                <loading v-if="this.$store.state.is_loading" />
+            </div>
         </div>
         {{ this.$store.state.user }}
     </div>
@@ -34,7 +34,7 @@ import axios from '../axios';
 import loading from '../components/loading.vue'
 
 export default {
-    components:{
+    components: {
         loading
     },
     data() {
@@ -42,7 +42,9 @@ export default {
             isKeyboardVisible: false,
             keyboardHeight: 0,
             userid: '',
-            password: ''
+            password: '',
+            start_date: '2024-01-01',
+            end_date: '2025-01-01'
         }
     },
     methods: {
@@ -74,11 +76,12 @@ export default {
             axios.post(`/oc_assets/login/`, credentials)
                 .then((reponse) => {
                     this.$store.state.user = reponse.data;
+                    this.getStatics('2024-01-01', '2025-01-01')
                     this.$router.push('/');
                     console.log(this.$store.state.user)
                     window.localStorage.setItem('user', JSON.stringify(reponse.data))
                 })
-        }
+        },
     },
     mounted() {
         this.windowHeight = window.innerHeight;

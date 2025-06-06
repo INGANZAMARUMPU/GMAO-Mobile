@@ -3,26 +3,25 @@
         <div class="py-1">
             <div class="flex justify-between">
                 <div class="">
-                    <img src="../assets/view/img/unnamed.jpg" alt="" class="w-25 px-1.5 ">
+                    <img src="../assets/view/img/gmao (2).webp" alt="" class="w-25 px-1.5 ">
                 </div>
                 <div class="justify-between items-center flex gap-3 p-4">
                     <div class="">
-                        <p class="font-segoe-ui-variable font-semibold text-[10px] "> {{ this.$store.state.user.fullname
-                            }}
-                        </p>
-                        <p for="" class="font-segoe-ui-variable font-light text-[10px] sm:text-[10px]"> {{
-                            this.$store.state.user.businessfunction }}
-                        </p>
-                        <p for="" class="font-segoe-ui-variable font-light text-[10px] sm:text-[10px]"> {{
-                            this.$store.state.user.zipcode }}
-                        </p>
+                        <p class="font-segoe-ui-variable font-semibold text-[10px] "> {{ this.$store.state.user.fullname}}</p>
+                        <p for="" class="text-end font-segoe-ui-variable font-light text-[10px] sm:text-[10px]"> {{this.$store.state.user.default_page }}</p>
+                        <p for="" class="text-end font-segoe-ui-variable font-light text-[10px] sm:text-[10px]"> {{this.$store.state.user.default_service_id }}</p>
                     </div>
                     <div class="">
                         <div class=" w-full h-full  flex items-center justify-center bg-white rounded-2xl"
-                            @click="logout">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
-                                <path fill="none" stroke="#014268" stroke-linecap="round" stroke-linejoin="round"
-                                    stroke-width="2" d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4m7 14l5-5l-5-5m5 5H9" />
+                            @click="info = true">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                                viewBox="0 0 24 24"><!-- Icon from Lucide by Lucide Contributors - https://github.com/lucide-icons/lucide/blob/main/LICENSE -->
+                                <g fill="none" stroke="#014268" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2">
+                                    <path d="M18 20a6 6 0 0 0-12 0" />
+                                    <circle cx="12" cy="10" r="4" />
+                                    <circle cx="12" cy="12" r="10" />
+                                </g>
                             </svg>
                         </div>
                     </div>
@@ -30,9 +29,9 @@
             </div>
             <div class="relative flex justify-center items-center">
                 <div class="flex justify-end items-center">
-                    <input type="number" name="" id="" placeholder="Recherche par numero"
+                    <input type="search" name="" id="" placeholder="Recherche par numero"
                         class="w-80 rounded-sm outline-2 outline-sky-800 text-[13px] font-poppins font-normal px-4 py-2 "
-                        v-model="search_equipement">
+                        v-model="keyword" @keyup.enter="Getinventaire">
                     <div class="absolute  mx-1 flex bg-sky-900 p-1  justify-center items-center rounded-sm">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" @click="Getinventaire"
                             viewBox="0 0 24 24">
@@ -162,9 +161,54 @@
             <div class="h-100 w-80 bg-white shadow-lg overflow-hidden flex flex-col justify-center items-center">
                 <video ref="video" class="w-full h-64 object-cover" autoplay></video>
                 <canvas ref="canvas" class="hidden"></canvas>
-                <div v-if="search_equipement" class="mt-4 text-green-600 font-semibold">
-                    QR Code détecté : {{ search_equipement }}
+                <div v-if="keyword" class="mt-4 text-green-600 font-semibold">
+                    QR Code détecté : {{ keyword }}
                 </div>
+            </div>
+        </VueFinalModal>
+        <VueFinalModal v-model="isDeconnection" :click-to-close="true" class="flex items-center justify-center">
+            <div
+                class="w-70 bg-white shadow-lg overflow-hidden flex flex-col justify-center items-center rounded-sm py-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24">
+                    <g fill="none" stroke="#0c4a6e" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5">
+                        <path d="M9 16c.85-.63 1.885-1 3-1s2.15.37 3 1m-5.5-5.5V10m5 .5V10" />
+                        <path d="M21 12a9 9 0 1 1-18 0a9 9 0 0 1 18 0" />
+                    </g>
+                </svg>
+                <p class="font-poppins">Voulez-vous se deconnecter</p>
+                <button @click="logout"
+                    class="bg-white border-2 border-sky-900 px-2 py-1 rounded-sm text-sky-950 mt-3 font-poppins text-[12px]">Déconnection</button>
+            </div>
+        </VueFinalModal>
+        <VueFinalModal v-model="info" :click-to-close="true" class="flex items-center justify-center">
+            <div
+                class="w-70 bg-white shadow-lg overflow-hidden flex flex-col justify-center items-center rounded-lg py-4">
+                
+                <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50"
+                                viewBox="0 0 24 24"><!-- Icon from Lucide by Lucide Contributors - https://github.com/lucide-icons/lucide/blob/main/LICENSE -->
+                                <g fill="none" stroke="#014268" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2">
+                                    <path d="M18 20a6 6 0 0 0-12 0" />
+                                    <circle cx="12" cy="10" r="4" />
+                                    <circle cx="12" cy="12" r="10" />
+                                </g>
+                            </svg>
+                            <div class="w-full px-3 mt-2 flex flex-col gap-3">
+                                <div class="w-full bg-sky-300/30 rounded-lg flex justify-between items-center px-2 py-2">
+                                    <p class="font-poppins font-semibold text-[14px] ">Nom</p>
+                                    <p class="font-poppins text-[11px]">{{ this.$store.state.user.fullname}}</p>
+                                </div>
+                                <div class="w-full bg-sky-300/30 rounded-lg flex justify-between items-center px-2 py-2">
+                                    <p class="font-poppins font-semibold text-[14px] ">Poste</p>
+                                    <p class="font-poppins text-[11px]">{{ this.$store.state.user.default_page}}</p>
+                                </div>
+                                <div class="w-full bg-sky-300/30 rounded-lg flex justify-between items-center px-2 py-2">
+                                    <p class="font-poppins font-semibold text-[14px] ">Service</p>
+                                    <p class="font-poppins text-[11px]">{{ this.$store.state.user.default_service_id}}</p>
+                                </div>
+                            </div>
+                <button @click="isDeconnection = true"
+                    class="bg-white border-2 border-sky-900 px-2 py-1 rounded-sm text-sky-950 mt-3 font-poppins text-[12px]">Se deconnecter</button>
             </div>
         </VueFinalModal>
     </div>
@@ -173,7 +217,7 @@
 
 <script>
 import axios from '../axios';
-import { VueFinalModal } from 'vue-final-modal'
+import { VueFinalModal, vueFinalModalProps } from 'vue-final-modal'
 import jsQR from 'jsqr'
 import loading from './loading.vue'
 export default {
@@ -203,17 +247,32 @@ export default {
             flipped: false,
             isModalVisible: false,
             isQRcode: false,
-            search_equipement: '',
+            keyword: '',
             startY: 0,
             pulling: false,
             refreshing: false,
+            isDeconnection: false,
+            info: false,
 
         }
     },
     methods: {
         logout() {
             this.$store.state.user = null;
-            window.localStorage.removeItem("user");
+            this.$store.state.code_inventaire = [];
+            this.$store.state.plan = [],
+                this.$store.state.keyword = "",
+                this.$store.state.equipements = [],
+                this.$store.state.PlanMaintance = [],
+                this.$store.state.Operation = [],
+                this.$store.state.code_inventaire = [],
+                this.$store.state.code_plan = [],
+                this.$store.state.user = null
+            this.$store.state.is_loading = false
+            this.$store.state.static = [],
+                this.$store.state.infrastructures = [],
+                this.$store.state.choice = '',
+                window.localStorage.clear();
 
         },
         onTouchStart(event) {
@@ -235,30 +294,29 @@ export default {
             }
         },
         Getinventaire() {
+            this.$store.state.keyword = this.keyword
             console.log('bonjour')
-            axios.get(`/oc_assetshistory/?search=${this.search_equipement}&oc_asset_service__icontains= ${this.$store.state.user.zipcode}&oc_asset_nomenclature__icontains=E`)
+            // this.$store.state.equipements = null
+            axios.get(`/oc_assets/?search=${this.keyword}&oc_asset_service__startswith= ${this.$store.state.user.default_service_id}&oc_asset_nomenclature__startswith=E`)
                 .then((reponse) => {
-                    this.$store.state.equipement_inventaire = reponse.data.results
+                    this.$store.state.equipements = reponse.data.results
                     this.$router.push({ path: '/Inventaire' })
                     console.log(this.items)
-                })
-            axios.get(`/oc_assetshistory/?search=${this.search_equipement}&oc_asset_service__icontains=${this.$store.state.user.zipcode}&oc_asset_nomenclature=I`)
-                .then((reponse) => {
-                    this.$store.state.infrastructure_inventaire = reponse.data.results
+                }).catch((error) => {
+                    const vyose = JSON.parse(window.localStorage.getItem('equipement'))
+                    this.$store.state.equipements = vyose.filter(item => (item.oc_asset_code === this.$store.state.keyword))
                     this.$router.push({ path: '/Inventaire' })
-                    console.log(this.items)
                 })
-            axios.get(`/oc_maintenanceoperations/?search=${this.search_equipement}`)
+            axios.get(`/oc_assets/?search=${this.keyword}&oc_asset_service__startswith=${this.$store.state.user.default_service_id}&oc_asset_nomenclature__startswith=I`)
                 .then((reponse) => {
-                    this.$store.state.Operation = reponse.data.results
-                    console.log(this.items)
+                    this.$store.state.infrastructures = reponse.data.results
+                    this.$router.push({ path: '/Inventaire' })
+                    console.log(reponse.data)
+                }).catch((error) => {
+                    const vyose = JSON.parse(window.localStorage.getItem('infrastructure'))
+                    this.$store.state.infrastructures = vyose.filter(item => (item.oc_asset_code === this.$store.state.keyword))
+                    this.$router.push({ path: '/Inventaire' })
                 })
-            axios.get(`/oc_maintenanceplanshistory/?search=${this.search_equipement}`)
-                .then((reponse) => {
-                    this.$store.state.PlanMaintance = reponse.data.results
-                    console.log(this.items)
-                })
-
         },
         navigate(path) {
             if (this.$route.path !== path) {
@@ -283,7 +341,7 @@ export default {
                     const imageData = context.getImageData(0, 0, canvas.width, canvas.height)
                     const code = jsQR(imageData.data, canvas.width, canvas.height)
                     if (code) {
-                        this.search_equipement = code.data
+                        this.keyword = code.data
                         this.Getinventaire()
                         this.stopScanner()
                         this.isQRcode = false

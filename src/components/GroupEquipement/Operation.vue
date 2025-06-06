@@ -1,7 +1,7 @@
 <template>
     <Base #slot4>
     <div class="w-screen h-full overflow-auto " v-if="!showNewView">
-        <div class="w-screen overflow-hidden flex items-center justify-center gap-[10%] my-8 mb-5 pb-4">
+        <div class="w-screen overflow-hidden flex items-center justify-center gap-[10%] my-2 mb-5 pb-3">
             <button class="custom-box custom-left" @click="isModalVisible = true">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="32" viewBox="0 0 24 24">
                     <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
@@ -11,13 +11,24 @@
                 </svg>
                 <p class="font-poppins font-medium text-[13px] text-white">Filtre</p>
             </button>
-            <button class="custom-box custom-right" @click="handleNewItem">
+            <button class="custom-box custom-right" @click="handleNewItem" v-if="$store.state.user.default_page === 'maintenance' & this.$store.state.code_plan[0]?.oc_maintenanceplan_assetuid">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="32"
                     viewBox="0 0 24 24"><!-- Icon from Lucide by Lucide Contributors - https://github.com/lucide-icons/lucide/blob/main/LICENSE -->
                     <path fill="none" stroke="#ffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M5 12h14m-7-7v14" />
                 </svg>
                 <p class="font-poppins font-medium text-[13px] text-white">Nouveau</p>
+            </button>
+        </div>
+        <div class="w-screen relative flex justify-center my-2" v-if="$store.state.user.default_page === 'maintenance'">
+            <button
+                class="w-12 h-12 flex justify-center items-center bg-sky-900 rounded-xl fixed bottom-30 right-6 shadow-[1px_1px_5px_1px_rgba(0,0,0,0.5)]"
+                @click="this.$router.go('/Operation')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                    viewBox="0 0 24 24"><!-- Icon from Material Symbols Light by Google - https://github.com/google/material-design-icons/blob/master/LICENSE -->
+                    <path fill="#ffffff"
+                        d="M5.53 17.506q-.978-1.142-1.504-2.558T3.5 12q0-3.616 2.664-6.058T12.5 3.5V2l3.673 2.75L12.5 7.5V6Q9.86 6 7.93 7.718T6 12q0 1.13.399 2.15t1.13 1.846zM11.5 22l-3.673-2.75L11.5 16.5V18q2.64 0 4.57-1.718T18 12q0-1.13-.399-2.16q-.399-1.028-1.13-1.855l1.998-1.51q.979 1.142 1.505 2.558T20.5 12q0 3.616-2.664 6.058T11.5 20.5z" />
+                </svg>
             </button>
         </div>
         <!-- <div v-if="hasError" class="erreur">
@@ -33,8 +44,8 @@
                 <p class="text-[8px]">ou veuiller vérifier l'état de votre connexion</p>
             </div>
         </div> -->
-        <div v-if="items.length" class="w-screen flex flex-col items-center space-y-3 mb-4">
-            <div v-if="this.$store.state.code_plan[0]?.oc_maintenanceplan_assetuid" v-for="item in filteredItems"
+        <div class="w-screen flex flex-col items-center space-y-3 mb-4">
+            <div  v-for="item in filteredItems"
                 :key="item.oc_maintenanceoperation_objectid"
                 class="w-[95%] rounded-2xl bg-sky-100 flex flex-col text-sky-900 p-2" @click="PlusInfo(item)">
                 <div class="w-full flex items-center justify-between">
@@ -64,7 +75,7 @@
                     </p>
                 </div>
             </div>
-            <div v-else class="">
+            <div v-if="this.items.length === 0" class="">
                 <p class="text-sky-900 text-[12px]">veuillez tout d'abord choisir un plan de maintenance</p>
             </div>
         </div>
@@ -167,7 +178,7 @@
             </button>
         </div>
         <div class="overflow-auto">
-            <div class="px-3 pt-0 space-y-4 my-4">
+            <form class="px-3 pt-0 space-y-4 my-4"  @submit.prevent="postPlan">
                 <div class="flex items-center content-between!">
                     <p class="font-poppins text-[26px] text-sky-900  font-extralight">Opération de maintenance</p>
                 </div>
@@ -233,10 +244,9 @@
                     <p class="font-poppins text-3xl text-sky-900  font-extralight">Info récentes</p>
                 </div>
                 <div class="flex gap-5 ">
-                    <button class="py-3 rounded-lg bg-sky-950 font-bold text-white grow basis-1"
-                        @click="postPlan">Sauvegarder</button>
+                    <button class="py-3 rounded-lg bg-sky-950 font-bold text-white grow basis-1" type="submit">Sauvegarder</button>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
     </Base>
@@ -248,6 +258,7 @@ import Base from '../Base.vue'
 import axios from 'axios'
 import { VueFinalModal } from 'vue-final-modal'
 import { Keyboard } from '@capacitor/keyboard'
+import { addOfflineRequest, getAllRequests, deleteRequest } from '../../indexDb';
 
 export default {
     components: {
@@ -269,25 +280,9 @@ export default {
                 item.oc_maintenanceoperation_maintenanceplanuid = code
             )
         },
-        equipementInventaire() {
-            return this.$store.state.equipement_inventaire;
-        }
-    },
-    watch: {
-        equipementInventaire: {
-            handler(newVal) {
-                const newSnapshot = JSON.stringify(newVal);
-                if (newSnapshot === this.previousInventaireSnapshot) {
-                    console.log("Aucun changement détecté.");
-                } else {
-                    console.log("🎉 Nouvelle(s) donnée(s) détectée(s) !");
-                    console.log("Nouvelles données :", newVal);
-                    this.items = newVal;
-                    this.previousInventaireSnapshot = newSnapshot;
-                }
-            },
-            deep: true
-        }
+        // equipementInventaire() {
+        //     return this.$store.state.equipements;
+        // }
     },
     data() {
         return {
@@ -311,6 +306,7 @@ export default {
             oc_maintenanceoperation_comment5: '',
             oc_maintenanceoperation_comment: '',
             refe: this.$store.state.code_plan[0]?.oc_maintenanceplan_assetuid,
+            isReallyOnline: false,
 
         }
     },
@@ -339,14 +335,24 @@ export default {
         },
         getOperation() {
             console.log('bonjour')
-            axios.get(`/oc_maintenanceoperations/`)
+            axios.get(`/oc_maintenanceoperations/?oc_maintenanceoperation_maintenanceplanuid=${this.$store.state.code_plan[0]?.oc_maintenanceplan_assetuid}`)
                 .then((reponse) => {
                     this.items = reponse.data.results
                     this.$store.state.Operation = reponse.data.results
                     console.log(this.items)
+                    window.localStorage.setItem('operation', JSON.stringify(reponse.data.results))
+
                 }).catch((error) => {
                     console.error("Erreur lors de la récupération de l'inventaire :", error);
                     this.hasError = true;
+                    this.$store.state.Operation = JSON.parse(window.localStorage.getItem('operation'))
+                    getAllRequests().then((reponse) =>{
+                        console.log(reponse)
+                        for(let item of reponse){
+                            if(item.url == "/oc_maintenanceoperations/")
+                            this.items.unshift(item.data)
+                        }
+                    })
                 });
         },
         handleNewItem() {
@@ -386,51 +392,82 @@ export default {
                 'oc_maintenanceoperation_comment3': this.oc_maintenanceoperation_comment3,
                 'oc_maintenanceoperation_comment5': this.oc_maintenanceoperation_comment5,
             };
+
             const url = '/oc_maintenanceoperations/';
-            if (!navigator.onLine) {
-                const stored = JSON.parse(localStorage.getItem('offlineRequests') || '[]');
-                stored.push({
-                    method: 'post',
-                    url,
-                    data
-                });
-                localStorage.setItem('offlineRequests', JSON.stringify(stored));
-                console.log("Requête stockée hors ligne :", data);
+
+            console.log("CLICKED");
+            if (!this.isReallyOnline) {
+                await addOfflineRequest({ method: 'post', url, data });
                 this.items.unshift(data);
                 this.showNewView = false;
-                localStorage.setItem('operation_temp', JSON.stringify(data));
-
-                console.warn("Requête enregistrée localement. Elle sera envoyée une fois la connexion rétablie.");
+                console.warn("📦 Requête enregistrée dans IndexedDB (offline).");
                 return;
             }
             try {
                 const response = await axios.post(url, data);
-                this.items.unshift(response.data);
+                this.items.push(response.data);
                 this.showNewView = false;
-                localStorage.setItem('operation', JSON.stringify(response.data));
             } catch (error) {
-                console.error("Erreur lors de l'envoi de l'opération :", error);
+                console.error("❌ Erreur lors de l'envoi :", error);
                 this.hasError = true;
             }
-        }
+        },
 
+        async resendOfflineRequests() {
+            const requests = await getAllRequests();
 
+            for (const req of requests) {
+                try {
+                    await axios.post(req.url, req.data);
+                    await deleteRequest(req.id);
+                    console.log('✅ Requête offline envoyée avec succès.');
+                } catch (err) {
+                    console.error('⚠️ Erreur lors de l’envoi offline :', err);
+                }
+            }
+        },
+
+        async verifyConnection() {
+            try {
+                const res = await fetch('https://gmao.amidev.bi/api/', {
+                    method: 'GET',
+                    cache: 'no-store',
+                });
+                this.isReallyOnline = res.ok;
+                console.log('🌐 Connexion réelle :', res.ok);
+
+                if (res.ok) {
+                    this.resendOfflineRequests();
+                }
+            } catch (err) {
+                console.warn('🚫 Connexion réelle impossible :', err);
+                this.isReallyOnline = false;
+            }
+        },
+
+        monitorNetworkStatus() {
+            window.addEventListener('online', this.verifyConnection);
+            window.addEventListener('offline', () => {
+                this.isReallyOnline = false;
+                console.warn('📴 Mode hors-ligne détecté.');
+            });
+
+            this.verifyConnection(); // Vérifie dès le démarrage
+        },
     },
     mounted() {
         this.windowHeight = window.innerHeight;
         window.addEventListener('resize', this.handleResize);
         Keyboard.addListener('keyboardWillShow', this.handleKeyboardShow);
         Keyboard.addListener('keyboardWillHide', this.handleKeyboardHide);
-        if (this.$store.state.Operation.length === 0) {
-            this.getOperation()
-        } else {
-            this.items = this.$store.state.Operation
-            this.previousOperationSnapshot = JSON.stringify(this.$store.state.Operation);
-            console.log(this.$store.state.Operation)
-        }
+        window.addEventListener('online', this.resendOfflineRequests);
+        this.monitorNetworkStatus();
+        this.getOperation()
     },
     beforeUnmount() {
         Keyboard.removeAllListeners();
+        window.removeEventListener('online', this.resendOfflineRequests);
+
     },
 
 }

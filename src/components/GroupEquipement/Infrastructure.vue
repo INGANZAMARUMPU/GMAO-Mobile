@@ -1,7 +1,8 @@
 <template>
     <Base #slot5>
-    <div class="w-screen h-screen overflow-auto mb-4">
-        <div class="w-screen overflow-hidden flex items-center justify-center gap-[10%] my-8 mb-5 pb-4">
+    <div class="w-screen h-screen overflow-auto mb-4" ref="scrollContainer" @touchstart="onTouchStart"
+        @touchmove="onTouchMove" @touchend="onTouchEnd">
+        <div class="w-screen overflow-hidden flex items-center justify-center gap-[10%] my-2 mb-5 pb-3">
             <button class="custom-box custom-right" @click="isModalVisible = true">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="32" viewBox="0 0 24 24">
                     <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
@@ -13,10 +14,10 @@
             </button>
         </div>
 
-        <div v-if="hasError" class="erreur">
+        <!-- <div v-if="hasError" class="erreur">
             <div class="message">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
-                    viewBox="0 0 24 24"><!-- Icon from Lucide by Lucide Contributors - https://github.com/lucide-icons/lucide/blob/main/LICENSE -->
+                    viewBox="0 0 24 24">
                     <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                         stroke-width="2"
                         d="m21.73 18l-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3M12 9v4m0 4h.01" />
@@ -25,7 +26,7 @@
                 <p class="text-[8px]">veuillez contacter la direction s'il vous plait</p>
                 <p class="text-[8px]">ou veuiller vérifier l'état de votre connexion</p>
             </div>
-        </div>
+        </div> -->
         <div class="flex flex-col items-center space-y-3 mb-10">
             <div v-for="item in items" :key="item.oc_asset_objectid"
                 class="w-[95%] rounded-2xl bg-sky-100  flex flex-col text-sky-900 " @click="selectItem(item)">
@@ -40,8 +41,7 @@
                     <div class="w-full flex flex-col items-start justify-center">
                         <div class=" w-full  flex items-end">
                             <div class="flex items-center">
-                                <p class="font-poppins font-semibold text-sm tracking-wider">{{
-                                    getShortDescription(item?.oc_asset_description) }}</p>
+                                <p class="font-poppins font-semibold text-sm tracking-wider">{{item?.oc_asset_description}}</p>
                             </div>
                         </div>
                         <div class=" w-full flex items-end">
@@ -53,9 +53,12 @@
                 </div>
                 <div
                     class="w-full bg-green-800 flex items-center justify-between p-2 text-white font-poppins font-normal text-[10px] tracking-wider rounded-b-lg ">
-                    <p class="">Mise à jour</p>
+                    <p class="">Date de mise à jour</p>
                     <p class="">{{ datetime(item?.oc_asset_updatetime) }}</p>
                 </div>
+            </div>
+            <div v-if="this.items.length === 0" class="">
+                <p class="text-sky-900 text-[12px]">Aucune informations sur cette infrastructure</p>
             </div>
             <!-- <div class="flex gap-1" v-if="filteredItems = 0">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
@@ -167,9 +170,43 @@ export default {
             oc_asset_supplieruid: '',
             oc_asset_description: '',
             previousInventaireSnapshot: null,
+            startY: 0,
+            pulling: false,
+            refreshing: false,
         }
     },
     methods: {
+        onTouchStart(event) {
+            console.log("touch start");
+            this.startY = event.touches[0].clientY;
+            this.pulling = false;
+        },
+
+        onTouchMove(event) {
+            console.log("touch move");
+            const currentY = event.touches[0].clientY;
+            const deltaY = currentY - this.startY;
+
+            const scrollTop = this.$refs.scrollContainer.scrollTop;
+            const isAtTop = scrollTop === 0;
+
+            if (deltaY > 40 && isAtTop && !this.refreshing) {
+                this.pulling = true;
+            }
+        },
+
+        onTouchEnd() {
+            console.log("touch end");
+            if (this.pulling) {
+                // this.refreshing = true;
+                // this.Getinventaire().finally(() => {
+                //     this.refreshing = false;
+                //     this.pulling = false;
+                //     console.log('bok');
+                // });
+                this.$router.go('/Infrastructure')
+            }
+        },
         selectItem(item) {
             this.$store.state.code_inventaire = item
             this.$router.push('/Plan')
@@ -179,6 +216,7 @@ export default {
                 const params = {
                     oc_asset_code: this.oc_asset_code || '',
                     oc_asset_nomenclature: this.oc_asset_nomenclature || '',
+                    oc_asset_service: this.$store.state.user.default_service_id,
                     oc_asset_purchasedate__gte: this.oc_asset_purchasedate__gte || '',
                     oc_asset_purchasedate__lte: this.oc_asset_purchasedate__lte || '',
                     oc_asset_serial: this.oc_asset_serial || '',
@@ -186,7 +224,7 @@ export default {
                     oc_asset_description: this.oc_asset_description || '',
                 };
 
-                const response = await axios.get("/oc_assetshistory/", { params });
+                const response = await axios.get("/oc_assets/", { params });
                 this.items = response.data.results;
                 this.isModalVisible = false
             } catch (error) {
@@ -215,15 +253,19 @@ export default {
             this.keyboardHeight = 0;
         },
         Getinventaire() {
-            axios.get(`/oc_assetshistory/?oc_asset_service__icontains=${this.$store.state.user.zipcode}&oc_asset_nomenclature=I`)
+            axios.get(`/oc_assets/?oc_asset_service__startswith=${this.$store.state.user.default_service_id}&oc_asset_nomenclature__startswith=I`)
                 .then((reponse) => {
                     this.items = reponse.data.results
-                    this.$store.state.infrastructure_inventaire = reponse.data.results;
+                    this.$store.state.infrastructures = reponse.data.results;
                     console.log(this.items)
+                    window.localStorage.setItem('infrastructure', JSON.stringify(reponse.data.results))
+
                 })
                 .catch((error) => {
                     console.error("Erreur lors de la récupération de l'inventaire :", error);
                     this.hasError = true;
+                    this.$store.state.infrastructures = JSON.parse(window.localStorage.getItem('infrastructure'))
+
                 });
         }
     },
@@ -233,12 +275,19 @@ export default {
         Keyboard.addListener('keyboardWillShow', this.handleKeyboardShow);
         Keyboard.addListener('keyboardWillHide', this.handleKeyboardHide);
         window.addEventListener('online', this.Getinventaire);
-        if (this.$store.state.infrastructure_inventaire.length === 0) {
+
+        // if (this.$store.state.keyword) {
+        //     console.log('Recherche active, on ne charge rien pour le moment')
+        // } else 
+        if (!this.$store.state.keyword && this.$store.state.infrastructures.length === 0) {
+            console.log('Aucun inventaire en cache, on appelle Getinventaire()')
             this.Getinventaire()
         } else {
-            this.items = this.$store.state.infrastructure_inventaire
-            this.previousInventaireSnapshot = JSON.stringify(this.$store.state.infrastructure_inventaire);
+            console.log('Chargement depuis le cache')
+            this.items = this.$store.state.infrastructures
+            console.log('Items affectés:', this.items)
         }
+
         const numero = this.$route.query.numero
         console.log('Numéro reçu en query :', numero)
     },
@@ -246,23 +295,15 @@ export default {
         Keyboard.removeAllListeners();
         window.removeEventListener('online', this.getOperation);
     },
-    computed: {
-        equipementInventaire() {
-            return this.$store.state.infrastructure_inventaire;
-        },
-    },
+    // computed: {
+    //     equipementInventaire() {
+    //         return this.$store.state.infrastructures;
+    //     },
+    // },
     watch: {
-        equipementInventaire: {
+        "$store.state.infrastructures": {
             handler(newVal) {
-                const newSnapshot = JSON.stringify(newVal);
-                if (newSnapshot === this.previousInventaireSnapshot) {
-                    console.log("Aucun changement détecté.");
-                } else {
-                    console.log("🎉 Nouvelle(s) donnée(s) détectée(s) !");
-                    console.log("Nouvelles données :", newVal);
-                    this.items = newVal;
-                    this.previousInventaireSnapshot = newSnapshot;
-                }
+                this.items = newVal
             },
             deep: true
         }

@@ -22,7 +22,6 @@
         </div> -->
         <div class="">
             <!-- <loading v-if="this.$store.state.is_loading" />  -->
-            <p class="font-poppins text-2xl text-sky-900  font-extralight mx-3 mt-[-10px]">Statistique d'equipement</p>
             <Equipement></Equipement>
         </div>
         <!-- <div class="">
@@ -120,11 +119,11 @@ export default {
             activeSlot: 'Equipement',
             isKeyboardVisible: false,
             keyboardHeight: 0,
-            search_equipement: '',
+            keyword: '',
             items: [],
-            nomenclature: this.$store.state.user.zipcode,
+            nomenclature: this.$store.state.user.default_service_id,
             start_date: '2024-03-12',
-            end_date: '2024-01-01',
+            end_date: new Date().toISOString().split('T')[0],
 
 
         }
@@ -138,7 +137,7 @@ export default {
         redirectionAvecDonnees() {
             this.$router.push({
                 path: '/equipement',
-                query: { numero: this.search_equipement }
+                query: { numero: this.keyword }
             })
         },
         nextSlot() {
@@ -172,15 +171,9 @@ export default {
             this.keyboardHeight = 0;
         },
         async FiltrerPerformance() {
-            try {
-                const response = await axios.get(`/statistics/?start_date=${this.start_date}&end_date=${this.end_date}&nomenclature=${this.nomenclature}`);
-                this.items = response.data.results;
-                this.isModalVisible = false
-                this.$store.state.static = response.data.results
-            } catch (error) {
-                console.error("Erreur lors du filtrage des opérations de maintenance :", error);
-                this.displayErrorOrRefreshToken(error, this.FiltrerMaintenanceOperations);
-            }
+            this.getStatics(this.start_date, this.end_date)
+            this.isModalVisible = false
+
         },
 
     },

@@ -1,3 +1,5 @@
+import axios from "axios";
+
 export default {
   watch: {
     "$store.state.user": {
@@ -29,7 +31,7 @@ export default {
         timeStyle: "short",
       }).format(date);
     },
-    money(x, decimals = 2) {
+    money(x, decimals = 0) {
       if (!x && x != 0) return "";
       let cash = parseFloat(x).toFixed(decimals);
       if (isNaN(x) || x == null) return "-";
@@ -39,6 +41,21 @@ export default {
       const str = number.toString();
       const parts = str.split(".");
       return parts.length > 1 ? parts[1] : null;
+    },
+    getStatics(start_date, end_date) {
+      console.log(start_date, end_date);
+      axios
+        .get(
+          `/statistics/?start_date=${start_date}&end_date=${end_date}&service=${this.$store.state.user.default_service_id}`
+        )
+        .then((reponse) => {
+          this.$store.state.static = reponse.data;
+          window.localStorage.setItem('statics', JSON.stringify(reponse.data))
+        })
+        .catch((error) => {
+          console.log(error);
+          this.$store.state.static = JSON.parse(window.localStorage.getItem('statics'))
+        });
     },
   },
 };
