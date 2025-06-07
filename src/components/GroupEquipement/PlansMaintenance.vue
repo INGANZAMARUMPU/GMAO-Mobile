@@ -110,7 +110,7 @@
         <VueFinalModal v-model="isModalVisible" :click-to-close="true" class=" !w-full flex flex-col justify-end"
             transition="vfm-fade-in-up">
             <div class="w-full bg-white rounded-t-4xl shadow-lg transition-transform duration-300 ease-in-out"
-                :style="{ transform: isKeyboardVisible ? `translateY(-${keyboardHeight}px)` : 'translateY(0)' }">
+                :style="{ bottom: isKeyboardVisible ? `translateY${keyboardHeight}` : 'translateY(0)' }">
                 <div class=" p-2 flex justify-center items-center">
                     <div class="w-[13vw] h-[5px] rounded-xl bg-sky-950" @click="isModalVisible = false"></div>
                 </div>
@@ -124,13 +124,13 @@
                         <p class="font-poppins text-3xl text-sky-900  font-extralight">Filtre</p>
                     </div>
                     <!-- <input type="text"
-                    class="w-[100%]  rounded-lg border-2 border-[rgb(116,175,209)] focus:border-2 focus:border-sky-900 focus:outline-none py-1 px-2"
+                    class="w-[100%] "
                     placeholder="Nomanclature" v-model="nomenclature"> -->
                     <input type="text" v-model="oc_maintenanceplan_operator"
-                        class="w-[100%]  rounded-lg "
+                        class="w-[100%] "
                         placeholder="Opérateur">
                     <select name="" id=""
-                        class="w-[100%]  rounded-lg border-2 border-[rgb(116,175,209)] focus:border-2 focus:border-sky-900 focus:outline-none py-1 px-2"
+                        class="w-[100%] "
                         v-model="oc_maintenanceplan_type">
                         <option value="">Types</option>
                         <option value="1">Contrôle</option>
@@ -141,7 +141,7 @@
                     <div class="w-[100%]  flex justify-between ">
                         <div class="w-[48%] relative flex items-center">
                             <input type="date" v-model="oc_maintenanceplan_historydate__gte"
-                                class="relative w-full rounded-lg border-2 border-[rgb(116,175,209)] focus:border-2 focus:border-sky-900 focus:outline-none py-1 "
+                                class="relative w-full rounded-lg  py-1 "
                                 placeholder="code">
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" class="absolute right-[2px]"
                                 viewBox="0 0 24 24">
@@ -151,7 +151,7 @@
                         </div>
                         <div class="w-[48%] relative flex items-center">
                             <input type="date" v-model="oc_maintenanceplan_historydate__lte"
-                                class="relative w-full rounded-lg border-2 border-[rgb(116,175,209)] focus:border-2 focus:border-sky-900 focus:outline-none py-1 "
+                                class="relative w-full rounded-lg  py-1 "
                                 placeholder="code">
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" class="absolute right-[2px]"
                                 viewBox="0 0 24 24">
@@ -186,33 +186,33 @@
                 <p class="text-[8px]">ou veuiller vérifier l'état de votre connexion</p>
             </div>
         </div> -->
-        <div class="w-screen flex items-center justify-center gap-[10%] my-8">
-            <button class="fixed left-4 p-2  bg-sky-900 rounded-xl flex justify-center items-center space-x-2 z-50"
+        <div class="w-screen flex items-center justify-center gap-[10%] my-4 ">
+            <button class="fixed left-4 p-1 bg-sky-900 rounded-xl flex justify-center items-center space-x-2 z-50"
                 @click="showNewView = false">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24">
                     <path fill="none" stroke="#ffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="m15 18l-6-6l6-6" />
                 </svg>
             </button>
         </div>
         <div class="overflow-auto ">
-            <form class="px-3 pt-0 space-y-4 my-4" @submit.prevent="postPlan">
+            <form class="px-3 pt-0 space-y-3 " @submit.prevent="postPlan">
                 <div class="flex items-center content-between!">
-                    <p class="font-poppins text-[29px] text-sky-900  font-extralight">Plan de maintenance</p>
+                    <p class="font-poppins text-[24px] text-sky-900  font-light">Plan de maintenance</p>
                 </div>
                 <div class="">
                     <p class="m-0 ">Référence inventaire</p>
                     <div class="flex ">
                         <input type="text" name="" id="" v-model="oc_maintenanceplan_assetuid"
                             placeholder="Référence inventaire" required
-                            class="w-full  rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none p-2 mt-2">
+                            class="w-full   p-2 mt-2">
                     </div>
                 </div>
                 <input type="text" v-model="nom"
-                    class="w-full rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none py-2 pl-3"
+                    class="w-full  py-2 pl-3"
                     placeholder="Nom du plan">
                 <select name="" id=""
-                    class="w-full rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
+                    class="w-full  p-2"
                     v-model="type">
                     <option value="">Types</option>
                     <option value="1">Contrôle</option>
@@ -221,36 +221,24 @@
                     <option value="99">Autre</option> 1.6485
                 </select>
                 <textarea v-model="commentaire" rows="6" placeholder="Écrivez votre commentaire ici..."
-                    class="w-full p-3 border-2 border-sky-900 rounded-lg resize-y  focus:border-3 focus:border-sky-900 focus:outline-none   text-gray-800" />
+                    class="w-full p-3 text-gray-800" />
                 <div class="flex items-center content-between!">
-                    <p class="font-poppins text-3xl text-sky-900  font-extralight">Coût</p>
+                    <p class="font-poppins text-[24px] text-sky-900  font-light">Coût</p>
                 </div>
                 <input type="number" v-model="transport"
-                    class="w-full rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none py-2 pl-3"
+                    class="w-full  py-2 pl-3"
                     placeholder="Transport">
                 <input type="number" v-model="prestataire"
-                    class="w-full rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none py-2 pl-3"
+                    class="w-full  py-2 pl-3"
                     placeholder="Préstataire">
                 <input type="number" v-model="consommable"
-                    class="w-full rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none py-2 pl-3"
+                    class="w-full  py-2 pl-3"
                     placeholder="Consommable">
                 <input type="number" v-model="Autre"
-                    class="w-full rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none py-2 pl-3"
+                    class="w-full  py-2 pl-3"
                     placeholder="Autre">
-                <div class="">
-                    <p class="m-0 ">Dernière modification par</p>
-                    <div class="flex ">
-                        <!-- <p class="ml-2">{{ items[0].maj }}</p> -->
-                    </div>
-                </div>
-                <div class="">
-                    <p class="m-0 ">Date et heure de création</p>
-                    <div class="flex ">
-                        <!-- <p class="ml-2">{{ items[0].maj }}</p> -->
-                    </div>
-                </div>
-                <div class="flex gap-5 ">
-                    <button class="py-3 rounded-lg bg-sky-950 font-bold text-white grow basis-1"
+                <div class="flex gap-5 my-3">
+                    <button class="py-2 rounded-lg bg-sky-950 font-bold text-white grow basis-1"
                         type="submit">Sauvegarder</button>
                 </div>
             </form>

@@ -31,19 +31,6 @@
                 </svg>
             </button>
         </div>
-        <!-- <div v-if="hasError" class="erreur">
-            <div class="message">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
-                    viewBox="0 0 24 24">
-                    <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                        stroke-width="2"
-                        d="m21.73 18l-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3M12 9v4m0 4h.01" />
-                </svg>
-                <p>Une erreur est survenue</p>
-                <p class="text-[8px]">veuillez contacter la direction s'il vous plait</p>
-                <p class="text-[8px]">ou veuiller vérifier l'état de votre connexion</p>
-            </div>
-        </div> -->
         <div class="w-screen flex flex-col items-center space-y-3 mb-4">
             <div  v-for="item in filteredItems"
                 :key="item.oc_maintenanceoperation_objectid"
@@ -51,8 +38,6 @@
                 <div class="w-full flex items-center justify-between">
                     <p class="font-poppins font-semibold text-sm tracking-wider">{{
                         item.oc_maintenanceoperation_maintenanceplanuid }}</p>
-                    <!-- <p class="font-poppins font-semibold text-xs tracking-wider">{{ item.oc_asset_nomenclature
-                    }}</p> -->
                     <p class="font-poppins font-normal text-xs tracking-wider">{{
                         datetime(item.oc_maintenanceoperation_historydate) }}</p>
                 </div>
@@ -82,7 +67,7 @@
         <VueFinalModal v-model="isInfo" :click-to-close="true" class="flex justify-center items-center"
             transition="vfm-fade-in-up">
             <div class="w-80 max-h-80 bg-white rounded-xl shadow-lg transition-transform duration-300 ease-in-out overflow-hidden"
-                :style="{ transform: isKeyboardVisible ? `translateY(-${keyboardHeight}px)` : 'translateY(0)' }">
+                :style="{ bottom: isKeyboardVisible ? `translateY${keyboardHeight}` : 'translateY(0)' }">
                 <div class="py-4 px-4 ">
                     <div class="flex items-center gap-3 pb-3">
                         <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
@@ -98,7 +83,7 @@
                     </div>
                     <div class="flex justify-center px-4 pt-3 pb-0 gap-9">
                         <button
-                            class="font-normal text-slate-300 py-1 text-slate-500 active:text-sky-800 active:bg-sky-500/30 active:border-1 active:border-sky-500/30  rounded-md grow basis-1 max-w-30"
+                            class="font-normal text-slate-300 py-1 active:text-slate-500  active:bg-sky-500/30 active:border-1 active:border-sky-500/30  rounded-md grow basis-1 max-w-30"
                             @click="isInfo = false">Fermer</button>
                     </div>
                 </div>
@@ -107,7 +92,7 @@
         <VueFinalModal v-model="isModalVisible" :click-to-close="true" class=" !w-full flex flex-col justify-end"
             transition="vfm-fade-in-up">
             <div class="w-full bg-white rounded-t-4xl shadow-lg transition-transform duration-300 ease-in-out"
-                :style="{ transform: isKeyboardVisible ? `translateY(-${keyboardHeight}px)` : 'translateY(0)' }">
+                :style="{ bottom: isKeyboardVisible ? `translateY${keyboardHeight}` : 'translateY(0)' }">
                 <div class=" p-2 flex justify-center items-center">
                     <div class="w-[13vw] h-[5px] rounded-xl bg-sky-950" @click="isModalVisible = false"></div>
                 </div>
@@ -121,13 +106,13 @@
                         <p class="font-poppins text-3xl text-sky-900  font-extralight">Filtre</p>
                     </div>
                     <input type="text"
-                        class="w-[100%]  rounded-lg border-2 border-[rgb(116,175,209)] focus:border-2 focus:border-sky-900 focus:outline-none py-1 px-2"
+                        class="w-[100%] "
                         placeholder="Nomanclature" v-model="oc_maintenanceoperation_maintenanceplanuid">
                     <input type="text" v-model="oc_maintenanceoperation_operator"
-                        class="w-[100%]  rounded-lg border-2 border-[rgb(116,175,209)] focus:border-2 focus:border-sky-900 focus:outline-none py-1 px-2"
+                        class="w-[100%] "
                         placeholder="Opérateur">
                     <select name="" id=""
-                        class="w-[100%]  rounded-lg border-2 border-[rgb(116,175,209)] focus:border-2 focus:border-sky-900 focus:outline-none py-1 px-2"
+                        class="w-[100%] "
                         v-model="oc_maintenanceoperation_result__icontains">
                         <option value="">Frequency</option>
                         <option value="defect">Défectueux</option>
@@ -137,7 +122,7 @@
                     <div class="w-[100%]  flex justify-between ">
                         <div class="w-[48%] relative flex items-center">
                             <input type="date" v-model="oc_maintenanceoperation_date__gte"
-                                class="relative w-full rounded-lg border-2 border-[rgb(116,175,209)] focus:border-2 focus:border-sky-900 focus:outline-none py-1 "
+                                class="relative w-full rounded-lg  py-1 "
                                 placeholder="code">
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" class="absolute right-[2px]"
                                 viewBox="0 0 24 24">
@@ -147,7 +132,7 @@
                         </div>
                         <div class="w-[48%] relative flex items-center">
                             <input type="date" v-model="oc_maintenanceoperation_date__lte"
-                                class="relative w-full rounded-lg border-2 border-[rgb(116,175,209)] focus:border-2 focus:border-sky-900 focus:outline-none py-1 "
+                                class="relative w-full rounded-lg  py-1 "
                                 placeholder="code">
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" class="absolute right-[2px]"
                                 viewBox="0 0 24 24">
@@ -168,8 +153,8 @@
         </VueFinalModal>
     </div>
     <div class="w-screen" v-else>
-        <div class="w-screen flex items-center justify-center gap-[10%] my-8">
-            <button class="fixed left-4 p-2 bg-sky-900 rounded-xl flex justify-center items-center space-x-2 z-50"
+        <div class="w-screen flex items-center justify-center gap-[10%] my-4">
+            <button class="fixed left-4 p-1 bg-sky-900 rounded-xl flex justify-center items-center space-x-2 z-50"
                 @click="showNewView = false">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
                     <path fill="none" stroke="#ffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -178,73 +163,50 @@
             </button>
         </div>
         <div class="overflow-auto">
-            <form class="px-3 pt-0 space-y-4 my-4"  @submit.prevent="postPlan">
+            <form class="px-3 pt-0 space-y-3"  @submit.prevent="postPlan">
                 <div class="flex items-center content-between!">
-                    <p class="font-poppins text-[26px] text-sky-900  font-extralight">Opération de maintenance</p>
+                    <p class="font-poppins text-[24px] text-sky-900  font-light">Opération de maintenance</p>
                 </div>
                 <div class="">
-                    <p class="m-0 ">Référence inventaire</p>
+                    <p class="">Référence inventaire</p>
                     <div class="flex ">
                         <!-- <p class="ml-2 font-semibold">{{ this.$store.state.code_plan.oc_maintenanceplan_assetuid }}</p> -->
                         <input type="text" name="" id="" v-model="refe" placeholder="Référence inventaire"
-                            class="w-full  rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none p-2 mt-2">
-                    </div>
-                </div>
-                <div class="">
-                    <p class="m-0 ">Date plan comptable</p>
-                    <div class="flex ">
-                        <p class="ml-2 font-semibold">{{
-                            datetime(this.$store.state.code_plan[0]?.oc_maintenanceplan_historydate) }}</p>
+                            class="w-full   p-2 mt-2">
                     </div>
                 </div>
                 <input type="text"
-                    class="w-full  rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
+                    class="w-full   p-2"
                     placeholder="Supplier" v-model="oc_maintenanceoperation_supplier">
 
                 <select name="" id=""
-                    class="w-full rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none p-2"
+                    class="w-full  p-2"
                     v-model="oc_maintenanceoperation_result">
                     <option value="">Resultat</option>
                     <option value="defect">Défectueux</option>
                     <option value="ok">ok</option>
                     <option value="revsion">Révision nécessaire</option>
                 </select>
-                <!-- <div class="relative flex justify-center items-center">
-                    <div class="w-full flex justify-end items-center">
-                        <input type="date"
-                            class="w-full  rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none p-2">
-                        <div class="absolute flex justify-center items-center rounded-sm px-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
-                                viewBox="0 0 24 24">
-                                <path fill="#014268"
-                                    d="M12 14q-.425 0-.712-.288T11 13t.288-.712T12 12t.713.288T13 13t-.288.713T12 14m-4 0q-.425 0-.712-.288T7 13t.288-.712T8 12t.713.288T9 13t-.288.713T8 14m8 0q-.425 0-.712-.288T15 13t.288-.712T16 12t.713.288T17 13t-.288.713T16 14m-4 4q-.425 0-.712-.288T11 17t.288-.712T12 16t.713.288T13 17t-.288.713T12 18m-4 0q-.425 0-.712-.288T7 17t.288-.712T8 16t.713.288T9 17t-.288.713T8 18m8 0q-.425 0-.712-.288T15 17t.288-.712T16 16t.713.288T17 17t-.288.713T16 18M5 22q-.825 0-1.412-.587T3 20V6q0-.825.588-1.412T5 4h1V2h2v2h8V2h2v2h1q.825 0 1.413.588T21 6v14q0 .825-.587 1.413T19 22zm0-2h14V10H5z" />
-                            </svg>
-                        </div>
-                    </div>
-                </div> -->
                 <textarea v-model="oc_maintenanceoperation_comment" rows="6"
                     placeholder="Écrivez votre commentaire ici..."
-                    class="w-full p-3 border-2 border-sky-900 rounded-lg resize-y  focus:border-3 focus:border-sky-900 focus:outline-none   text-gray-800" />
+                    class="w-full p-3" />
                 <div class="flex items-center content-between!">
-                    <p class="font-poppins text-3xl text-sky-900  font-extralight">Coût</p>
+                    <p class="font-poppins text-[24px] text-sky-900  font-light">Coût</p>
                 </div>
                 <input type="number" v-model="oc_maintenanceoperation_comment1"
-                    class="w-full rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none py-2 pl-3"
+                    class="w-full  py-2 pl-3"
                     placeholder="Transport">
                 <input type="number" v-model="oc_maintenanceoperation_comment5"
-                    class="w-full rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none py-2 pl-3"
+                    class="w-full  py-2 pl-3"
                     placeholder="Préstataire">
                 <input type="number" v-model="oc_maintenanceoperation_comment2"
-                    class="w-full rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none py-2 pl-3"
+                    class="w-full  py-2 pl-3"
                     placeholder="Consommable">
                 <input type="number" v-model="oc_maintenanceoperation_comment3"
-                    class="w-full rounded-lg border-2 border-sky-900/80 focus:border-3 focus:border-sky-900 focus:outline-none py-2 pl-3"
+                    class="w-full  py-2 pl-3"
                     placeholder="Autre">
-                <div class="flex items-center content-between!">
-                    <p class="font-poppins text-3xl text-sky-900  font-extralight">Info récentes</p>
-                </div>
-                <div class="flex gap-5 ">
-                    <button class="py-3 rounded-lg bg-sky-950 font-bold text-white grow basis-1" type="submit">Sauvegarder</button>
+                <div class="flex gap-5 my-3">
+                    <button class="py-2 rounded-lg bg-sky-950 font-bold text-white grow basis-1" type="submit">Sauvegarder</button>
                 </div>
             </form>
         </div>

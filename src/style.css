@@ -70,3 +70,11 @@
 .scroll-touch {
   -webkit-overflow-scrolling: touch;
 }
+input, select, textarea{
+  background-color: #cde;
+  border-radius: 5px;
+  padding: 7px 10px;
+}
+input[type=search]{
+  background-color: white;
+}

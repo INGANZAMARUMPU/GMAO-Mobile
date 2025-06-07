@@ -29,7 +29,7 @@
         </div> -->
         <div class="flex flex-col items-center space-y-3 mb-10">
             <div v-for="item in items" :key="item.oc_asset_objectid"
-                class="w-[95%] rounded-2xl bg-sky-100  flex flex-col text-sky-900 " @click="selectItem(item)">
+                class="w-[95%] rounded-sm bg-sky-100  flex flex-col text-sky-900 " @click="selectItem(item)">
                 <div class="p-2">
                     <div class="w-full flex items-center justify-between">
                         <p class="font-poppins font-semibold text-[12px] tracking-wider">{{ item?.oc_asset_code }}</p>
@@ -52,7 +52,7 @@
                     </div>
                 </div>
                 <div
-                    class="w-full bg-green-800 flex items-center justify-between p-2 text-white font-poppins font-normal text-[10px] tracking-wider rounded-b-lg ">
+                    class="w-full bg-sky-800/90 flex items-center justify-between p-2 text-white font-poppins font-normal text-[10px] tracking-wider rounded-b-sm ">
                     <p class="">Date de mise à jour</p>
                     <p class="">{{ datetime(item?.oc_asset_updatetime) }}</p>
                 </div>
@@ -89,26 +89,26 @@
                         <p class="font-poppins text-3xl text-sky-900  font-extralight">Filtre</p>
                     </div>
                     <input type="text"
-                        class="w-[100%]  rounded-lg border-2 border-[rgb(116,175,209)] focus:border-2 focus:border-sky-900 focus:outline-none py-1 px-2"
+                        class="w-[100%] "
                         placeholder="Nomanclature" v-model="oc_asset_nomenclature">
                     <input type="text"
-                        class="w-[100%]  rounded-lg border-2 border-[rgb(116,175,209)] focus:border-2 focus:border-sky-900 focus:outline-none py-1 px-2"
+                        class="w-[100%] "
                         placeholder="Description" v-model="oc_asset_description">
                     <input type="text"
-                        class="w-[100%]  rounded-lg border-2 border-[rgb(116,175,209)] focus:border-2 focus:border-sky-900 focus:outline-none py-1 px-2"
+                        class="w-[100%] "
                         placeholder="Fournisseur" v-model="oc_asset_supplieruid">
                     <div class="w-[100%]  flex justify-between ">
                         <input type="number"
-                            class="w-[48%]  rounded-lg border-2 border-[rgb(116,175,209)] focus:border-2 focus:border-sky-900 focus:outline-none py-1 px-2"
+                            class="w-[48%]  rounded-lg p-2"
                             placeholder="code" v-model="oc_asset_code">
                         <input type="number"
-                            class="w-[48%]  rounded-lg border-2 border-[rgb(116,175,209)] focus:border-2 focus:border-sky-900 focus:outline-none py-1 px-2"
+                            class="w-[48%]  rounded-lg p-2"
                             placeholder="Numéro de série" v-model="oc_asset_serial">
                     </div>
                     <div class="w-[100%]  flex justify-between ">
                         <div class="w-[48%] relative flex items-center">
                             <input type="date"
-                                class="relative w-full rounded-lg border-2 border-[rgb(116,175,209)] focus:border-2 focus:border-sky-900 focus:outline-none py-1 "
+                                class="relative w-full rounded-lg  py-1 "
                                 placeholder="code" v-model="oc_asset_purchasedate__gte">
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" class="absolute right-[2px]"
                                 viewBox="0 0 24 24">
@@ -118,7 +118,7 @@
                         </div>
                         <div class="w-[48%] relative flex items-center">
                             <input type="date"
-                                class="relative w-full rounded-lg border-2 border-[rgb(116,175,209)] focus:border-2 focus:border-sky-900 focus:outline-none py-1 "
+                                class="relative w-full rounded-lg  py-1 "
                                 placeholder="code" v-model="oc_asset_purchasedate__lte">
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" class="absolute right-[2px]"
                                 viewBox="0 0 24 24">

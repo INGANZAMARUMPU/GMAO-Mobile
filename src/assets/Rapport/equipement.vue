@@ -46,15 +46,15 @@
                     <p class="font-poppins text-3xl text-sky-900  font-extralight">Filtre</p>
                 </div>
                 <input type="text"
-                    class="w-[100%]  rounded-lg border-2 border-[rgb(116,175,209)] focus:border-2 focus:border-sky-900 focus:outline-none py-1 px-2"
+                    class="w-[100%] "
                     placeholder="Nomanclature" v-model="nomenclature">
                 <!-- <input type="text"
-                    class="w-[100%]  rounded-lg border-2 border-[rgb(116,175,209)] focus:border-2 focus:border-sky-900 focus:outline-none py-1 px-2"
+                    class="w-[100%] "
                     placeholder="Description"> -->
                 <div class="w-[100%]  flex justify-between ">
                     <div class="w-[48%] relative flex items-center">
                         <input type="date" v-model="start_date"
-                            class="relative w-full rounded-lg border-2 border-[rgb(116,175,209)] focus:border-2 focus:border-sky-900 focus:outline-none py-1 "
+                            class="relative w-full rounded-lg  py-1 "
                             placeholder="code">
                         <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" class="absolute right-[2px]"
                             viewBox="0 0 24 24">
@@ -64,7 +64,7 @@
                     </div>
                     <div class="w-[48%] relative flex items-center">
                         <input type="date" v-model="end_date"
-                            class="relative w-full rounded-lg border-2 border-[rgb(116,175,209)] focus:border-2 focus:border-sky-900 focus:outline-none py-1 "
+                            class="relative w-full rounded-lg  py-1 "
                             placeholder="code">
                         <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" class="absolute right-[2px]"
                             viewBox="0 0 24 24">
