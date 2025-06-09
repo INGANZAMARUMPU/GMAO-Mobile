@@ -11,7 +11,8 @@
                 </svg>
                 <p class="font-poppins font-medium text-[13px] text-white">Filtre</p>
             </button>
-            <button class="custom-box custom-right" @click="handleNewItem" v-if="$store.state.user.default_page === 'maintenance' & this.$store.state.code_plan[0]?.oc_maintenanceplan_assetuid">
+            <button class="custom-box custom-right" @click="handleNewItem"
+                v-if="$store.state.user.default_page === 'maintenance' & this.$store.state.code_plan[0]?.oc_maintenanceplan_assetuid">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="32"
                     viewBox="0 0 24 24"><!-- Icon from Lucide by Lucide Contributors - https://github.com/lucide-icons/lucide/blob/main/LICENSE -->
                     <path fill="none" stroke="#ffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -32,8 +33,7 @@
             </button>
         </div>
         <div class="w-screen flex flex-col items-center space-y-3 mb-4">
-            <div  v-for="item in filteredItems"
-                :key="item.oc_maintenanceoperation_objectid"
+            <div v-for="item in filteredItems" :key="item.oc_maintenanceoperation_objectid"
                 class="w-[95%] rounded-2xl bg-sky-100 flex flex-col text-sky-900 p-2" @click="PlusInfo(item)">
                 <div class="w-full flex items-center justify-between">
                     <p class="font-poppins font-semibold text-sm tracking-wider">{{
@@ -105,15 +105,11 @@
                         </svg>
                         <p class="font-poppins text-3xl text-sky-900  font-extralight">Filtre</p>
                     </div>
-                    <input type="text"
-                        class="w-[100%] "
-                        placeholder="Nomanclature" v-model="oc_maintenanceoperation_maintenanceplanuid">
-                    <input type="text" v-model="oc_maintenanceoperation_operator"
-                        class="w-[100%] "
+                    <input type="text" class="w-[100%] " placeholder="Nomanclature"
+                        v-model="oc_maintenanceoperation_maintenanceplanuid">
+                    <input type="text" v-model="oc_maintenanceoperation_operator" class="w-[100%] "
                         placeholder="Opérateur">
-                    <select name="" id=""
-                        class="w-[100%] "
-                        v-model="oc_maintenanceoperation_result__icontains">
+                    <select name="" id="" class="w-[100%] " v-model="oc_maintenanceoperation_result__icontains">
                         <option value="">Frequency</option>
                         <option value="defect">Défectueux</option>
                         <option value="ok">ok</option>
@@ -122,8 +118,7 @@
                     <div class="w-[100%]  flex justify-between ">
                         <div class="w-[48%] relative flex items-center">
                             <input type="date" v-model="oc_maintenanceoperation_date__gte"
-                                class="relative w-full rounded-lg  py-1 "
-                                placeholder="code">
+                                class="relative w-full rounded-lg  py-1 " placeholder="code">
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" class="absolute right-[2px]"
                                 viewBox="0 0 24 24">
                                 <path fill="#014268"
@@ -132,8 +127,7 @@
                         </div>
                         <div class="w-[48%] relative flex items-center">
                             <input type="date" v-model="oc_maintenanceoperation_date__lte"
-                                class="relative w-full rounded-lg  py-1 "
-                                placeholder="code">
+                                class="relative w-full rounded-lg  py-1 " placeholder="code">
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" class="absolute right-[2px]"
                                 viewBox="0 0 24 24">
                                 <path fill="#014268"
@@ -163,7 +157,7 @@
             </button>
         </div>
         <div class="overflow-auto">
-            <form class="px-3 pt-0 space-y-3"  @submit.prevent="postPlan">
+            <form class="px-3 pt-0 space-y-3">
                 <div class="flex items-center content-between!">
                     <p class="font-poppins text-[24px] text-sky-900  font-light">Opération de maintenance</p>
                 </div>
@@ -175,38 +169,33 @@
                             class="w-full   p-2 mt-2">
                     </div>
                 </div>
-                <input type="text"
-                    class="w-full   p-2"
-                    placeholder="Supplier" v-model="oc_maintenanceoperation_supplier">
+                <input type="text" class="w-full   p-2" placeholder="Supplier"
+                    v-model="oc_maintenanceoperation_supplier">
 
-                <select name="" id=""
-                    class="w-full  p-2"
-                    v-model="oc_maintenanceoperation_result">
+                <select name="" id="" class="w-full  p-2" v-model="oc_maintenanceoperation_result">
                     <option value="">Resultat</option>
                     <option value="defect">Défectueux</option>
                     <option value="ok">ok</option>
                     <option value="revsion">Révision nécessaire</option>
                 </select>
                 <textarea v-model="oc_maintenanceoperation_comment" rows="6"
-                    placeholder="Écrivez votre commentaire ici..."
-                    class="w-full p-3" />
+                    placeholder="Écrivez votre commentaire ici..." class="w-full p-3" />
                 <div class="flex items-center content-between!">
                     <p class="font-poppins text-[24px] text-sky-900  font-light">Coût</p>
                 </div>
-                <input type="number" v-model="oc_maintenanceoperation_comment1"
-                    class="w-full  py-2 pl-3"
+                <input type="number" v-model="oc_maintenanceoperation_comment1" class="w-full  py-2 pl-3"
                     placeholder="Transport">
-                <input type="number" v-model="oc_maintenanceoperation_comment5"
-                    class="w-full  py-2 pl-3"
+                <input type="number" v-model="oc_maintenanceoperation_comment5" class="w-full  py-2 pl-3"
                     placeholder="Préstataire">
-                <input type="number" v-model="oc_maintenanceoperation_comment2"
-                    class="w-full  py-2 pl-3"
+                <input type="number" v-model="oc_maintenanceoperation_comment2" class="w-full  py-2 pl-3"
                     placeholder="Consommable">
-                <input type="number" v-model="oc_maintenanceoperation_comment3"
-                    class="w-full  py-2 pl-3"
+                <input type="number" v-model="oc_maintenanceoperation_comment3" class="w-full  py-2 pl-3"
                     placeholder="Autre">
-                <div class="flex gap-5 my-3">
-                    <button class="py-2 rounded-lg bg-sky-950 font-bold text-white grow basis-1" type="submit">Sauvegarder</button>
+                <div class="flex gap-5 my-3 mb-15">
+                    <button class="py-2 rounded-lg bg-sky-950 font-bold text-white grow basis-1" @click="putOperation"
+                        type="submit">Enregistrer</button>
+                    <button class="py-2 rounded-lg bg-sky-950 font-bold text-white grow basis-1" @click="postPlan"
+                        type="submit">Sauvegarder</button>
                 </div>
             </form>
         </div>
@@ -290,10 +279,51 @@ export default {
                 this.displayErrorOrRefreshToken(error, this.FiltrerMaintenanceOperations);
             }
         },
+        Modifier(info) {
+            this.showNewView = true;
+            // this.plus = this.plus.map(({ __local, ...rest }) => rest)
+            this.refe = info.refe
+            this.oc_maintenanceoperation_result = info.oc_maintenanceoperation_result;
+            this.oc_maintenanceoperation_comment = info.oc_maintenanceoperation_comment;
+            this.oc_maintenanceoperation_comment1 = info.oc_maintenanceoperation_comment1
+            this.oc_maintenanceoperation_comment2 = info.oc_maintenanceoperation_comment2
+            this.oc_maintenanceoperation_comment3 = info.oc_maintenanceoperation_comment3
+            this.oc_maintenanceoperation_comment5 = info.oc_maintenanceoperation_comment5
+
+        },
         PlusInfo(info) {
-            this.isInfo = true
-            this.plus = info
-            console.log(this.plus)
+            if (info.__local) {
+                this.Modifier(info)
+            } else {
+                this.selectInfo(info)
+            }
+        },
+        putOperation() {
+
+            const doc = {
+                'oc_maintenanceoperation_maintenanceplanuid': this.refe,
+                'oc_maintenanceoperation_operator': this.$store.state.code_plan.oc_maintenanceplan_operator,
+                'oc_maintenanceoperation_result': this.oc_maintenanceoperation_result,
+                'oc_maintenanceoperation_comment': this.oc_maintenanceoperation_comment,
+                'oc_maintenanceoperation_comment1': this.oc_maintenanceoperation_comment1,
+                'oc_maintenanceoperation_comment2': this.oc_maintenanceoperation_comment2,
+                'oc_maintenanceoperation_comment3': this.oc_maintenanceoperation_comment3,
+                'oc_maintenanceoperation_comment5': this.oc_maintenanceoperation_comment5,
+            };
+            let existing = JSON.parse(window.localStorage.getItem('putOperation') || '[]');
+            if (!Array.isArray(existing)) {
+                existing = [];
+            }
+            const index = existing.findIndex(
+                item => item.oc_maintenanceplan_assetuid === doc.oc_maintenanceplan_assetuid
+            );
+            if (index !== -1) {
+                existing[index] = doc;
+            } else {
+                existing.unshift(doc);
+            }
+            window.localStorage.setItem('putOperation', JSON.stringify(existing));
+            it
         },
         getOperation() {
             console.log('bonjour')
@@ -308,13 +338,17 @@ export default {
                     console.error("Erreur lors de la récupération de l'inventaire :", error);
                     this.hasError = true;
                     this.$store.state.Operation = JSON.parse(window.localStorage.getItem('operation'))
-                    getAllRequests().then((reponse) =>{
+                    getAllRequests().then((reponse) => {
                         console.log(reponse)
-                        for(let item of reponse){
-                            if(item.url == "/oc_maintenanceoperations/")
-                            this.items.unshift(item.data)
+                        for (let item of reponse) {
+                            if (item.url == "/oc_maintenanceoperations/")
+                                this.items.unshift(item.data)
                         }
                     })
+                    let planLocal = JSON.parse(window.localStorage.getItem('putOperation'))
+                    planLocal = planLocal.map(item => ({ ...item, __local: true }))
+                    this.items.unshift(...planLocal)
+                    console.log(this.items)
                 });
         },
         handleNewItem() {
@@ -344,6 +378,7 @@ export default {
             this.keyboardHeight = 0;
         },
         async postPlan() {
+            window.localStorage.removeItem('putOperation')
             const data = {
                 'oc_maintenanceoperation_maintenanceplanuid': this.refe,
                 'oc_maintenanceoperation_operator': this.$store.state.code_plan.oc_maintenanceplan_operator,

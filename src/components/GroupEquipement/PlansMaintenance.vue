@@ -30,6 +30,12 @@
                 </svg>
             </button>
         </div>
+        <div class="toast flex justify-center ">
+            <div class="w-80 bg-black/80 text-white text-[8pt] rounded-lg p-3 flex justify-between items-center" v-if="planAlert">
+                <p>choisissent un équipement ou infrastructure</p>
+                <button class="bg-sky-950 p-2 rounnded-xl">OK</button>
+            </div>
+        </div>
         <!-- <div v-if="hasError" class="erreur">
             <div class="message">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
@@ -44,10 +50,14 @@
         </div> -->
         <div class="w-screen flex flex-col items-center space-y-3 mb-4">
             <div v-for="item in filteredItems" :key="item.oc_maintenanceplan_objectid"
-                class="w-[95%] rounded-2xl bg-sky-100  flex flex-col text-sky-900 p-2" @click="PlusInfo(item)">
+                class="w-[95%] rounded-2xl bg-sky-100  flex flex-col text-sky-900 p-2" @click="PlusInfo(item)"
+                :class="{ 'opacity-60': item.__local }">
                 <div class="w-full flex items-center justify-between">
-                    <p v-if="!$store.state.code_inventaire.oc_asset_description " class="font-poppins font-semibold text-sm tracking-wider">{{ item.oc_maintenanceplan_assetuid }}</p>
-                    <p v-else class="font-poppins font-semibold text-[10px] tracking-wider">{{ this.$store.state.code_inventaire.oc_asset_description  }}</p>
+                    <p v-if="!$store.state.code_inventaire.oc_asset_description"
+                        class="font-poppins font-semibold text-sm tracking-wider">{{ item.oc_maintenanceplan_assetuid }}
+                    </p>
+                    <p v-else class="font-poppins font-semibold text-[10px] tracking-wider">{{
+                        this.$store.state.code_inventaire.oc_asset_description }}</p>
                     <p class="font-poppins font-normal text-xs tracking-wider">{{
                         datetime(item.oc_maintenanceplan_updatetime) }}
                     </p>
@@ -126,12 +136,8 @@
                     <!-- <input type="text"
                     class="w-[100%] "
                     placeholder="Nomanclature" v-model="nomenclature"> -->
-                    <input type="text" v-model="oc_maintenanceplan_operator"
-                        class="w-[100%] "
-                        placeholder="Opérateur">
-                    <select name="" id=""
-                        class="w-[100%] "
-                        v-model="oc_maintenanceplan_type">
+                    <input type="text" v-model="oc_maintenanceplan_operator" class="w-[100%] " placeholder="Opérateur">
+                    <select name="" id="" class="w-[100%] " v-model="oc_maintenanceplan_type">
                         <option value="">Types</option>
                         <option value="1">Contrôle</option>
                         <option value="2">Maintenance</option>
@@ -141,8 +147,7 @@
                     <div class="w-[100%]  flex justify-between ">
                         <div class="w-[48%] relative flex items-center">
                             <input type="date" v-model="oc_maintenanceplan_historydate__gte"
-                                class="relative w-full rounded-lg  py-1 "
-                                placeholder="code">
+                                class="relative w-full rounded-lg  py-1 " placeholder="code">
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" class="absolute right-[2px]"
                                 viewBox="0 0 24 24">
                                 <path fill="#014268"
@@ -151,8 +156,7 @@
                         </div>
                         <div class="w-[48%] relative flex items-center">
                             <input type="date" v-model="oc_maintenanceplan_historydate__lte"
-                                class="relative w-full rounded-lg  py-1 "
-                                placeholder="code">
+                                class="relative w-full rounded-lg  py-1 " placeholder="code">
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" class="absolute right-[2px]"
                                 viewBox="0 0 24 24">
                                 <path fill="#014268"
@@ -196,24 +200,12 @@
             </button>
         </div>
         <div class="overflow-auto ">
-            <form class="px-3 pt-0 space-y-3 " @submit.prevent="postPlan">
+            <form class="px-3 pt-0 space-y-3 ">
                 <div class="flex items-center content-between!">
                     <p class="font-poppins text-[24px] text-sky-900  font-light">Plan de maintenance</p>
                 </div>
-                <div class="">
-                    <p class="m-0 ">Référence inventaire</p>
-                    <div class="flex ">
-                        <input type="text" name="" id="" v-model="oc_maintenanceplan_assetuid"
-                            placeholder="Référence inventaire" required
-                            class="w-full   p-2 mt-2">
-                    </div>
-                </div>
-                <input type="text" v-model="nom"
-                    class="w-full  py-2 pl-3"
-                    placeholder="Nom du plan">
-                <select name="" id=""
-                    class="w-full  p-2"
-                    v-model="type">
+                <input type="text" v-model="nom" class="w-full  py-2 pl-3" placeholder="Nom du plan">
+                <select name="" id="" class="w-full  p-2" v-model="type">
                     <option value="">Types</option>
                     <option value="1">Contrôle</option>
                     <option value="2">Maintenance</option>
@@ -225,21 +217,15 @@
                 <div class="flex items-center content-between!">
                     <p class="font-poppins text-[24px] text-sky-900  font-light">Coût</p>
                 </div>
-                <input type="number" v-model="transport"
-                    class="w-full  py-2 pl-3"
-                    placeholder="Transport">
-                <input type="number" v-model="prestataire"
-                    class="w-full  py-2 pl-3"
-                    placeholder="Préstataire">
-                <input type="number" v-model="consommable"
-                    class="w-full  py-2 pl-3"
-                    placeholder="Consommable">
-                <input type="number" v-model="Autre"
-                    class="w-full  py-2 pl-3"
-                    placeholder="Autre">
-                <div class="flex gap-5 my-3">
-                    <button class="py-2 rounded-lg bg-sky-950 font-bold text-white grow basis-1"
-                        type="submit">Sauvegarder</button>
+                <input type="number" v-model="transport" class="w-full  py-2 pl-3" placeholder="Transport">
+                <input type="number" v-model="prestataire" class="w-full  py-2 pl-3" placeholder="Préstataire">
+                <input type="number" v-model="consommable" class="w-full  py-2 pl-3" placeholder="Consommable">
+                <input type="number" v-model="Autre" class="w-full  py-2 pl-3" placeholder="Autre">
+                <div class="flex gap-5 my-3 mb-15">
+                    <button class="py-2 rounded-lg bg-sky-950 font-bold text-white grow basis-1" @click="putPlan"
+                        type="submit">Enregistrer</button>
+                    <button class="py-2 rounded-lg bg-sky-950 font-bold text-white grow basis-1" @click="postPlan"
+                        type="submit">Envoyer</button>
                 </div>
             </form>
         </div>
@@ -301,7 +287,8 @@ export default {
             oc_maintenanceplan_historydate__gte: '',
             oc_maintenanceplan_historydate__lte: '',
             isReallyOnline: false,
-            oc_maintenanceplan_assetuid: this.$store.state.code_inventaire.oc_asset_code
+            assetid: this.$store.state.code_inventaire.oc_asset_code,
+            planAlert: false,
 
         }
     },
@@ -324,7 +311,28 @@ export default {
                 this.displayErrorOrRefreshToken(error, this.FiltrerMaintenanceOperations);
             }
         },
+        Modifier(plus) {
+            this.showNewView = true;
+            // this.plus = this.plus.map(({ __local, ...rest }) => rest)
+            this.oc_maintenanceplan_type = plus.oc_maintenanceplan_type;
+            this.nom = plus.oc_maintenanceplan_name;
+            this.commentaire = plus.oc_maintenanceplan_instructions
+            this.assetid = plus.oc_maintenanceplan_assetuid;
+            this.Autre = plus.oc_maintenanceplan_comment4
+            this.consommable = plus.oc_maintenanceplan_comment1
+            this.prestataire = plus.oc_maintenanceplan_comment3
+            this.transport = plus.oc_maintenanceplan_comment2
+            this.type = plus.oc_maintenanceplan_type
+
+        },
         PlusInfo(info) {
+            if (info.__local) {
+                this.Modifier(info)
+            } else {
+                this.selectInfo(info)
+            }
+        },
+        selectInfo(info) {
             this.isInfo = true
             this.plus = info
             console.log(this.plus)
@@ -341,14 +349,21 @@ export default {
             this.isInfo = false
         },
         handleNewItem() {
-            this.showNewView = true
+            if (this.$store.state.code_inventaire.oc_asset_code) {
+                this.showNewView = true
+            } else {
+                this.planAlert = true
+                setTimeout(() => {
+                    this.planAlert = false;
+                }, 3000);
+            }
         },
         returnToMainView() {
             this.showNewView = false
         },
-        async postPlan() {
-            const data = {
-                oc_maintenanceplan_assetuid: this.oc_maintenanceplan_assetuid,
+        putPlan() {
+            const doc = {
+                oc_maintenanceplan_assetuid: this.assetid,
                 oc_maintenanceplan_operator: this.$store.state.user.fullname,
                 oc_maintenanceplan_comment4: this.Autre,
                 oc_maintenanceplan_comment1: this.consommable,
@@ -358,7 +373,39 @@ export default {
                 oc_maintenanceplan_type: this.type,
                 oc_maintenanceplan_instructions: this.commentaire,
             };
-
+            let existing = JSON.parse(window.localStorage.getItem('putPlan') || '[]');
+            if (!Array.isArray(existing)) {
+                existing = [];
+            }
+            const index = existing.findIndex(
+                item => item.oc_maintenanceplan_assetuid === doc.oc_maintenanceplan_assetuid
+            );
+            if (index !== -1) {
+                existing[index] = doc;
+            } else {
+                existing.unshift(doc);
+            }
+            window.localStorage.setItem('planPut', JSON.stringify(existing));
+            it
+        },
+        async postPlan() {
+            // const plane = JSON.parse(window.localStorage.getItem('putPlan'))
+            // if(plane.oc_maintenanceplan_assetuid){
+            //     window.localStorage.clear('planPut')
+            // }
+            window.localStorage.removeItem('planPut')
+            const data = {
+                oc_maintenanceplan_assetuid: this.assetid,
+                oc_maintenanceplan_operator: this.$store.state.user.fullname,
+                oc_maintenanceplan_comment4: this.Autre,
+                oc_maintenanceplan_comment1: this.consommable,
+                oc_maintenanceplan_comment3: this.prestataire,
+                oc_maintenanceplan_comment2: this.transport,
+                oc_maintenanceplan_name: this.nom,
+                oc_maintenanceplan_type: this.type,
+                oc_maintenanceplan_instructions: this.commentaire,
+            };
+            console.log(this.data)
             const url = '/oc_maintenanceplanshistory/';
 
             console.log("CLICKED");
@@ -380,7 +427,6 @@ export default {
                 this.hasError = true;
             }
         },
-
         async resendOfflineRequests() {
             const requests = await getAllRequests();
 
@@ -462,6 +508,9 @@ export default {
                                 this.items.unshift(item.data)
                         }
                     })
+                    let planLocal = JSON.parse(window.localStorage.getItem('planPut'))
+                    planLocal = planLocal.map(item => ({ ...item, __local: true }))
+                    this.items.unshift(...planLocal)
                 });
         }
     },

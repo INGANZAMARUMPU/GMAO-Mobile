@@ -9,13 +9,13 @@ import { QrcodeStream } from "vue-qrcode-reader";
 import store from "./assets/store/index";
 import mixins from "../mixins";
 import axios from "./axios";
-import { Capacitor } from '@capacitor/core'
+import { Capacitor } from "@capacitor/core";
 import { App as CapacitorApp } from "@capacitor/app";
 
 const app = createApp(App);
 const vfm = createVfm();
 app.use(router);
-app.use(Vue3TouchEvents);
+app.use(Vue3TouchEvents, {tapTolerance: 10,swipeTolerance: 30,longTapTimeInterval: 400});
 app.component("QrcodeStream", QrcodeStream);
 app.use(vfm);
 app.mixin(mixins);
