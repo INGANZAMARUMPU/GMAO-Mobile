@@ -53,14 +53,15 @@
                 </div>
                 <div
                     class="w-full bg-sky-800/90 flex items-center justify-between p-2 text-white font-poppins font-normal text-[10px] tracking-wider rounded-b-sm ">
-                    <p class="">Etat</p>
-                    <p class="" v-if="item?.oc_asset_comment9 == 1">Bon</p>
-                    <p class="" v-if="item?.oc_asset_comment9 == 2">satisfaisant</p>
-                    <p class="" v-if="item?.oc_asset_comment9 == 3">insatisfaisant</p>
-                    <p class="" v-if="item?.oc_asset_comment9 == 4">Mauvais</p>
-                    <p class="" v-if="item?.oc_asset_comment9 == 5">A remplacer</p>
-                    <p class="" v-if="item?.oc_asset_comment9 == ''">Aucune info</p>
-                    <p class="" v-else-if="item?.oc_asset_comment9 == 0">neuf</p>
+                    <p class="" v-if="item?.oc_asset_comment9 == 1">Etat : Bon</p>
+                    <p class="" v-if="item?.oc_asset_comment9 == 2">Etat : satisfaisant</p>
+                    <p class="" v-if="item?.oc_asset_comment9 == 3">Etat : insatisfaisant</p>
+                    <p class="" v-if="item?.oc_asset_comment9 == 4">Etat : Mauvais</p>
+                    <p class="" v-if="item?.oc_asset_comment9 == 5">Etat : A remplacer</p>
+                    <p class="" v-if="item?.oc_asset_comment9 == ''">Etat : Aucune info</p>
+                    <p class="" v-else-if="item?.oc_asset_comment9 == 0">Etat : neuf</p>
+                    <p v-if="item?.oc_asset_comment6== ''">Aucune info</p>
+                    <p v-else>{{ item?.oc_asset_comment6 }}</p>
                 </div>
             </div>
             <div v-if="this.items.length === 0" class="">
@@ -220,7 +221,7 @@ export default {
                 const params = {
                     oc_asset_code: this.oc_asset_code || '',
                     oc_asset_nomenclature: this.oc_asset_nomenclature || '',
-                    oc_asset_service: this.$store.state.user.default_service_id,
+                    oc_asset_service: this.$store.state.lieu,
                     oc_asset_purchasedate__gte: this.oc_asset_purchasedate__gte || '',
                     oc_asset_purchasedate__lte: this.oc_asset_purchasedate__lte || '',
                     oc_asset_serial: this.oc_asset_serial || '',
@@ -261,7 +262,7 @@ export default {
             this.Getinventaire()
         },
         Getinventaire() {
-            axios.get(`/oc_assets/?page=${this.count}&oc_asset_service__startswith=${this.$store.state.user.default_service_id}&oc_asset_nomenclature__startswith=I&oc_asset_comment9=${this.$store.state.code ?? ''}&oc_asset_comment12__lte=${this.$store.state.start_date || ''}`)
+            axios.get(`/oc_assets/?page=${this.count}&oc_asset_service__startswith=${this.$store.state.lieu || this.$store.state.user.default_service_id}&oc_asset_nomenclature__startswith=I&oc_asset_comment9=${this.$store.state.code ?? ''}&oc_asset_comment12__lte=${this.$store.state.start_date || ''}`)
                 .then((reponse) => {
                     // this.items.push(...reponse.data.results)
                     this.items = reponse.data.results

@@ -67,9 +67,10 @@
                     </p>
                 </div>
             </div>
-            <div v-if="this.items.length === 0" class="">
-                <p class="text-sky-900 text-[12px]">veuillez tout d'abord choisir un plan de maintenance</p>
-            </div>
+            <p class="text-sky-900 text-[12px]" v-if="$store.state.code_inventaire.oc_asset_description">Aucune opération</p>
+            <!-- Sinon, si items est vide ET qu'il n'y a pas de description -->
+            <p class="text-sky-900 text-[12px]"v-else-if="items.length === 0 && !$store.state.code_inventaire.oc_asset_description">veuillez tout d'abord choisir un plan de maintenance
+            </p>
         </div>
         <VueFinalModal v-model="isInfo" :click-to-close="true" class="flex justify-center items-center"
             transition="vfm-fade-in-up">

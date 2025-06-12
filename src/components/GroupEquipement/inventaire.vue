@@ -37,7 +37,8 @@
                         <p class="font-poppins font-semibold text-[12px] tracking-wider">{{ item.oc_asset_code }}</p>
                         <p class="font-poppins font-semibold text-[9px] tracking-wider">{{ item.oc_asset_nomenclature }}
                         </p>
-                    <p class="font-poppins font-normal text-[11px] tracking-wider">{{ datetime(item.oc_asset_updatetime) }}</p>
+                        <p class="font-poppins font-normal text-[11px] tracking-wider">{{
+                            datetime(item.oc_asset_updatetime) }}</p>
                     </div>
                     <div class="w-full flex flex-col items-start justify-center">
                         <div class=" w-full  flex items-end">
@@ -46,32 +47,35 @@
                         </div>
                         <div class=" w-full flex items-end">
                             <p class="font-poppins text-[12px] tracking-wider flex items-end ">{{
-                                item.oc_asset_service}}</p>
+                                item.oc_asset_service }}</p>
                         </div>
                     </div>
                 </div>
                 <div
                     class="w-full bg-sky-800/90 flex items-center justify-between p-2 text-white font-poppins font-normal text-[10px] tracking-wider rounded-b-sm ">
-                    <p class="">Etat</p>
-                    <p class="" v-if="item?.oc_asset_comment9 == 1">Bon</p>
-                    <p class="" v-if="item?.oc_asset_comment9 == 2">satisfaisant</p>
-                    <p class="" v-if="item?.oc_asset_comment9 == 3">insatisfaisant</p>
-                    <p class="" v-if="item?.oc_asset_comment9 == 4">Mauvais</p>
-                    <p class="" v-if="item?.oc_asset_comment9 == 5">A remplacer</p>
-                    <p class="" v-if="item?.oc_asset_comment9 == ''">Aucune info</p>
-                    <p class="" v-else-if="item?.oc_asset_comment9 == 0">neuf</p>
+                    <p class="" v-if="item?.oc_asset_comment9 == 1">Etat : Bon</p>
+                    <p class="" v-if="item?.oc_asset_comment9 == 2">Etat : satisfaisant</p>
+                    <p class="" v-if="item?.oc_asset_comment9 == 3">Etat : insatisfaisant</p>
+                    <p class="" v-if="item?.oc_asset_comment9 == 4">Etat : Mauvais</p>
+                    <p class="" v-if="item?.oc_asset_comment9 == 5">Etat : A remplacer</p>
+                    <p class="" v-if="item?.oc_asset_comment9 == ''">Etat : Aucune info</p>
+                    <p class="" v-else-if="item?.oc_asset_comment9 == 0">Etat : neuf</p>
+                    <p v-if="item?.oc_asset_comment6 == ''">Aucune info</p>
+                    <p v-else>{{ item?.oc_asset_comment6 }}</p>
                 </div>
             </div>
             <div v-if="this.items.length === 0" class="">
                 <p class="text-sky-900 text-[12px]">Aucune équipement</p>
             </div>
-            <button v-if="next && items.length >= 40 " @click="summer" class=" flex items-center justify-center border-1 border-sky-950 font-poppins text-sky-950 text-[16px] px-3 gap-1  rounded-xl">
+            <button v-if="next && items.length >= 40" @click="summer"
+                class=" flex items-center justify-center border-1 border-sky-950 font-poppins text-sky-950 text-[16px] px-3 gap-1  rounded-xl">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                     viewBox="0 0 24 24"><!-- Icon from Lucide by Lucide Contributors - https://github.com/lucide-icons/lucide/blob/main/LICENSE -->
                     <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                         stroke-width="2" d="M12 5v14m7-7l-7 7l-7-7" />
                 </svg>
-                <p>suite</p></button>
+                <p>suite</p>
+            </button>
         </div>
         <VueFinalModal v-model="isModalVisible" :click-to-close="true" class="flex justify-center items-end"
             transition="vfm-fade-in-up">
@@ -170,6 +174,28 @@ export default {
         }
     },
     methods: {
+        getval() {
+            switch (val) {
+                case 0:
+                    return { label: 'Etat : Neuf', color: 'bg-green-700' };
+                case 1:
+                    return { label: 'Etat : Bon', color: 'bg-green-600' };
+                case 2:
+                    return { label: 'Etat : Satisfaisant', color: 'bg-yellow-500' };
+                case 3:
+                    return { label: 'Etat : Insatisfaisant', color: 'bg-orange-500' };
+                case 4:
+                    return { label: 'Etat : Mauvais', color: 'bg-red-600' };
+                case 5:
+                    return { label: 'Etat : À remplacer', color: 'bg-red-800' };
+                case '':
+                case null:
+                case undefined:
+                    return { label: 'Etat : Aucune info', color: 'bg-gray-500' };
+                default:
+                    return { label: 'Etat inconnu', color: 'bg-gray-400' };
+            }
+        },
         onTouchStart(event) {
             console.log("touch start");
             this.startY = event.touches[0].clientY;
@@ -210,7 +236,7 @@ export default {
                 const params = {
                     oc_asset_code: this.oc_asset_code || '',
                     oc_asset_nomenclature: this.oc_asset_nomenclature || '',
-                    oc_asset_service__startswith: this.$store.state.user.default_service_id,
+                    oc_asset_service__startswith: this.$store.state.lieu,
                     oc_asset_purchasedate__gte: this.oc_asset_purchasedate__gte || '',
                     oc_asset_purchasedate__lte: this.oc_asset_purchasedate__lte || '',
                     oc_asset_serial: this.oc_asset_serial || '',
@@ -249,20 +275,21 @@ export default {
         },
         summer() {
             this.count++,
-            this.getInventaire()
+                this.getInventaire()
         },
         handleKeyboardHide() {
             this.isKeyboardVisible = false;
             this.keyboardHeight = 0;
         },
         getInventaire() {
-            axios.get(`/oc_assets/?page=${this.count}&oc_asset_service__startswith=${this.$store.state.user.default_service_id}&oc_asset_nomenclature__icontains=e&oc_asset_comment9=${this.$store.state.codeEqui  ?? ''}&oc_asset_comment12__lte=${this.$store.state.start_date || ''}`)
-            .then((reponse) => {
+            axios.get(`/oc_assets/?page=${this.count}&oc_asset_service__startswith=${this.$store.state.lieu || this.$store.state.user.default_service_id}&oc_asset_nomenclature__icontains=e&oc_asset_comment9=${this.$store.state.codeEqui ?? ''}&oc_asset_comment12__lte=${this.$store.state.start_date || ''}`)
+                .then((reponse) => {
                     this.items.push(...reponse.data.results)
                     this.$store.state.equipements = this.items
                     console.log(this.items)
                     window.localStorage.setItem('equipement', JSON.stringify(this.items))
                     this.$store.state.start_date = ''
+                    
                 }).catch((error) => {
                     this.$store.state.equipements = JSON.parse(window.localStorage.getItem('equipement'))
                     this.next = false
@@ -315,9 +342,6 @@ export default {
     }
 }
 </script>
-
-
-
 <style scoped>
 .modal-inner.vfm-fade-in-up-enter-active,
 .modal-inner.vfm-fade-in-up-leave-active {

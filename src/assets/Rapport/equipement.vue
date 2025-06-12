@@ -40,15 +40,6 @@
                     </svg>
                     <p class="font-poppins text-3xl text-sky-900  font-extralight">Filtre</p>
                 </div>
-                <!-- <input type="text"
-                    class="w-[100%] "
-                    placeholder="Nomanclature" v-model="nomenclature"> -->
-                <!-- <input type="text"
-                    class="w-[100%] "
-                    placeholder="Description"> -->
-                <select name="" id="" class="w-[100%]">
-                    <option value="">Burundi</option>
-                </select>
                 <select name="" id="" class="w-[100%]" v-model="province">
                     <option value="">Provinces</option>
                     <option v-for="list in listprovinces" :value="list.oc_label_id">{{ list.oc_label_value }}</option>
@@ -57,7 +48,6 @@
                     <option value="">Disctrictes</option>
                     <option v-for="list in listdistricts" :value="list.oc_label_id">{{ list.oc_label_value }}</option>
                 </select>
-                <!-- <input list="etablisement" name="" id="" class="w-[100%]" placeholder="Etablissement"> -->
                 <select name="" id="" class="w-[100%]" v-model="hopital" v-if="district">
                     <option value="">Etablisement</option>
                     <option v-for="list in listetablissement" :value="list.oc_label_id">{{ list.oc_label_value }}
@@ -194,7 +184,8 @@ export default {
         },
         async FiltrerPerformance() {
             this.$store.state.start_date = this.start_date
-            this.lieu = this.hopital ? this.hopital : this.district;
+            this.$store.state.district = this.lieu
+            this.lieu = this.hopital || this.district || this.province;
             console.log(this.lieu)
             this.getStatics(this.start_date, this.end_date, this.lieu)
             this.isModalVisible = false

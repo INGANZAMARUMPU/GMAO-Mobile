@@ -43,18 +43,19 @@ export default {
       return parts.length > 1 ? parts[1] : null;
     },
     getStatics(start_date, end_date, lieu) {
-      if (!lieu.includes(this.$store.state.user.default_service_id)) {
+      const lieuUpper = lieu; // garder la version originale (majuscule)
+      const lieuLower = lieu.toLowerCase();
+      if (!lieuLower.includes(this.$store.state.user.default_service_id)) {
         console.log("vous ne pouvez pas");
-        this.activerStaticalert()
+        this.activerStaticalert();
         return;
       }
       console.log(this.lieu);
       axios
-        .get(
-          `/statistics/?service=${lieu}&start_date=${start_date}&end_date=${end_date}`
-        )
+        .get(`/statistics/?service=${lieuUpper}&start_date=${start_date}&end_date=${end_date}`)
         .then((reponse) => {
           this.$store.state.static = reponse.data;
+          this.$store.state.lieu = this.lieu;
           window.localStorage.setItem("statics", JSON.stringify(reponse.data));
         })
         .catch((error) => {
