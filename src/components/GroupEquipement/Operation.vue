@@ -67,9 +67,12 @@
                     </p>
                 </div>
             </div>
-            <p class="text-sky-900 text-[12px]" v-if="$store.state.code_inventaire.oc_asset_description">Aucune opération</p>
+            <p class="text-sky-900 text-[12px]" v-if="$store.state.code_inventaire.oc_asset_description">Aucune
+                opération</p>
             <!-- Sinon, si items est vide ET qu'il n'y a pas de description -->
-            <p class="text-sky-900 text-[12px]"v-else-if="items.length === 0 && !$store.state.code_inventaire.oc_asset_description">veuillez tout d'abord choisir un plan de maintenance
+            <p class="text-sky-900 text-[12px]"
+                v-else-if="items.length === 0 && !$store.state.code_inventaire.oc_asset_description">veuillez tout
+                d'abord choisir un plan de maintenance
             </p>
         </div>
         <VueFinalModal v-model="isInfo" :click-to-close="true" class="flex justify-center items-center"
@@ -165,7 +168,7 @@
             </button>
         </div>
         <div class="overflow-auto">
-            <form class="px-3 pt-0 space-y-3">
+            <form class="px-3 pt-0 space-y-3" @submit.prevent="handleSubmit">
                 <div class="flex items-center content-between!">
                     <p class="font-poppins text-[24px] text-sky-900  font-light">Opération de maintenance</p>
                 </div>
@@ -178,16 +181,16 @@
                     </div>
                 </div>
                 <input type="text" class="w-full   p-2" placeholder="Supplier"
-                    v-model="oc_maintenanceoperation_supplier">
+                    v-model="oc_maintenanceoperation_supplier" required>
 
-                <select name="" id="" class="w-full  p-2" v-model="oc_maintenanceoperation_result">
+                <select name="" id="" class="w-full  p-2" v-model="oc_maintenanceoperation_result" required>
                     <option value="">Resultat</option>
                     <option value="defect">Défectueux</option>
                     <option value="ok">ok</option>
                     <option value="revsion">Révision nécessaire</option>
                 </select>
                 <textarea v-model="oc_maintenanceoperation_comment" rows="6"
-                    placeholder="Écrivez votre commentaire ici..." class="w-full p-3" />
+                    placeholder="Écrivez votre commentaire ici..." class="w-full p-3" required />
                 <div class="flex items-center content-between!">
                     <p class="font-poppins text-[24px] text-sky-900  font-light">Coût</p>
                 </div>
@@ -200,10 +203,10 @@
                 <input type="number" v-model="oc_maintenanceoperation_comment3" class="w-full  py-2 pl-3"
                     placeholder="Autre">
                 <div class="flex gap-5 my-3 mb-15">
-                    <button class="py-2 rounded-lg bg-sky-950 font-bold text-white grow basis-1" @click="putOperation"
-                        type="submit">Enregistrer</button>
-                    <button class="py-2 rounded-lg bg-sky-950 font-bold text-white grow basis-1" @click="postPlan"
-                        type="submit">Sauvegarder</button>
+                    <button class="py-2 rounded-lg bg-sky-950 font-bold text-white grow basis-1"
+                        @click="submitType = 'put'" type="submit">Enregistrer</button>
+                    <button class="py-2 rounded-lg bg-sky-950 font-bold text-white grow basis-1"
+                        @click="submitType = 'post'" type="submit">Sauvegarder</button>
                 </div>
             </form>
         </div>
@@ -269,9 +272,17 @@ export default {
             isReallyOnline: false,
             nameplan: this.$store.state.code_inventaire.oc_asset_description,
             postalert: false,
+            submitType: '',
         }
     },
     methods: {
+        handleSubmit() {
+            if (this.submitType === 'put') {
+                this.putOperation();
+            } else if (this.submitType === 'post') {
+                this.postPlan();
+            }
+        },
         async FiltrerMaintenanceOperations() {
             try {
                 const params = {

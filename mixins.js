@@ -21,7 +21,10 @@ export default {
     },
     formatInstructions(text) {
       if (!text) return "";
-      return text.replace(/\n/g, "<br>");
+      // Enlever tous les <br>, <br/>, <br /> existants
+      const cleaned = text.replace(/<br\s*\/?>/gi, '');
+      // Remplacer les sauts de ligne (\n) par <br>
+      return cleaned.replace(/\n/g, "<br>");
     },
     datetime(x) {
       if (!x) return "-";

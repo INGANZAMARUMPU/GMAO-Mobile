@@ -208,13 +208,13 @@
             </button>
         </div>
         <div class="overflow-auto ">
-            <form class="px-3 pt-0 space-y-3 ">
+            <form class="px-3 pt-0 space-y-3 " @submit.prevent="handleSubmit">
                 <div class="flex items-center content-between!">
                     <p class="font-poppins text-[24px] text-sky-900  font-light">Plan de maintenance</p>
                 </div>
                 <input type="text" v-model="nameplan" name="" id="" class="w-[100%]" disabled>
-                <input type="text" v-model="nom" class="w-full  py-2 pl-3" placeholder="Nom du plan">
-                <select name="" id="" class="w-full  p-2" v-model="type">
+                <input type="text" v-model="nom" class="w-full  py-2 pl-3" placeholder="Nom du plan" required>
+                <select name="" id="" class="w-full  p-2" v-model="type" required>
                     <option value="">Types</option>
                     <option value="1">Contrôle</option>
                     <option value="2">Maintenance</option>
@@ -222,7 +222,7 @@
                     <option value="99">Autre</option> 1.6485
                 </select>
                 <textarea v-model="commentaire" rows="6" placeholder="Écrivez votre commentaire ici..."
-                    class="w-full p-3 text-gray-800" />
+                    class="w-full p-3 text-gray-800" required />
                 <div class="flex items-center content-between!">
                     <p class="font-poppins text-[24px] text-sky-900  font-light">Coût</p>
                 </div>
@@ -231,10 +231,10 @@
                 <input type="number" v-model="consommable" class="w-full  py-2 pl-3" placeholder="Consommable">
                 <input type="number" v-model="Autre" class="w-full  py-2 pl-3" placeholder="Autre">
                 <div class="flex gap-5 my-3 mb-15">
-                    <button class="py-2 rounded-lg bg-sky-950 font-bold text-white grow basis-1" @click="putPlan"
-                        type="submit">Enregistrer</button>
-                    <button class="py-2 rounded-lg bg-sky-950 font-bold text-white grow basis-1" @click="postPlan"
-                        type="submit">Envoyer</button>
+                    <button class="py-2 rounded-lg bg-sky-950 font-bold text-white grow basis-1"
+                        @click="submitType = 'put'" type="submit">Enregistrer</button>
+                    <button class="py-2 rounded-lg bg-sky-950 font-bold text-white grow basis-1"
+                        @click="submitType = 'post'" type="submit">Envoyer</button>
                 </div>
             </form>
         </div>
@@ -300,10 +300,18 @@ export default {
             planAlert: false,
             nameplan: this.$store.state.code_inventaire.oc_asset_description,
             serverid: '1',
-            postalert: false
+            postalert: false,
+            submitType: '',
         }
     },
     methods: {
+        handleSubmit() {
+            if (this.submitType === 'put') {
+                this.putPlan();
+            } else if (this.submitType === 'post') {
+                this.postPlan();
+            }
+        },
         async FiltrerMaintenancePlan() {
             try {
                 const params = {

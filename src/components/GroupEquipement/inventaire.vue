@@ -43,7 +43,7 @@
                     <div class="w-full flex flex-col items-start justify-center">
                         <div class=" w-full  flex items-end">
                             <p class="w-full font-poppins font-semibold text-sm tracking-wider description">
-                                {{ item.oc_asset_description }}</p>
+                                {{ formatInstructions(item.oc_asset_description) }}</p>
                         </div>
                         <div class=" w-full flex items-end">
                             <p class="font-poppins text-[12px] tracking-wider flex items-end ">{{
