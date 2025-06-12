@@ -3,7 +3,7 @@
     <div class="relative h-8/8 overflow-y-auto">
         <div class="w-screen relative flex justify-center my-2">
             <button
-                class="w-12 h-12 flex justify-center items-center bg-sky-900 rounded-xl fixed bottom-30 right-6 shadow-[1px_1px_5px_1px_rgba(0,0,0,0.5)]"
+                class="w-12 h-12 flex justify-center items-center bg-sky-900/90 rounded-xl fixed bottom-30 right-6 shadow-[1px_1px_5px_1px_rgba(0,0,0,0.5)]"
                 @click="this.isModalVisible = true">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="32" viewBox="0 0 24 24">
                     <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
@@ -12,22 +12,17 @@
                         color="#ffffff" />
                 </svg>
             </button>
+            <div class="toast flex justify-center ">
+                <div class="w-80 bg-black/80 text-white text-[9pt] rounded-lg p-3 flex justify-between items-center"
+                    v-if="staticalert">
+                    <p>Votre recherche dépasse la limite du secteur attribué</p>
+                    <button class="bg-sky-950 p-2 rounnded-xl" @click="this.staticalert = false">OK</button>
+                </div>
+            </div>
         </div>
-        <!-- <transition :name="`fade-slide-${transitionDirection}`" mode="out-in">
-            <component :is="currentSlot" :key="currentSlot" />
-        </transition> -->
-        <!-- <div class="">
-            <p class="font-poppins text-2xl text-sky-900  font-extralight mx-3 my-4">Statistique d'infrastructure</p>
-            <Infrastructure></Infrastructure>
-        </div> -->
         <div class="">
-            <!-- <loading v-if="this.$store.state.is_loading" />  -->
             <Equipement></Equipement>
         </div>
-        <!-- <div class="">
-            <p class="font-poppins text-xl text-sky-900  font-extralight mx-3 my-4">Statistique de performance</p>
-            <Performance></Performance>
-        </div> -->
     </div>
     <VueFinalModal v-model="isModalVisible" :click-to-close="true" class=" !w-full flex flex-col justify-end"
         transition="vfm-fade-in-up">
@@ -45,16 +40,32 @@
                     </svg>
                     <p class="font-poppins text-3xl text-sky-900  font-extralight">Filtre</p>
                 </div>
-                <input type="text"
+                <!-- <input type="text"
                     class="w-[100%] "
-                    placeholder="Nomanclature" v-model="nomenclature">
+                    placeholder="Nomanclature" v-model="nomenclature"> -->
                 <!-- <input type="text"
                     class="w-[100%] "
                     placeholder="Description"> -->
+                <select name="" id="" class="w-[100%]">
+                    <option value="">Burundi</option>
+                </select>
+                <select name="" id="" class="w-[100%]" v-model="province">
+                    <option value="">Provinces</option>
+                    <option v-for="list in listprovinces" :value="list.oc_label_id">{{ list.oc_label_value }}</option>
+                </select>
+                <select name="" id="" class="w-[100%]" v-model="district" v-if="province">
+                    <option value="">Disctrictes</option>
+                    <option v-for="list in listdistricts" :value="list.oc_label_id">{{ list.oc_label_value }}</option>
+                </select>
+                <!-- <input list="etablisement" name="" id="" class="w-[100%]" placeholder="Etablissement"> -->
+                <select name="" id="" class="w-[100%]" v-model="hopital" v-if="district">
+                    <option value="">Etablisement</option>
+                    <option v-for="list in listetablissement" :value="list.oc_label_id">{{ list.oc_label_value }}
+                    </option>
+                </select>
                 <div class="w-[100%]  flex justify-between ">
                     <div class="w-[48%] relative flex items-center">
-                        <input type="date" v-model="start_date"
-                            class="relative w-full rounded-lg  py-1 "
+                        <input type="date" v-model="start_date" class="relative w-full rounded-lg  py-1 "
                             placeholder="code">
                         <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" class="absolute right-[2px]"
                             viewBox="0 0 24 24">
@@ -63,8 +74,7 @@
                         </svg>
                     </div>
                     <div class="w-[48%] relative flex items-center">
-                        <input type="date" v-model="end_date"
-                            class="relative w-full rounded-lg  py-1 "
+                        <input type="date" v-model="end_date" class="relative w-full rounded-lg  py-1 "
                             placeholder="code">
                         <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" class="absolute right-[2px]"
                             viewBox="0 0 24 24">
@@ -121,11 +131,17 @@ export default {
             keyboardHeight: 0,
             keyword: '',
             items: [],
-            nomenclature: this.$store.state.user.default_service_id,
-            start_date: '2024-03-12',
-            end_date: new Date().toISOString().split('T')[0],
-
-
+            // nomenclature: this.$store.state.user.default_service_id,
+            start_date: '',
+            end_date: '',
+            province: '',
+            hopital: '',
+            district: '',
+            listprovinces: [],
+            listdistricts: [],
+            listetablissement: [],
+            lieu: '',
+            staticalert: false
         }
     },
     computed: {
@@ -134,12 +150,12 @@ export default {
         }
     },
     methods: {
-        redirectionAvecDonnees() {
-            this.$router.push({
-                path: '/equipement',
-                query: { numero: this.keyword }
-            })
-        },
+        // redirectionAvecDonnees() {
+        //     this.$router.push({
+        //         path: '/equipement',
+        //         query: { numero: this.keyword }
+        //     })
+        // },
         nextSlot() {
             this.transitionDirection = 'left'
             this.index = (this.index + 1) % this.slots.length
@@ -148,42 +164,68 @@ export default {
             this.transitionDirection = 'right'
             this.index = (this.index - 1 + this.slots.length) % this.slots.length
         },
-        handleResize() {
-            const currentHeight = window.innerHeight;
-            const heightDiff = this.windowHeight - currentHeight;
+        // handleResize() {
+        //     const currentHeight = window.innerHeight;
+        //     const heightDiff = this.windowHeight - currentHeight;
 
-            if (heightDiff > 150) {
-                this.isKeyboardVisible = true;
-                this.keyboardHeight = heightDiff;
-            } else {
-                this.isKeyboardVisible = false;
-                this.keyboardHeight = 0;
-            }
-        },
-        handleKeyboardShow(event) {
-            if (event?.keyboardHeight) {
-                this.keyboardHeight = event.keyboardHeight;
-            }
-            this.isKeyboardVisible = true;
-        },
-        handleKeyboardHide() {
-            this.isKeyboardVisible = false;
-            this.keyboardHeight = 0;
+        //     if (heightDiff > 150) {
+        //         this.isKeyboardVisible = true;
+        //         this.keyboardHeight = heightDiff;
+        //     } else {
+        //         this.isKeyboardVisible = false;
+        //         this.keyboardHeight = 0;
+        //     }
+        // },
+        // handleKeyboardShow(event) {
+        //     if (event?.keyboardHeight) {
+        //         this.keyboardHeight = event.keyboardHeight;
+        //     }
+        //     this.isKeyboardVisible = true;
+        // },
+        // handleKeyboardHide() {
+        //     this.isKeyboardVisible = false;
+        //     this.keyboardHeight = 0;
+        // },
+        activerStaticalert() {
+            this.staticalert = true;
+            setTimeout(() => {
+                        this.staticalert = false;
+                    }, 3000);
         },
         async FiltrerPerformance() {
-            this.getStatics(this.start_date, this.end_date)
+            this.$store.state.start_date = this.start_date
+            this.lieu = this.hopital ? this.hopital : this.district;
+            console.log(this.lieu)
+            this.getStatics(this.start_date, this.end_date, this.lieu)
             this.isModalVisible = false
 
         },
-
+        fetchLabels() {
+            axios.get('/oc_labels/?oc_label_id__iregex=bi[.][a-z]{2}$')
+                .then((reponse) => {
+                    this.listprovinces = reponse.data.results
+                })
+        }
     },
     watch: {
-        isQRcode(newVal) {
-            if (newVal) {
-                this.startScanner()
-            } else {
-                this.stopScanner()
-            }
+        // isQRcode(newVal) {
+        //     if (newVal) {
+        //         this.startScanner()
+        //     } else {
+        //         this.stopScanner()
+        //     }
+        // },
+        province(newVal) {
+            axios.get(`/oc_labels/?oc_label_id__iregex=${newVal}.[a-z]*$`)
+                .then((reponse) => {
+                    this.listdistricts = reponse.data.results
+                })
+        },
+        district(newVal) {
+            axios.get(`/oc_labels/?oc_label_id__iregex=${newVal}.[a-z]*$`)
+                .then((reponse) => {
+                    this.listetablissement = reponse.data.results
+                })
         }
     },
     mounted() {
@@ -191,6 +233,7 @@ export default {
         window.addEventListener('resize', this.handleResize);
         Keyboard.addListener('keyboardWillShow', this.handleKeyboardShow);
         Keyboard.addListener('keyboardWillHide', this.handleKeyboardHide);
+        this.fetchLabels()
     },
     beforeUnmount() {
         window.removeEventListener('resize', this.handleResize);

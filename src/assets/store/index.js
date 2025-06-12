@@ -15,6 +15,10 @@ const store = createStore({
       static: [],
       infrastructures: [],
       choice: '',
+      code: '',
+      codeEqui: '',
+      district: '',
+      start_date: ''
     };
   },
 

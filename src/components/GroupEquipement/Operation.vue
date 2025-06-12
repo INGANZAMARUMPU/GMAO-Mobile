@@ -21,9 +21,16 @@
                 <p class="font-poppins font-medium text-[13px] text-white">Nouveau</p>
             </button>
         </div>
+        <div class="toast flex justify-center ">
+            <div class="w-80 bg-black/80 text-white text-[9pt] rounded-lg p-3 flex justify-between items-center"
+                v-if="postalert">
+                <p>⚠️ Erreur lors de l'envoi offline</p>
+                <button class="bg-sky-950 p-2 rounnded-xl" @click="this.postalert = false">OK</button>
+            </div>
+        </div>
         <div class="w-screen relative flex justify-center my-2" v-if="$store.state.user.default_page === 'maintenance'">
             <button
-                class="w-12 h-12 flex justify-center items-center bg-sky-900 rounded-xl fixed bottom-30 right-6 shadow-[1px_1px_5px_1px_rgba(0,0,0,0.5)]"
+                class="w-12 h-12 flex justify-center items-center bg-sky-900/90 rounded-xl fixed bottom-30 right-6 shadow-[1px_1px_5px_1px_rgba(0,0,0,0.5)]"
                 @click="this.$router.go('/Operation')">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
                     viewBox="0 0 24 24"><!-- Icon from Material Symbols Light by Google - https://github.com/google/material-design-icons/blob/master/LICENSE -->
@@ -165,8 +172,8 @@
                     <p class="">Référence inventaire</p>
                     <div class="flex ">
                         <!-- <p class="ml-2 font-semibold">{{ this.$store.state.code_plan.oc_maintenanceplan_assetuid }}</p> -->
-                        <input type="text" name="" id="" v-model="refe" placeholder="Référence inventaire"
-                            class="w-full   p-2 mt-2">
+                        <input type="text" name="" id="" v-model="nameplan" placeholder="Référence inventaire"
+                            class="w-full p-2 mt-2" disabled>
                     </div>
                 </div>
                 <input type="text" class="w-full   p-2" placeholder="Supplier"
@@ -199,6 +206,7 @@
                 </div>
             </form>
         </div>
+
     </div>
     </Base>
 </template>
@@ -258,7 +266,8 @@ export default {
             oc_maintenanceoperation_comment: '',
             refe: this.$store.state.code_plan[0]?.oc_maintenanceplan_assetuid,
             isReallyOnline: false,
-
+            nameplan: this.$store.state.code_inventaire.oc_asset_description,
+            postalert: false,
         }
     },
     methods: {
@@ -418,12 +427,19 @@ export default {
                     await axios.post(req.url, req.data);
                     await deleteRequest(req.id);
                     console.log('✅ Requête offline envoyée avec succès.');
+                    this.getOperation()
                 } catch (err) {
                     console.error('⚠️ Erreur lors de l’envoi offline :', err);
+                    this.activerpostalert()
                 }
             }
         },
-
+        activerpostalert() {
+            this.postalert = true;
+            setTimeout(() => {
+                this.postalert = false;
+            }, 3000);
+        },
         async verifyConnection() {
             try {
                 const res = await fetch('https://gmao.amidev.bi/api/', {

@@ -36,7 +36,7 @@
                         <p class="font-poppins font-semibold text-[9px] tracking-wider">{{ item?.oc_asset_nomenclature
                         }}
                         </p>
-                        <p class="font-segoe font-normal text-[11px] tracking-wider">{{ item?.oc_asset_comment12 }}</p>
+                        <p class="font-poppins font-normal text-[11px] tracking-wider">{{ datetime(item?.oc_asset_updatetime) }}</p>
                     </div>
                     <div class="w-full flex flex-col items-start justify-center">
                         <div class=" w-full  flex items-end">
@@ -53,24 +53,26 @@
                 </div>
                 <div
                     class="w-full bg-sky-800/90 flex items-center justify-between p-2 text-white font-poppins font-normal text-[10px] tracking-wider rounded-b-sm ">
-                    <p class="">Date de mise à jour</p>
-                    <p class="">{{ datetime(item?.oc_asset_updatetime) }}</p>
+                    <p class="">Etat</p>
+                    <p class="" v-if="item?.oc_asset_comment9 == 1">Bon</p>
+                    <p class="" v-if="item?.oc_asset_comment9 == 2">satisfaisant</p>
+                    <p class="" v-if="item?.oc_asset_comment9 == 3">insatisfaisant</p>
+                    <p class="" v-if="item?.oc_asset_comment9 == 4">Mauvais</p>
+                    <p class="" v-if="item?.oc_asset_comment9 == 5">A remplacer</p>
+                    <p class="" v-if="item?.oc_asset_comment9 == ''">Aucune info</p>
+                    <p class="" v-else-if="item?.oc_asset_comment9 == 0">neuf</p>
                 </div>
             </div>
             <div v-if="this.items.length === 0" class="">
                 <p class="text-sky-900 text-[12px]">Aucune informations sur cette infrastructure</p>
             </div>
-            <!-- <div class="flex gap-1" v-if="filteredItems = 0">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
-                    viewBox="0 0 24 24">
-                    <g fill="none" stroke="#0c4a6e" stroke-linecap="round" stroke-linejoin="round"
-                        stroke-width="1.5">
-                        <path d="M9 16c.85-.63 1.885-1 3-1s2.15.37 3 1m-5.5-5.5V10m5 .5V10" />
-                        <path d="M21 12a9 9 0 1 1-18 0a9 9 0 0 1 18 0" />
-                    </g>
+            <button v-if="next && items.length >= 40" @click="summer" class=" flex items-center justify-center border-1 border-sky-950 font-poppins text-sky-950 text-[16px] px-3 gap-1  rounded-xl">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                    viewBox="0 0 24 24"><!-- Icon from Lucide by Lucide Contributors - https://github.com/lucide-icons/lucide/blob/main/LICENSE -->
+                    <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                        stroke-width="2" d="M12 5v14m7-7l-7 7l-7-7" />
                 </svg>
-                <p>Aucun éléments trouvés</p>
-            </div> -->
+                <p>suite</p></button>
         </div>
         <VueFinalModal v-model="isModalVisible" :click-to-close="true" class="flex justify-center items-end"
             transition="vfm-fade-in-up">
@@ -173,6 +175,8 @@ export default {
             startY: 0,
             pulling: false,
             refreshing: false,
+            next: true,
+            count: 1,
         }
     },
     methods: {
@@ -190,7 +194,7 @@ export default {
             const scrollTop = this.$refs.scrollContainer.scrollTop;
             const isAtTop = scrollTop === 0;
 
-            if (deltaY > 40 && isAtTop && !this.refreshing) {
+            if (deltaY > 60 && isAtTop && !this.refreshing) {
                 this.pulling = true;
             }
         },
@@ -252,20 +256,25 @@ export default {
             this.isKeyboardVisible = false;
             this.keyboardHeight = 0;
         },
+        summer() {
+            this.count++,
+            this.Getinventaire()
+        },
         Getinventaire() {
-            axios.get(`/oc_assets/?oc_asset_service__startswith=${this.$store.state.user.default_service_id}&oc_asset_nomenclature__startswith=I`)
+            axios.get(`/oc_assets/?page=${this.count}&oc_asset_service__startswith=${this.$store.state.user.default_service_id}&oc_asset_nomenclature__startswith=I&oc_asset_comment9=${this.$store.state.code ?? ''}&oc_asset_comment12__lte=${this.$store.state.start_date || ''}`)
                 .then((reponse) => {
+                    // this.items.push(...reponse.data.results)
                     this.items = reponse.data.results
-                    this.$store.state.infrastructures = reponse.data.results;
+                    this.$store.state.infrastructures = this.items
                     console.log(this.items)
-                    window.localStorage.setItem('infrastructure', JSON.stringify(reponse.data.results))
+                    window.localStorage.setItem('infrastructure', JSON.stringify(this.items))
 
                 })
                 .catch((error) => {
                     console.error("Erreur lors de la récupération de l'inventaire :", error);
                     this.hasError = true;
                     this.$store.state.infrastructures = JSON.parse(window.localStorage.getItem('infrastructure'))
-
+                    this.next = false
                 });
         }
     },
@@ -275,10 +284,6 @@ export default {
         Keyboard.addListener('keyboardWillShow', this.handleKeyboardShow);
         Keyboard.addListener('keyboardWillHide', this.handleKeyboardHide);
         window.addEventListener('online', this.Getinventaire);
-
-        // if (this.$store.state.keyword) {
-        //     console.log('Recherche active, on ne charge rien pour le moment')
-        // } else 
         if (!this.$store.state.keyword && this.$store.state.infrastructures.length === 0) {
             console.log('Aucun inventaire en cache, on appelle Getinventaire()')
             this.Getinventaire()
@@ -306,6 +311,14 @@ export default {
                 this.items = newVal
             },
             deep: true
+        },
+        "$store.state.code": {
+            handler(newVal) {
+                this.$store.state.infrastructures = []
+                // this.Getinventaire(newVal)
+            },
+            deep: true,
+            immediate: true
         }
     }
 }

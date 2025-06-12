@@ -20,9 +20,16 @@
                 <p class="font-poppins font-medium text-[13px] text-white">Nouveau</p>
             </button>
         </div>
+        <div class="toast flex justify-center ">
+            <div class="w-80 bg-black/80 text-white text-[9pt] rounded-lg p-3 flex justify-between items-center"
+                v-if="postalert">
+                <p>⚠️ Erreur lors de l'envoi offline</p>
+                <button class="bg-sky-950 p-2 rounnded-xl" @click="this.postalert = false">OK</button>
+            </div>
+        </div>
         <div class="w-screen relative flex justify-center my-2" v-if="$store.state.user.default_page === 'maintenance'">
             <button
-                class="w-12 h-12 flex justify-center items-center bg-sky-900 rounded-xl fixed bottom-30 right-6 shadow-[1px_1px_5px_1px_rgba(0,0,0,0.5)]"
+                class="w-12 h-12 flex justify-center items-center bg-sky-900/90 rounded-xl fixed bottom-30 right-6 shadow-[1px_1px_5px_1px_rgba(0,0,0,0.5)]"
                 @click="this.$router.go('/plan')">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
                     <path fill="#ffffff"
@@ -31,9 +38,10 @@
             </button>
         </div>
         <div class="toast flex justify-center ">
-            <div class="w-80 bg-black/80 text-white text-[8pt] rounded-lg p-3 flex justify-between items-center" v-if="planAlert">
+            <div class="w-80 bg-black/80 text-white text-[8pt] rounded-lg p-3 flex justify-between items-center"
+                v-if="planAlert">
                 <p>choisissent un équipement ou infrastructure</p>
-                <button class="bg-sky-950 p-2 rounnded-xl">OK</button>
+                <button class="bg-sky-950 p-2 rounnded-xl" @click="this.planAlert = false">OK</button>
             </div>
         </div>
         <!-- <div v-if="hasError" class="erreur">
@@ -204,6 +212,7 @@
                 <div class="flex items-center content-between!">
                     <p class="font-poppins text-[24px] text-sky-900  font-light">Plan de maintenance</p>
                 </div>
+                <input type="text" v-model="nameplan" name="" id="" class="w-[100%]" disabled>
                 <input type="text" v-model="nom" class="w-full  py-2 pl-3" placeholder="Nom du plan">
                 <select name="" id="" class="w-full  p-2" v-model="type">
                     <option value="">Types</option>
@@ -289,7 +298,9 @@ export default {
             isReallyOnline: false,
             assetid: this.$store.state.code_inventaire.oc_asset_code,
             planAlert: false,
-
+            nameplan: this.$store.state.code_inventaire.oc_asset_description,
+            serverid: '1',
+            postalert: false
         }
     },
     methods: {
@@ -389,13 +400,10 @@ export default {
             it
         },
         async postPlan() {
-            // const plane = JSON.parse(window.localStorage.getItem('putPlan'))
-            // if(plane.oc_maintenanceplan_assetuid){
-            //     window.localStorage.clear('planPut')
-            // }
             window.localStorage.removeItem('planPut')
             const data = {
-                oc_maintenanceplan_assetuid: this.assetid,
+                oc_maintenanceplan_assetuid: `${this.assetid}`,
+                oc_maintenanceplan_serverid: this.serverid,
                 oc_maintenanceplan_operator: this.$store.state.user.fullname,
                 oc_maintenanceplan_comment4: this.Autre,
                 oc_maintenanceplan_comment1: this.consommable,
@@ -406,7 +414,7 @@ export default {
                 oc_maintenanceplan_instructions: this.commentaire,
             };
             console.log(this.data)
-            const url = '/oc_maintenanceplanshistory/';
+            const url = 'https://gmao.amidev.bi/api/oc_maintenanceplanshistory/';
 
             console.log("CLICKED");
             if (!this.isReallyOnline) {
@@ -432,15 +440,35 @@ export default {
 
             for (const req of requests) {
                 try {
+                    console.warn('📦 Tentative d’envoi :', req); // Tout le contenu
+                    console.warn('🕵️ UID utilisé :', req.data?.oc_maintenanceplan_assetuid);
                     await axios.post(req.url, req.data);
                     await deleteRequest(req.id);
-                    console.log('Requête offline envoyée avec succès.');
-                } catch (err) {
-                    console.error('Erreur lors de l’envoi offline :', err);
+                    console.log('✅ Requête offline envoyée avec succès :', req);
+                    this.getPlan()
+                } catch (error) {
+                    console.error('❌ Erreur lors de l’envoi offline :', error.message);
+                    this.activerpostalert()
+                    if (error.response) {
+                        // Le serveur a répondu avec une erreur (statut HTTP 4xx ou 5xx)
+                        console.error('🔁 Réponse serveur :', error.response.data);
+                        console.error('🧾 Statut HTTP :', error.response.status);
+                    } else if (error.request) {
+                        // La requête a été envoyée mais aucune réponse reçue
+                        console.error('📡 Requête envoyée mais sans réponse :', error.request);
+                    } else {
+                        // Une autre erreur s'est produite lors de la configuration de la requête
+                        console.error('⚠️ Erreur inattendue :', error.message);
+                    }
                 }
             }
         },
-
+        activerpostalert() {
+            this.postalert = true;
+            setTimeout(() => {
+                this.postalert = false;
+            }, 3000);
+        },
         async verifyConnection() {
             try {
                 const res = await fetch('https://gmao.amidev.bi/api/', {
@@ -480,6 +508,18 @@ export default {
                 this.keyboardHeight = 0;
             }
         },
+        handleResize() {
+            const currentHeight = window.innerHeight;
+            const heightDiff = this.windowHeight - currentHeight;
+
+            if (heightDiff > 150) {
+                this.isKeyboardVisible = true;
+                this.keyboardHeight = heightDiff;
+            } else {
+                this.isKeyboardVisible = false;
+                this.keyboardHeight = 0;
+            }
+        },
         handleKeyboardShow(event) {
             this.isKeyboardVisible = true;
             this.keyboardHeight = event.keyboardHeight;
@@ -504,7 +544,7 @@ export default {
                     getAllRequests().then((reponse) => {
                         console.log(reponse)
                         for (let item of reponse) {
-                            if (item.url == "/oc_maintenanceplanshistory/")
+                            if (item.url = "https://gmao.amidev.bi/api/oc_maintenanceplanshistory/")
                                 this.items.unshift(item.data)
                         }
                     })

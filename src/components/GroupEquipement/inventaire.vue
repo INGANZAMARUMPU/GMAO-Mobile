@@ -13,6 +13,8 @@
                 </svg>
                 <p class="font-poppins font-medium text-[13px] text-white">Filtre</p>
             </button>
+            <!-- <p v-else >Aucun notre page trouver</p> -->
+            {{ reponse }}
         </div>
         <div v-if="hasError" class="erreur">
             <div class="message">
@@ -27,7 +29,7 @@
                 <p class="text-[8px]">ou veuiller vérifier l'état de votre connexion</p>
             </div>
         </div>
-        <div class="w-screen flex flex-col items-center space-y-3 mb-10">
+        <div class="w-screen flex flex-col items-center space-y-3 ">
             <div v-for="item in items" :key="item.oc_asset_objectid"
                 class="w-[95%] rounded-sm bg-sky-100  flex flex-col text-sky-900 " @click="selectItem(item)">
                 <div class="p-2">
@@ -35,26 +37,41 @@
                         <p class="font-poppins font-semibold text-[12px] tracking-wider">{{ item.oc_asset_code }}</p>
                         <p class="font-poppins font-semibold text-[9px] tracking-wider">{{ item.oc_asset_nomenclature }}
                         </p>
-                        <p class="font-segoe font-normal text-[11px] tracking-wider">{{ item.oc_asset_comment12 }}</p>
+                    <p class="font-poppins font-normal text-[11px] tracking-wider">{{ datetime(item.oc_asset_updatetime) }}</p>
                     </div>
                     <div class="w-full flex flex-col items-start justify-center">
                         <div class=" w-full  flex items-end">
-                            <p class="w-full font-poppins font-semibold text-sm tracking-wider description">{{item.oc_asset_description }}</p>
+                            <p class="w-full font-poppins font-semibold text-sm tracking-wider description">
+                                {{ item.oc_asset_description }}</p>
                         </div>
                         <div class=" w-full flex items-end">
-                            <p class="font-poppins text-[12px] tracking-wider flex items-end ">{{ item.oc_asset_service}}</p>
+                            <p class="font-poppins text-[12px] tracking-wider flex items-end ">{{
+                                item.oc_asset_service}}</p>
                         </div>
                     </div>
                 </div>
                 <div
                     class="w-full bg-sky-800/90 flex items-center justify-between p-2 text-white font-poppins font-normal text-[10px] tracking-wider rounded-b-sm ">
-                    <p class="">Date de mise à jour</p>
-                    <p class="">{{ datetime(item.oc_asset_updatetime) }}</p>
+                    <p class="">Etat</p>
+                    <p class="" v-if="item?.oc_asset_comment9 == 1">Bon</p>
+                    <p class="" v-if="item?.oc_asset_comment9 == 2">satisfaisant</p>
+                    <p class="" v-if="item?.oc_asset_comment9 == 3">insatisfaisant</p>
+                    <p class="" v-if="item?.oc_asset_comment9 == 4">Mauvais</p>
+                    <p class="" v-if="item?.oc_asset_comment9 == 5">A remplacer</p>
+                    <p class="" v-if="item?.oc_asset_comment9 == ''">Aucune info</p>
+                    <p class="" v-else-if="item?.oc_asset_comment9 == 0">neuf</p>
                 </div>
             </div>
             <div v-if="this.items.length === 0" class="">
                 <p class="text-sky-900 text-[12px]">Aucune équipement</p>
             </div>
+            <button v-if="next && items.length >= 40 " @click="summer" class=" flex items-center justify-center border-1 border-sky-950 font-poppins text-sky-950 text-[16px] px-3 gap-1  rounded-xl">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                    viewBox="0 0 24 24"><!-- Icon from Lucide by Lucide Contributors - https://github.com/lucide-icons/lucide/blob/main/LICENSE -->
+                    <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                        stroke-width="2" d="M12 5v14m7-7l-7 7l-7-7" />
+                </svg>
+                <p>suite</p></button>
         </div>
         <VueFinalModal v-model="isModalVisible" :click-to-close="true" class="flex justify-center items-end"
             transition="vfm-fade-in-up">
@@ -72,25 +89,17 @@
                         </svg>
                         <p class="font-poppins text-3xl text-sky-900  font-extralight">Filtre</p>
                     </div>
-                    <input type="text"
-                        class="w-[100%] "
-                        placeholder="Description" v-model="oc_asset_description">
-                    <input type="text"
-                        class="w-[100%] "
-                        placeholder="Fournisseur" v-model="oc_asset_supplieruid">
+                    <input type="text" class="w-[100%] " placeholder="Description" v-model="oc_asset_description">
+                    <input type="text" class="w-[100%] " placeholder="Fournisseur" v-model="oc_asset_supplieruid">
                     <div class="w-[100%]  flex justify-between ">
-                        <input type="number"
-                            class="w-[48%]  rounded-lg p-2"
-                            placeholder="code" v-model="oc_asset_code">
-                        <input type="number"
-                            class="w-[48%]  rounded-lg p-2"
-                            placeholder="Numéro de série" v-model="oc_asset_serial">
+                        <input type="number" class="w-[48%]  rounded-lg p-2" placeholder="code" v-model="oc_asset_code">
+                        <input type="number" class="w-[48%]  rounded-lg p-2" placeholder="Numéro de série"
+                            v-model="oc_asset_serial">
                     </div>
                     <div class="w-[100%]  flex justify-between ">
                         <div class="w-[48%] relative flex items-center">
-                            <input type="date"
-                                class="relative w-full rounded-lg  py-1 "
-                                placeholder="code" v-model="oc_asset_purchasedate__gte">
+                            <input type="date" class="relative w-full rounded-lg  py-1 " placeholder="code"
+                                v-model="oc_asset_purchasedate__gte">
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" class="absolute right-[2px]"
                                 viewBox="0 0 24 24">
                                 <path fill="#014268"
@@ -98,9 +107,8 @@
                             </svg>
                         </div>
                         <div class="w-[48%] relative flex items-center">
-                            <input type="date"
-                                class="relative w-full rounded-lg  py-1 "
-                                placeholder="code" v-model="oc_asset_purchasedate__lte">
+                            <input type="date" class="relative w-full rounded-lg  py-1 " placeholder="code"
+                                v-model="oc_asset_purchasedate__lte">
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" class="absolute right-[2px]"
                                 viewBox="0 0 24 24">
                                 <path fill="#014268"
@@ -129,6 +137,7 @@ import axios from '../../axios'
 import { VueFinalModal } from 'vue-final-modal'
 import { Keyboard } from '@capacitor/keyboard'
 import loading from '../../components/loading.vue'
+import { handler } from 'tailwindcss-animate'
 
 export default {
     components: {
@@ -156,6 +165,8 @@ export default {
             startY: 0,
             pulling: false,
             refreshing: false,
+            count: 1,
+            next: true
         }
     },
     methods: {
@@ -173,7 +184,7 @@ export default {
             const scrollTop = this.$refs.scrollContainer.scrollTop;
             const isAtTop = scrollTop === 0;
 
-            if (deltaY > 40 && isAtTop && !this.refreshing) {
+            if (deltaY > 60 && isAtTop && !this.refreshing) {
                 this.pulling = true;
             }
         },
@@ -236,19 +247,25 @@ export default {
             this.isKeyboardVisible = true;
             this.keyboardHeight = event.keyboardHeight;
         },
+        summer() {
+            this.count++,
+            this.getInventaire()
+        },
         handleKeyboardHide() {
             this.isKeyboardVisible = false;
             this.keyboardHeight = 0;
         },
         getInventaire() {
-            axios.get(`/oc_assets/?oc_asset_service__startswith=${this.$store.state.user.default_service_id}&oc_asset_nomenclature__startswith=E`)
-                .then((reponse) => {
-                    this.items = reponse.data.results;
-                    this.$store.state.equipements = reponse.data.results
-                    window.localStorage.setItem('equipement', JSON.stringify(reponse.data.results))
+            axios.get(`/oc_assets/?page=${this.count}&oc_asset_service__startswith=${this.$store.state.user.default_service_id}&oc_asset_nomenclature__icontains=e&oc_asset_comment9=${this.$store.state.codeEqui  ?? ''}&oc_asset_comment12__lte=${this.$store.state.start_date || ''}`)
+            .then((reponse) => {
+                    this.items.push(...reponse.data.results)
+                    this.$store.state.equipements = this.items
+                    console.log(this.items)
+                    window.localStorage.setItem('equipement', JSON.stringify(this.items))
+                    this.$store.state.start_date = ''
                 }).catch((error) => {
                     this.$store.state.equipements = JSON.parse(window.localStorage.getItem('equipement'))
-
+                    this.next = false
                 })
         }
 
@@ -258,8 +275,7 @@ export default {
         window.addEventListener('resize', this.handleResize);
         Keyboard.addListener('keyboardWillShow', this.handleKeyboardShow);
         Keyboard.addListener('keyboardWillHide', this.handleKeyboardHide);
-        window.addEventListener('online', this.getOperation);
-
+        window.addEventListener('online', this.getInventaire);
         if (!this.$store.state.keyword && this.$store.state.equipements.length === 0) {
             console.log('Aucun inventaire en cache, on appelle Getinventaire()')
             this.getInventaire()
@@ -287,6 +303,14 @@ export default {
                 this.items = newVal
             },
             deep: true
+        },
+        "$store.state.codeEqui": {
+            handler(newVal) {
+                this.$store.state.equipements = []
+                // this.getInventaire(newVal)
+            },
+            deep: true,
+            immediate: true
         }
     }
 }

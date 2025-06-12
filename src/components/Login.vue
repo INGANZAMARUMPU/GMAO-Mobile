@@ -1,29 +1,28 @@
 <template>
-    <div class="w-screen h-screen overflow-hidden bg-[#014268] flex justify-center items-center">
+    <div class="w-screen h-screen overflow-hidden bg-[#014268] flex justify-center items-center" @keyup.enter="postLogin">
         <!-- <img src="../assets/view/img/Frame 38.png" alt="" class="fixed"> -->
-        <div class="w-80 h-100 bg-white relative rounded-2xl shadow-black shadow-2xl flex overflow-hidden flex-col"
+        <div class="w-80 h-95 bg-white relative rounded-2xl shadow-black shadow-2xl flex overflow-hidden flex-col"
             :style="{ transform: isKeyboardVisible ? `translateY(-${keyboardHeight})` : 'translateY(0)' }">
             <div class="w-full flex justify-center items-center">
                 <img src="../assets/view/img/gmao (2).webp" alt="" class="w-[50%]">
             </div>
-            <div class="w-full flex flex-col items-center space-y-5 justify-center text-sm">
+            <div class="w-full flex flex-col items-center space-y-4 justify-center text-sm">
                 <input type="number" v-model="userid"
-                    class="w-[90%] py-3 rounded-lg bg-sky-200 p-2 font-bold active:border-sky-800 outline-none"
+                    class="w-[90%]  rounded-lg bg-sky-200  font-bold active:border-sky-800 outline-none login"
                     placeholder="Nom de l'utilisateur">
                 <input type="password" v-model="password"
-                    class="w-[90%] py-3 rounded-lg bg-sky-200 p-2 font-bold text-sm active:border-sky-800 outline-none"
-                    placeholder="Mot de passe"  @keyup.enter="postLogin">
+                    class="w-[90%]  rounded-lg bg-sky-200  font-bold text-sm active:border-sky-800 outline-none login"
+                    placeholder="Mot de passe">
             </div>
-            <div class=" w-full flex justify-center items-center mt-10">
+            <div class=" w-full flex justify-center items-center my-7">
                 <button
                     class="w-[50%] py-3 bg-sky-950 rounded-lg font-Orbitron text-white tracking-wider shadow-slate-400 shadow-xl"
                     @click="postLogin">connecter</button>
             </div>
-            <div class="py-9">
+            <div class="loader">
                 <loading v-if="this.$store.state.is_loading" />
             </div>
         </div>
-        {{ this.$store.state.user }}
     </div>
 
 </template>
@@ -76,10 +75,11 @@ export default {
             axios.post(`/oc_assets/login/`, credentials)
                 .then((reponse) => {
                     this.$store.state.user = reponse.data;
-                    this.getStatics('2024-01-01', '2025-01-01')
+                    window.localStorage.setItem('user', JSON.stringify(this.$store.state.user))
+                    // this.getStatics()
                     this.$router.push('/');
                     console.log(this.$store.state.user)
-                    window.localStorage.setItem('user', JSON.stringify(reponse.data))
+                    console.log('bonne nuit')
                 })
         },
     },
