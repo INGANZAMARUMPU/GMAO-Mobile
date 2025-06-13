@@ -13,7 +13,6 @@
                 <p class="font-poppins font-medium text-[13px] text-white">Filtre</p>
             </button>
         </div>
-
         <!-- <div v-if="hasError" class="erreur">
             <div class="message">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
@@ -41,7 +40,7 @@
                     <div class="w-full flex flex-col items-start justify-center">
                         <div class=" w-full  flex items-end">
                             <div class="flex items-center">
-                                <p class="font-poppins font-semibold text-sm tracking-wider">{{item?.oc_asset_description}}</p>
+                                <p class="font-poppins font-semibold text-sm tracking-wider">{{formatInstructions(item?.oc_asset_description)}}</p>
                             </div>
                         </div>
                         <div class=" w-full flex items-end">
@@ -67,7 +66,7 @@
             <div v-if="this.items.length === 0" class="">
                 <p class="text-sky-900 text-[12px]">Aucune informations sur cette infrastructure</p>
             </div>
-            <button v-if="next && items.length >= 40" @click="summer" class=" flex items-center justify-center border-1 border-sky-950 font-poppins text-sky-950 text-[16px] px-3 gap-1  rounded-xl">
+            <button v-if="next" @click="summer" class=" flex items-center justify-center border-1 border-sky-950 font-poppins text-sky-950 text-[16px] px-3 gap-1  rounded-xl">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                     viewBox="0 0 24 24"><!-- Icon from Lucide by Lucide Contributors - https://github.com/lucide-icons/lucide/blob/main/LICENSE -->
                     <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
@@ -132,7 +131,7 @@
                     </div>
                     <div class="flex gap-5 ">
                         <button
-                            class="py-1.5 my-1 rounded-lg border-1 border-[#014268] m-0 font-bold text-[#014268] active:text-[#fff] active:bg-[#014268] grow basis-1">Vider</button>
+                            class="py-1.5 my-1 rounded-lg border-1 border-[#014268] m-0 font-bold text-[#014268] active:text-[#fff] active:bg-[#014268] grow basis-1" @click="vide">Vider</button>
                         <button
                             class="py-1.5 my-1 rounded-lg bg-[#014268] font-bold text-white grow basis-1 active:text-[#014268] active:bg-[#ffff] active:border-1 active:border-[#014268]"
                             @click="FiltrerEquipement">Recherche</button>
@@ -176,11 +175,21 @@ export default {
             startY: 0,
             pulling: false,
             refreshing: false,
-            next: true,
+            next: '',
             count: 1,
+            saledate: true
         }
     },
     methods: {
+        vide(){
+            this.oc_asset_purchasedate__lte = '';
+            this.oc_asset_purchasedate__gte = '';
+            this.oc_asset_serial = '';
+            this.oc_asset_code = '';
+            this.oc_asset_supplieruid = '';
+            this.oc_asset_description = '';
+            this.oc_asset_nomenclature = '';
+        },
         onTouchStart(event) {
             console.log("touch start");
             this.startY = event.touches[0].clientY;
@@ -262,10 +271,11 @@ export default {
             this.Getinventaire()
         },
         Getinventaire() {
-            axios.get(`/oc_assets/?page=${this.count}&oc_asset_service__startswith=${this.$store.state.lieu || this.$store.state.user.default_service_id}&oc_asset_nomenclature__startswith=I&oc_asset_comment9=${this.$store.state.code ?? ''}&oc_asset_comment12__lte=${this.$store.state.start_date || ''}`)
+            axios.get(`/oc_assets/?page=${this.count}&oc_asset_service__istartswith=${this.$store.state.lieu || this.$store.state.user.default_service_id}&oc_asset_nomenclature__istartswith=I&oc_asset_saledate__isnull=${this.saledate}&oc_asset_comment9=${this.$store.state.code ?? ''}&oc_asset_comment12__lte=${this.$store.state.start_date || ''}`)
                 .then((reponse) => {
-                    // this.items.push(...reponse.data.results)
-                    this.items = reponse.data.results
+                    this.items.push(...reponse.data.results)
+                    // this.items = reponse.data.results
+                    this.next = reponse.data.next
                     this.$store.state.infrastructures = this.items
                     console.log(this.items)
                     window.localStorage.setItem('infrastructure', JSON.stringify(this.items))

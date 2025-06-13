@@ -2,7 +2,7 @@
     <div class="space-y-4 my-4">
         <div class="font-poppins font-bold text-base mx-3.5 text-sky-900">Infrastructures</div>
         <div class="title font-poppins">
-            <div>
+            <div @click="totalinfra()">
                 <div class="key">Total</div>
                 <div class="value">{{ money(static.total_infrastructures) }}</div>
             </div>
@@ -39,7 +39,7 @@
         </div>
         <div class=" font-bold text-base mx-3.5 text-sky-900">Equipements</div>
         <div class="title font-poppins">
-            <div class="">
+            <div @click="totalequi()">
                 <div class="key">Total</div>
                 <div class="value">{{
                     money(static.total_equipements) }}</div>
@@ -118,7 +118,15 @@ export default {
         infoEqui(eq) {
             this.$store.state.codeEqui = eq
             this.$router.push('/Inventaire')
-        }
+        },
+        totalinfra(){
+            this.$store.state.code = ''
+            this.$router.push('/Infrastructure')
+        },
+        totalequi(){
+            this.$store.state.codeEqui = ''
+            this.$router.push('/Inventaire')
+        },
     },
     watch: {
         "$store.state.static"(newVal) {

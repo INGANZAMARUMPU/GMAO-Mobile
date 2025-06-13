@@ -148,7 +148,7 @@
                     </div>
                     <div class="flex gap-5 ">
                         <button
-                            class="py-1.5 my-1 rounded-lg border-1 border-[#014268] m-0 font-bold text-[#014268] active:text-[#fff] active:bg-[#014268] grow basis-1">Vider</button>
+                            class="py-1.5 my-1 rounded-lg border-1 border-[#014268] m-0 font-bold text-[#014268] active:text-[#fff] active:bg-[#014268] grow basis-1" @click="vide">Vider</button>
                         <button
                             class="py-1.5 my-1 rounded-lg bg-[#014268] font-bold text-white grow basis-1 active:text-[#014268] active:bg-[#ffff] active:border-1 active:border-[#014268]"
                             @click="FiltrerMaintenanceOperations">Recherche</button>
@@ -176,7 +176,7 @@
                     <p class="">Référence inventaire</p>
                     <div class="flex ">
                         <!-- <p class="ml-2 font-semibold">{{ this.$store.state.code_plan.oc_maintenanceplan_assetuid }}</p> -->
-                        <input type="text" name="" id="" v-model="nameplan" placeholder="Référence inventaire"
+                        <input type="text" name="" id="" :value="refe+' '+nameplan" placeholder="Référence inventaire"
                             class="w-full p-2 mt-2" disabled>
                     </div>
                 </div>
@@ -268,7 +268,7 @@ export default {
             oc_maintenanceoperation_comment3: '',
             oc_maintenanceoperation_comment5: '',
             oc_maintenanceoperation_comment: '',
-            refe: this.$store.state.code_plan[0]?.oc_maintenanceplan_assetuid,
+            refe: this.$store.state.code_inventaire.oc_asset_code,
             isReallyOnline: false,
             nameplan: this.$store.state.code_inventaire.oc_asset_description,
             postalert: false,
@@ -276,6 +276,13 @@ export default {
         }
     },
     methods: {
+        vide() {
+            this.oc_maintenanceoperation_maintenanceplanuid = '';
+            this.oc_maintenanceoperation_operator = '';
+            this.oc_maintenanceoperation_result__icontains = '';
+            this.oc_maintenanceoperation_date__gte = '';
+            this.oc_maintenanceoperation_date__lte = '';
+        },
         handleSubmit() {
             if (this.submitType === 'put') {
                 this.putOperation();
@@ -344,7 +351,8 @@ export default {
                 existing.unshift(doc);
             }
             window.localStorage.setItem('putOperation', JSON.stringify(existing));
-            it
+            this.showNewView = false
+            this.$router.go('/Operation')
         },
         getOperation() {
             console.log('bonjour')

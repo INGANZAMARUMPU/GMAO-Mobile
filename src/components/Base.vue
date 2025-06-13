@@ -297,7 +297,7 @@ export default {
             this.$store.state.keyword = this.keyword
             console.log('bonjour')
             // this.$store.state.equipements = null
-            axios.get(`/oc_assets/?search=${this.keyword}&oc_asset_service__startswith= ${this.$store.state.user.default_service_id}&oc_asset_nomenclature__startswith=E`)
+            axios.get(`/oc_assets/?search=${this.keyword}&oc_asset_service__istartswith= ${this.$store.state.user.default_service_id}&oc_asset_nomenclature__startswith=E`)
                 .then((reponse) => {
                     this.$store.state.equipements = reponse.data.results
                     this.$router.push({ path: '/Inventaire' })
@@ -307,7 +307,7 @@ export default {
                     this.$store.state.equipements = vyose.filter(item => (item.oc_asset_code === this.$store.state.keyword))
                     this.$router.push({ path: '/Inventaire' })
                 })
-            axios.get(`/oc_assets/?search=${this.keyword}&oc_asset_service__startswith=${this.$store.state.user.default_service_id}&oc_asset_nomenclature__startswith=I`)
+            axios.get(`/oc_assets/?search=${this.keyword}&oc_asset_service__istartswith=${this.$store.state.user.default_service_id}&oc_asset_nomenclature__startswith=I`)
                 .then((reponse) => {
                     this.$store.state.infrastructures = reponse.data.results
                     this.$router.push({ path: '/Inventaire' })

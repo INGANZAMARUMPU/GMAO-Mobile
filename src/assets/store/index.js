@@ -18,7 +18,9 @@ const store = createStore({
       code: '',
       codeEqui: '',
       district: '',
-      start_date: ''
+      start_date: '',
+      lieu:'',
+      provinces: []
     };
   },
 

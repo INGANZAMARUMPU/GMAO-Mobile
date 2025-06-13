@@ -65,7 +65,7 @@
                         class="font-poppins font-semibold text-sm tracking-wider">{{ item.oc_maintenanceplan_assetuid }}
                     </p>
                     <p v-else class="font-poppins font-semibold text-[10px] tracking-wider">{{
-                        this.$store.state.code_inventaire.oc_asset_description }}</p>
+                        formatInstructions(this.$store.state.code_inventaire.oc_asset_description) }}</p>
                     <p class="font-poppins font-normal text-xs tracking-wider">{{
                         datetime(item.oc_maintenanceplan_updatetime) }}
                     </p>
@@ -174,7 +174,8 @@
                     </div>
                     <div class="flex gap-5 ">
                         <button
-                            class="py-1.5 my-1 rounded-lg border-1 border-[#014268] m-0 font-bold text-[#014268] active:text-[#fff] active:bg-[#014268] grow basis-1">Vider</button>
+                            class="py-1.5 my-1 rounded-lg border-1 border-[#014268] m-0 font-bold text-[#014268] active:text-[#fff] active:bg-[#014268] grow basis-1"
+                            @click="vide">Vider</button>
                         <button
                             class="py-1.5 my-1 rounded-lg bg-[#014268] font-bold text-white grow basis-1 active:text-[#014268] active:bg-[#ffff] active:border-1 active:border-[#014268]"
                             @click="FiltrerMaintenancePlan">Recherche</button>
@@ -212,7 +213,7 @@
                 <div class="flex items-center content-between!">
                     <p class="font-poppins text-[24px] text-sky-900  font-light">Plan de maintenance</p>
                 </div>
-                <input type="text" v-model="nameplan" name="" id="" class="w-[100%]" disabled>
+                <input type="text" :value="assetid + ' ' + nameplan" name="" id="" class="w-[100%]" disabled>
                 <input type="text" v-model="nom" class="w-full  py-2 pl-3" placeholder="Nom du plan" required>
                 <select name="" id="" class="w-full  p-2" v-model="type" required>
                     <option value="">Types</option>
@@ -305,6 +306,12 @@ export default {
         }
     },
     methods: {
+        vide() {
+            this.oc_maintenanceplan_operator = '';
+            this.oc_maintenanceplan_type = '';
+            this.oc_maintenanceplan_historydate__gte = '';
+            this.oc_maintenanceplan_historydate__lte = '';
+        },
         handleSubmit() {
             if (this.submitType === 'put') {
                 this.putPlan();
@@ -392,23 +399,23 @@ export default {
                 oc_maintenanceplan_type: this.type,
                 oc_maintenanceplan_instructions: this.commentaire,
             };
-            let existing = JSON.parse(window.localStorage.getItem('putPlan') || '[]');
-            if (!Array.isArray(existing)) {
-                existing = [];
-            }
+            let existing = JSON.parse(window.localStorage.getItem('plans') || '[]');
             const index = existing.findIndex(
-                item => item.oc_maintenanceplan_assetuid === doc.oc_maintenanceplan_assetuid
+                item => item.oc_maintenanceplan_historydate === doc.oc_maintenanceplan_historydate
             );
             if (index !== -1) {
                 existing[index] = doc;
             } else {
+                doc.oc_maintenanceplan_historydate = new Date().toISOString()
                 existing.unshift(doc);
             }
-            window.localStorage.setItem('planPut', JSON.stringify(existing));
-            it
+            window.localStorage.setItem('plans', JSON.stringify(existing));
+            this.showNewView = false
         },
         async postPlan() {
+            console.log(' debut remove plan enregistre')
             window.localStorage.removeItem('planPut')
+            console.log(' fin remove plan enregistre')
             const data = {
                 oc_maintenanceplan_assetuid: `${this.assetid}`,
                 oc_maintenanceplan_serverid: this.serverid,
@@ -438,6 +445,7 @@ export default {
                 const response = await axios.post(url, data);
                 this.items.unshift(response.data);
                 this.showNewView = false;
+                this.$router.go('/Plan')
             } catch (error) {
                 console.error("Erreur lors de l'envoi :", error);
                 this.hasError = true;
@@ -537,7 +545,7 @@ export default {
             this.keyboardHeight = 0;
         },
         getPlan() {
-            axios.get(`/oc_maintenanceplanshistory/?oc_maintenanceplan_assetuid__oc_asset_code=${this.$store.state.code_inventaire.oc_asset_code || ''}&oc_maintenanceplan_assetuid__oc_asset_service__startswith=${this.$store.state.user.default_service_id}`)
+            axios.get(`/oc_maintenanceplanshistory/?oc_maintenanceplan_assetuid__oc_asset_code=${this.$store.state.code_inventaire.oc_asset_code || ''}&oc_maintenanceplan_assetuid__oc_asset_service__istartswith=${this.$store.state.user.default_service_id}`)
                 .then((reponse) => {
                     this.items = reponse.data.results
                     this.$store.state.PlanMaintance = reponse.data.results
@@ -556,7 +564,7 @@ export default {
                                 this.items.unshift(item.data)
                         }
                     })
-                    let planLocal = JSON.parse(window.localStorage.getItem('planPut'))
+                    let planLocal = JSON.parse(window.localStorage.getItem('plans'))
                     planLocal = planLocal.map(item => ({ ...item, __local: true }))
                     this.items.unshift(...planLocal)
                 });
@@ -569,7 +577,6 @@ export default {
         Keyboard.addListener('keyboardWillHide', this.handleKeyboardHide);
         window.addEventListener('online', this.resendOfflineRequests);
         this.getPlan()
-
     },
     beforeUnmount() {
         Keyboard.removeAllListeners();

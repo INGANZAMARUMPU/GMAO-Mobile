@@ -20,6 +20,7 @@
                 </div>
             </div>
         </div>
+
         <div class="">
             <Equipement></Equipement>
         </div>
@@ -40,15 +41,15 @@
                     </svg>
                     <p class="font-poppins text-3xl text-sky-900  font-extralight">Filtre</p>
                 </div>
-                <select name="" id="" class="w-[100%]" v-model="province">
+                <select name="" id="" class="w-[100%]" v-model="province" v-if="pays == 'bi'">
                     <option value="">Provinces</option>
                     <option v-for="list in listprovinces" :value="list.oc_label_id">{{ list.oc_label_value }}</option>
                 </select>
-                <select name="" id="" class="w-[100%]" v-model="district" v-if="province">
+                <select name="" id="" class="w-[100%]" v-model="district" v-if="pays.length <= 5">
                     <option value="">Disctrictes</option>
                     <option v-for="list in listdistricts" :value="list.oc_label_id">{{ list.oc_label_value }}</option>
                 </select>
-                <select name="" id="" class="w-[100%]" v-model="hopital" v-if="district">
+                <select name="" id="" class="w-[100%]" v-model="hopital" v-if="pays.length <= 8 && district">
                     <option value="">Etablisement</option>
                     <option v-for="list in listetablissement" :value="list.oc_label_id">{{ list.oc_label_value }}
                     </option>
@@ -75,7 +76,8 @@
                 </div>
                 <div class="flex gap-5 ">
                     <button
-                        class="py-1.5 my-1 rounded-lg border-1 border-[#014268] m-0 font-bold text-[#014268] active:text-[#fff] active:bg-[#014268] grow basis-1">Vider</button>
+                        class="py-1.5 my-1 rounded-lg border-1 border-[#014268] m-0 font-bold text-[#014268] active:text-[#fff] active:bg-[#014268] grow basis-1"
+                        @click="vide">Vider</button>
                     <button
                         class="py-1.5 my-1 rounded-lg bg-[#014268] font-bold text-white grow basis-1 active:text-[#014268] active:bg-[#ffff] active:border-1 active:border-[#014268]"
                         @click="FiltrerPerformance">Recherche</button>
@@ -131,7 +133,8 @@ export default {
             listdistricts: [],
             listetablissement: [],
             lieu: '',
-            staticalert: false
+            staticalert: false,
+            pays: this.$store.state.user.default_service_id
         }
     },
     computed: {
@@ -140,12 +143,13 @@ export default {
         }
     },
     methods: {
-        // redirectionAvecDonnees() {
-        //     this.$router.push({
-        //         path: '/equipement',
-        //         query: { numero: this.keyword }
-        //     })
-        // },
+        vide() {
+            this.start_date = '';
+            this.end_date = '';
+            this.province = '';
+            this.hopital = '';
+            this.district = '';
+        },
         nextSlot() {
             this.transitionDirection = 'left'
             this.index = (this.index + 1) % this.slots.length
@@ -179,23 +183,37 @@ export default {
         activerStaticalert() {
             this.staticalert = true;
             setTimeout(() => {
-                        this.staticalert = false;
-                    }, 3000);
+                this.staticalert = false;
+            }, 3000);
         },
         async FiltrerPerformance() {
             this.$store.state.start_date = this.start_date
             this.$store.state.district = this.lieu
-            this.lieu = this.hopital || this.district || this.province;
+            this.lieu = this.hopital || this.district || this.province || this.pays;
             console.log(this.lieu)
             this.getStatics(this.start_date, this.end_date, this.lieu)
             this.isModalVisible = false
 
         },
         fetchLabels() {
-            axios.get('/oc_labels/?oc_label_id__iregex=bi[.][a-z]{2}$')
+            axios.get('/oc_labels/?oc_label_id__iregex=^BI\\.[a-z]*[.]?[a-z]*$')
                 .then((reponse) => {
-                    this.listprovinces = reponse.data.results
-                })
+                    this.$store.state.provinces = reponse.data.results
+                    window.localStorage.setItem('provinces', JSON.stringify(reponse.data.results))
+                }).catch((error) => {
+                    console.log(error);
+                    this.$store.state.provinces = JSON.parse(
+                        window.localStorage.getItem("provinces")
+                    );
+                });
+        },
+        controlleprovince() {
+            let newVal = this.$store.state.user.default_service_id
+            if (newVal.length === 5) {
+                this.province = newVal
+            } else if (newVal.length === 8) {
+                this.district = newVal
+            }
         }
     },
     watch: {
@@ -206,25 +224,32 @@ export default {
         //         this.stopScanner()
         //     }
         // },
+        "$store.state.provinces"(newVal) {
+            this.listprovinces = newVal.filter(x => x.oc_label_id.length === 5)
+        },
         province(newVal) {
-            axios.get(`/oc_labels/?oc_label_id__iregex=${newVal}.[a-z]*$`)
-                .then((reponse) => {
-                    this.listdistricts = reponse.data.results
-                })
+            this.listdistricts = this.$store.state.provinces.filter(x => {
+                return x.oc_label_id.toLowerCase().includes(`${newVal.toLowerCase()}.`)
+            })
         },
         district(newVal) {
             axios.get(`/oc_labels/?oc_label_id__iregex=${newVal}.[a-z]*$`)
                 .then((reponse) => {
                     this.listetablissement = reponse.data.results
                 })
-        }
+        },
+
     },
     mounted() {
         this.windowHeight = window.innerHeight;
         window.addEventListener('resize', this.handleResize);
         Keyboard.addListener('keyboardWillShow', this.handleKeyboardShow);
         Keyboard.addListener('keyboardWillHide', this.handleKeyboardHide);
-        this.fetchLabels()
+        this.fetchLabels();
+        setTimeout(() => {
+            console.log("Fonction exécutée après 2 secondes");
+            this.controlleprovince()
+        }, 2000);
     },
     beforeUnmount() {
         window.removeEventListener('resize', this.handleResize);

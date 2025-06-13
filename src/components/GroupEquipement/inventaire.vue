@@ -14,7 +14,6 @@
                 <p class="font-poppins font-medium text-[13px] text-white">Filtre</p>
             </button>
             <!-- <p v-else >Aucun notre page trouver</p> -->
-            {{ reponse }}
         </div>
         <div v-if="hasError" class="erreur">
             <div class="message">
@@ -67,7 +66,7 @@
             <div v-if="this.items.length === 0" class="">
                 <p class="text-sky-900 text-[12px]">Aucune équipement</p>
             </div>
-            <button v-if="next && items.length >= 40" @click="summer"
+            <button v-if="next" @click="summer"
                 class=" flex items-center justify-center border-1 border-sky-950 font-poppins text-sky-950 text-[16px] px-3 gap-1  rounded-xl">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                     viewBox="0 0 24 24"><!-- Icon from Lucide by Lucide Contributors - https://github.com/lucide-icons/lucide/blob/main/LICENSE -->
@@ -122,7 +121,7 @@
                     </div>
                     <div class="flex gap-5 ">
                         <button
-                            class="py-1.5 my-1 rounded-lg border-1 border-[#014268] m-0 font-bold text-[#014268] active:text-[#fff] active:bg-[#014268] grow basis-1">Vider</button>
+                            class="py-1.5 my-1 rounded-lg border-1 border-[#014268] m-0 font-bold text-[#014268] active:text-[#fff] active:bg-[#014268] grow basis-1" @click="vide">Vider</button>
                         <button
                             class="py-1.5 my-1 rounded-lg bg-[#014268] font-bold text-white grow basis-1 active:text-[#014268] active:bg-[#ffff] active:border-1 active:border-[#014268]"
                             @click="FiltrerEquipement">Recherche</button>
@@ -170,10 +169,20 @@ export default {
             pulling: false,
             refreshing: false,
             count: 1,
-            next: true
+            next: '',
+            saledate: true
         }
     },
     methods: {
+        vide(){
+            this.oc_asset_purchasedate__lte = '';
+            this.oc_asset_purchasedate__gte = '';
+            this.oc_asset_serial = '';
+            this.oc_asset_code = '';
+            this.oc_asset_supplieruid = '';
+            this.oc_asset_description = '';
+            this.oc_asset_nomenclature = '';
+        },
         getval() {
             switch (val) {
                 case 0:
@@ -236,7 +245,7 @@ export default {
                 const params = {
                     oc_asset_code: this.oc_asset_code || '',
                     oc_asset_nomenclature: this.oc_asset_nomenclature || '',
-                    oc_asset_service__startswith: this.$store.state.lieu,
+                    oc_asset_service__istartswith: this.$store.state.lieu,
                     oc_asset_purchasedate__gte: this.oc_asset_purchasedate__gte || '',
                     oc_asset_purchasedate__lte: this.oc_asset_purchasedate__lte || '',
                     oc_asset_serial: this.oc_asset_serial || '',
@@ -282,9 +291,11 @@ export default {
             this.keyboardHeight = 0;
         },
         getInventaire() {
-            axios.get(`/oc_assets/?page=${this.count}&oc_asset_service__startswith=${this.$store.state.lieu || this.$store.state.user.default_service_id}&oc_asset_nomenclature__icontains=e&oc_asset_comment9=${this.$store.state.codeEqui ?? ''}&oc_asset_comment12__lte=${this.$store.state.start_date || ''}`)
+            axios.get(`/oc_assets/?page=${this.count}&oc_asset_service__istartswith=${this.$store.state.lieu || this.$store.state.user.default_service_id}&oc_asset_nomenclature__istartswith=E&oc_asset_comment9=${this.$store.state.codeEqui ?? ''}&oc_asset_saledate__isnull=${this.saledate}&oc_asset_comment12__lte=${this.$store.state.start_date || ''}`)
                 .then((reponse) => {
                     this.items.push(...reponse.data.results)
+                    this.next = reponse.data.next
+                    console.log(reponse.data.next)
                     this.$store.state.equipements = this.items
                     console.log(this.items)
                     window.localStorage.setItem('equipement', JSON.stringify(this.items))
