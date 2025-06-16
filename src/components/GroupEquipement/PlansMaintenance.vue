@@ -1,7 +1,7 @@
 <template>
     <Base #slot3>
     <div class="h-full mb-4 overflow-auto" v-if="!showNewView">
-        <div class="flex items-center justify-center  my-2 mb-2 pb-3">
+        <div class="flex items-center justify-center  my-2 mb-3 pb-3">
             <button @click="isModalVisible = true" class="custom-box custom-left">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="32" viewBox="0 0 24 24">
                     <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
@@ -36,30 +36,19 @@
                         d="M5.53 17.506q-.978-1.142-1.504-2.558T3.5 12q0-3.616 2.664-6.058T12.5 3.5V2l3.673 2.75L12.5 7.5V6Q9.86 6 7.93 7.718T6 12q0 1.13.399 2.15t1.13 1.846zM11.5 22l-3.673-2.75L11.5 16.5V18q2.64 0 4.57-1.718T18 12q0-1.13-.399-2.16q-.399-1.028-1.13-1.855l1.998-1.51q.979 1.142 1.505 2.558T20.5 12q0 3.616-2.664 6.058T11.5 20.5z" />
                 </svg>
             </button>
+            <loading v-if="loader" class="w-full mb-3" />
         </div>
         <div class="toast flex justify-center ">
             <div class="w-80 bg-black/80 text-white text-[8pt] rounded-lg p-3 flex justify-between items-center"
                 v-if="planAlert">
-                <p>choisissent un équipement ou infrastructure</p>
+                <p>choisis un équipement ou infrastructure</p>
                 <button class="bg-sky-950 p-2 rounnded-xl" @click="this.planAlert = false">OK</button>
             </div>
         </div>
-        <!-- <div v-if="hasError" class="erreur">
-            <div class="message">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
-                    <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                        stroke-width="2"
-                        d="m21.73 18l-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3M12 9v4m0 4h.01" />
-                </svg>
-                <p>Une erreur est survenue</p>
-                <p class="text-[8px]">veuillez contacter la direction s'il vous plait</p>
-                <p class="text-[8px]">ou veuiller vérifier l'état de votre connexion</p>
-            </div>
-        </div> -->
         <div class="w-screen flex flex-col items-center space-y-3 mb-4">
             <div v-for="item in filteredItems" :key="item.oc_maintenanceplan_objectid"
                 class="w-[95%] rounded-2xl bg-sky-100  flex flex-col text-sky-900 p-2" @click="PlusInfo(item)"
-                :class="{ 'opacity-60': item.__local }">
+                :class="{ 'opacity-80': item.mode == 'offline' }">
                 <div class="w-full flex items-center justify-between">
                     <p v-if="!$store.state.code_inventaire.oc_asset_description"
                         class="font-poppins font-semibold text-sm tracking-wider">{{ item.oc_maintenanceplan_assetuid }}
@@ -93,8 +82,11 @@
                     <p class="font-poppins">{{ datetime(item.oc_maintenanceplan_historydate) }}</p>
                 </div>
             </div>
-            <div v-if="this.items.length === 0" class="">
+            <div v-if="this.items.length === 0 && this.loader === false" class="">
                 <p class="text-sky-900 text-[12px]">Aucun plans</p>
+            </div>
+            <div v-if="this.loader" class="">
+                <p class="text-sky-900 text-[12px]">Téléchargement en cours .....</p>
             </div>
         </div>
         <VueFinalModal v-model="isInfo" :click-to-close="true" class="flex justify-center items-center"
@@ -186,19 +178,6 @@
 
     </div>
     <div class="" v-else>
-        <!-- <div v-if="hasError" class="erreur">
-            <div class="message">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
-                    viewBox="0 0 24 24">
-                    <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                        stroke-width="2"
-                        d="m21.73 18l-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3M12 9v4m0 4h.01" />
-                </svg>
-                <p>Une erreur est survenue</p>
-                <p class="text-[8px]">veuillez contacter la direction s'il vous plait</p>
-                <p class="text-[8px]">ou veuiller vérifier l'état de votre connexion</p>
-            </div>
-        </div> -->
         <div class="w-screen flex items-center justify-center gap-[10%] my-4 ">
             <button class="fixed left-4 p-1 bg-sky-900 rounded-xl flex justify-center items-center space-x-2 z-50"
                 @click="showNewView = false">
@@ -249,11 +228,10 @@ import axios from 'axios'
 import { VueFinalModal } from 'vue-final-modal'
 import { Keyboard } from '@capacitor/keyboard'
 import { addOfflineRequest, getAllRequests, deleteRequest } from '../../indexDb';
-
-
+import loading from '../../components/loading.vue'
 export default {
     components: {
-        VueFinalModal, Base
+        VueFinalModal, Base, loading
     },
     props: {
         equipementId: {
@@ -296,6 +274,7 @@ export default {
             oc_maintenanceplan_type: '',
             oc_maintenanceplan_historydate__gte: '',
             oc_maintenanceplan_historydate__lte: '',
+            oc_maintenanceplan_historydate: null,
             isReallyOnline: false,
             assetid: this.$store.state.code_inventaire.oc_asset_code,
             planAlert: false,
@@ -303,6 +282,7 @@ export default {
             serverid: '1',
             postalert: false,
             submitType: '',
+            loader: false
         }
     },
     methods: {
@@ -320,6 +300,7 @@ export default {
             }
         },
         async FiltrerMaintenancePlan() {
+            this.loader = true
             try {
                 const params = {
                     oc_maintenanceplan_assetuid: this.oc_maintenanceplan_assetuid || '',
@@ -332,9 +313,11 @@ export default {
                 const response = await axios.get("/oc_maintenanceplanshistory/", { params });
                 this.items = response.data.results;
                 this.isModalVisible = false
+                this.loader = false
             } catch (error) {
                 console.error("Erreur lors du filtrage des opérations de maintenance :", error);
                 this.displayErrorOrRefreshToken(error, this.FiltrerMaintenanceOperations);
+                this.loader = false
             }
         },
         Modifier(plus) {
@@ -349,10 +332,11 @@ export default {
             this.prestataire = plus.oc_maintenanceplan_comment3
             this.transport = plus.oc_maintenanceplan_comment2
             this.type = plus.oc_maintenanceplan_type
+            this.oc_maintenanceplan_historydate = plus.oc_maintenanceplan_historydate
 
         },
         PlusInfo(info) {
-            if (info.__local) {
+            if (info.mode == 'offline') {
                 this.Modifier(info)
             } else {
                 this.selectInfo(info)
@@ -364,15 +348,10 @@ export default {
             console.log(this.plus)
         },
         selectItem(plus) {
-            this.$store.state.code_plan = plus
+            console.log(this.plus)
+            this.$store.state.code_plan = this.plus.oc_maintenanceplan_assetuid
+            console.log(this.$store.state.code_plan)
             this.$router.push('/Operation')
-        },
-        openModal() {
-            this.isModalVisible = true
-        },
-        closeModal() {
-            this.isModalVisible = false
-            this.isInfo = false
         },
         handleNewItem() {
             if (this.$store.state.code_inventaire.oc_asset_code) {
@@ -387,6 +366,29 @@ export default {
         returnToMainView() {
             this.showNewView = false
         },
+        replaceInStorage(doc) {
+            let existing = JSON.parse(window.localStorage.getItem('waiting_plans') || '[]');
+            const index = existing.findIndex(
+                item => item.oc_maintenanceplan_historydate === this.oc_maintenanceplan_historydate
+            );
+            if (index !== -1) {
+                existing[index] = doc;
+            } else {
+                doc.oc_maintenanceplan_historydate = new Date().toISOString()
+                existing.unshift(doc);
+            }
+            window.localStorage.setItem('waiting_plans', JSON.stringify(existing));
+        },
+        replaceInListed(doc) {
+            const index = this.items.findIndex(
+                item => item.oc_maintenanceplan_historydate === this.oc_maintenanceplan_historydate
+            );
+            if (index !== -1) {
+                this.items[index] = doc;
+            } else {
+                this.items.unshift(doc);
+            }
+        },
         putPlan() {
             const doc = {
                 oc_maintenanceplan_assetuid: this.assetid,
@@ -398,24 +400,18 @@ export default {
                 oc_maintenanceplan_name: this.nom,
                 oc_maintenanceplan_type: this.type,
                 oc_maintenanceplan_instructions: this.commentaire,
+                mode: 'offline',
             };
-            let existing = JSON.parse(window.localStorage.getItem('plans') || '[]');
-            const index = existing.findIndex(
-                item => item.oc_maintenanceplan_historydate === doc.oc_maintenanceplan_historydate
-            );
-            if (index !== -1) {
-                existing[index] = doc;
-            } else {
-                doc.oc_maintenanceplan_historydate = new Date().toISOString()
-                existing.unshift(doc);
-            }
-            window.localStorage.setItem('plans', JSON.stringify(existing));
+            this.replaceInListed(doc);
+            this.replaceInStorage(doc);
             this.showNewView = false
         },
         async postPlan() {
-            console.log(' debut remove plan enregistre')
-            window.localStorage.removeItem('planPut')
-            console.log(' fin remove plan enregistre')
+            this.loader = true
+            let existing = JSON.parse(window.localStorage.getItem('waiting_plans') || '[]');
+            existing = existing.filter(x => x.oc_maintenanceplan_historydate != this.oc_maintenanceplan_historydate)
+            this.items = this.items.filter(x => x.oc_maintenanceplan_historydate != this.oc_maintenanceplan_historydate)
+            window.localStorage.setItem('waiting_plans', JSON.stringify(existing));
             const data = {
                 oc_maintenanceplan_assetuid: `${this.assetid}`,
                 oc_maintenanceplan_serverid: this.serverid,
@@ -427,28 +423,26 @@ export default {
                 oc_maintenanceplan_name: this.nom,
                 oc_maintenanceplan_type: this.type,
                 oc_maintenanceplan_instructions: this.commentaire,
+                oc_maintenanceplan_historydate: this.oc_maintenanceplan_historydate
             };
-            console.log(this.data)
             const url = 'https://gmao.amidev.bi/api/oc_maintenanceplanshistory/';
 
-            console.log("CLICKED");
             if (!this.isReallyOnline) {
                 await addOfflineRequest({ method: 'post', url, data });
                 this.items.unshift(data);
                 this.showNewView = false;
-                console.log(data)
-                console.warn("Requête enregistrée dans IndexedDB (offline).");
+                this.loader = false
                 return;
-            }
-
-            try {
-                const response = await axios.post(url, data);
-                this.items.unshift(response.data);
-                this.showNewView = false;
-                this.$router.go('/Plan')
-            } catch (error) {
-                console.error("Erreur lors de l'envoi :", error);
-                this.hasError = true;
+            } else {
+                try {
+                    const response = await axios.post(url, data);
+                    this.items.unshift(response.data);
+                    this.showNewView = false;
+                    this.loader = false
+                } catch (error) {
+                    console.error("Erreur lors de l'envoi :", error);
+                    this.hasError = true;
+                }
             }
         },
         async resendOfflineRequests() {
@@ -460,22 +454,9 @@ export default {
                     console.warn('🕵️ UID utilisé :', req.data?.oc_maintenanceplan_assetuid);
                     await axios.post(req.url, req.data);
                     await deleteRequest(req.id);
-                    console.log('✅ Requête offline envoyée avec succès :', req);
                     this.getPlan()
                 } catch (error) {
-                    console.error('❌ Erreur lors de l’envoi offline :', error.message);
-                    this.activerpostalert()
-                    if (error.response) {
-                        // Le serveur a répondu avec une erreur (statut HTTP 4xx ou 5xx)
-                        console.error('🔁 Réponse serveur :', error.response.data);
-                        console.error('🧾 Statut HTTP :', error.response.status);
-                    } else if (error.request) {
-                        // La requête a été envoyée mais aucune réponse reçue
-                        console.error('📡 Requête envoyée mais sans réponse :', error.request);
-                    } else {
-                        // Une autre erreur s'est produite lors de la configuration de la requête
-                        console.error('⚠️ Erreur inattendue :', error.message);
-                    }
+                    console.error('❌ Erreur lors de l’envoi offline :', error);
                 }
             }
         },
@@ -545,28 +526,36 @@ export default {
             this.keyboardHeight = 0;
         },
         getPlan() {
-            axios.get(`/oc_maintenanceplanshistory/?oc_maintenanceplan_assetuid__oc_asset_code=${this.$store.state.code_inventaire.oc_asset_code || ''}&oc_maintenanceplan_assetuid__oc_asset_service__istartswith=${this.$store.state.user.default_service_id}`)
+            this.loader = true
+            this.monitorNetworkStatus()
+            let planLocal = JSON.parse(window.localStorage.getItem('waiting_plans') || "[]")
+            if (!!this.assetid) {
+                planLocal = planLocal.filter(item => item.oc_maintenanceplan_assetuid === this.assetid)
+            }
+            this.items.unshift(...planLocal)
+            if(this.$store.state.user.default_service_id === 'bi'){
+                const check_id = this.$store.state.user.default_service_id
+                this.check_id = ''
+            }else {
+                this.check_id = this.$store.state.user.default_service_id
+            }
+            axios.get(`/oc_maintenanceplanshistory/?oc_maintenanceplan_assetuid__oc_asset_code=${this.$store.state.code_inventaire.oc_asset_code || ''}&oc_maintenanceplan_assetuid__oc_asset_service__startswith=${this.check_id}`)
                 .then((reponse) => {
-                    this.items = reponse.data.results
-                    this.$store.state.PlanMaintance = reponse.data.results
-                    console.log(this.items)
-                    window.localStorage.setItem('plan', JSON.stringify(reponse.data.results))
-
+                    this.items.push(...reponse.data.results)
+                    this.$store.state.PlanMaintance.push(...reponse.data.results)
+                    window.localStorage.setItem('plans', JSON.stringify(reponse.data.results))
+                    this.loader = false
                 }).catch((error) => {
                     console.error("Erreur lors de la récupération de l'inventaire :", error);
                     this.hasError = true;
-                    this.$store.state.PlanMaintance = JSON.parse(window.localStorage.getItem('plan'))
-                    console.log('en attente')
+                    this.$store.state.PlanMaintance = JSON.parse(window.localStorage.getItem('plans'))
                     getAllRequests().then((reponse) => {
-                        console.log(reponse)
                         for (let item of reponse) {
                             if (item.url = "https://gmao.amidev.bi/api/oc_maintenanceplanshistory/")
                                 this.items.unshift(item.data)
                         }
                     })
-                    let planLocal = JSON.parse(window.localStorage.getItem('plans'))
-                    planLocal = planLocal.map(item => ({ ...item, __local: true }))
-                    this.items.unshift(...planLocal)
+                    this.loader = false
                 });
         }
     },

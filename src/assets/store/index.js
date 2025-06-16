@@ -9,7 +9,7 @@ const store = createStore({
       PlanMaintance: [],
       Operation: [],
       code_inventaire: [],
-      code_plan: [],
+      code_plan: '',
       user: null,
       is_loading: false,
       static: [],
@@ -20,7 +20,11 @@ const store = createStore({
       district: '',
       start_date: '',
       lieu:'',
-      provinces: []
+      provinces: [],
+      putPlan: [],
+      loader : '',
+      checksuite: false,
+      checkoperation: []
     };
   },
 

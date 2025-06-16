@@ -1,9 +1,8 @@
 <template>
     <Base #slot2>
-    <!-- <loading v-if="this.$store.state.is_loading" />  -->
     <div class="w-screen h-[100vh] overflow-auto mb-4 scroll-touch" ref="scrollContainer" @touchstart="onTouchStart"
         @touchmove="onTouchMove" @touchend="onTouchEnd">
-        <div class="w-screen overflow-hidden flex items-center justify-center gap-[10%] my-2 mb-5 pb-3">
+        <div class="w-screen overflow-hidden flex items-center justify-center gap-[10%] my-2 mb-3 pb-3">
             <button class="custom-box custom-right" @click="isModalVisible = true">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="32" viewBox="0 0 24 24">
                     <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
@@ -13,8 +12,8 @@
                 </svg>
                 <p class="font-poppins font-medium text-[13px] text-white">Filtre</p>
             </button>
-            <!-- <p v-else >Aucun notre page trouver</p> -->
         </div>
+        <loading v-if="loader" class="w-full mb-3" /> 
         <div v-if="hasError" class="erreur">
             <div class="message">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
@@ -63,10 +62,13 @@
                     <p v-else>{{ item?.oc_asset_comment6 }}</p>
                 </div>
             </div>
-            <div v-if="this.items.length === 0" class="">
+            <div v-if="this.items.length === 0 && !this.loader" class="">
                 <p class="text-sky-900 text-[12px]">Aucune équipement</p>
             </div>
-            <button v-if="next" @click="summer"
+            <div v-if="this.loader" class="">
+                <p class="text-sky-900 text-[12px]">Téléchargement en cours .....</p>
+            </div>
+            <button v-if="$store.state.checksuite" @click="summer"
                 class=" flex items-center justify-center border-1 border-sky-950 font-poppins text-sky-950 text-[16px] px-3 gap-1  rounded-xl">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                     viewBox="0 0 24 24"><!-- Icon from Lucide by Lucide Contributors - https://github.com/lucide-icons/lucide/blob/main/LICENSE -->
@@ -121,7 +123,8 @@
                     </div>
                     <div class="flex gap-5 ">
                         <button
-                            class="py-1.5 my-1 rounded-lg border-1 border-[#014268] m-0 font-bold text-[#014268] active:text-[#fff] active:bg-[#014268] grow basis-1" @click="vide">Vider</button>
+                            class="py-1.5 my-1 rounded-lg border-1 border-[#014268] m-0 font-bold text-[#014268] active:text-[#fff] active:bg-[#014268] grow basis-1"
+                            @click="vide">Vider</button>
                         <button
                             class="py-1.5 my-1 rounded-lg bg-[#014268] font-bold text-white grow basis-1 active:text-[#014268] active:bg-[#ffff] active:border-1 active:border-[#014268]"
                             @click="FiltrerEquipement">Recherche</button>
@@ -170,11 +173,12 @@ export default {
             refreshing: false,
             count: 1,
             next: '',
-            saledate: true
+            saledate: true,
+            loader: false
         }
     },
     methods: {
-        vide(){
+        vide() {
             this.oc_asset_purchasedate__lte = '';
             this.oc_asset_purchasedate__gte = '';
             this.oc_asset_serial = '';
@@ -237,8 +241,13 @@ export default {
             }
         },
         selectItem(item) {
-            this.$store.state.code_inventaire = item
-            this.$router.push('/Plan')
+            window.localStorage.setItem('code_inventaire', JSON.stringify(item));
+            this.$store.state.code_inventaire = JSON.parse(window.localStorage.getItem('code_inventaire'));
+            const check = this.$store.state.code_inventaire
+            this.$store.state.checkoperation = [this.check]
+            console.log('check',check)
+            console.log(this.$store.state.code_inventaire)
+            this.$router.push('/Plan');
         },
         async FiltrerEquipement() {
             try {
@@ -291,19 +300,22 @@ export default {
             this.keyboardHeight = 0;
         },
         getInventaire() {
+            this.loader = true;
             axios.get(`/oc_assets/?page=${this.count}&oc_asset_service__istartswith=${this.$store.state.lieu || this.$store.state.user.default_service_id}&oc_asset_nomenclature__istartswith=E&oc_asset_comment9=${this.$store.state.codeEqui ?? ''}&oc_asset_saledate__isnull=${this.saledate}&oc_asset_comment12__lte=${this.$store.state.start_date || ''}`)
                 .then((reponse) => {
                     this.items.push(...reponse.data.results)
                     this.next = reponse.data.next
                     console.log(reponse.data.next)
+                    this.$store.state.checksuite = this.next
                     this.$store.state.equipements = this.items
                     console.log(this.items)
                     window.localStorage.setItem('equipement', JSON.stringify(this.items))
                     this.$store.state.start_date = ''
-                    
+                    this.loader = false
                 }).catch((error) => {
                     this.$store.state.equipements = JSON.parse(window.localStorage.getItem('equipement'))
                     this.next = false
+                    this.loader = false
                 })
         }
 

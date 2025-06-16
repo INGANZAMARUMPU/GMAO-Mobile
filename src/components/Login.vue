@@ -13,6 +13,7 @@
                 <input type="password" v-model="password"
                     class="w-[90%]  rounded-lg bg-sky-200  font-bold text-sm active:border-sky-800 outline-none login"
                     placeholder="Mot de passe">
+                    <p v-if="password">veuiller saisir le mot de passe</p>
             </div>
             <div class=" w-full flex justify-center items-center my-7">
                 <button

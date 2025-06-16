@@ -2,7 +2,7 @@
     <Base #slot5>
     <div class="w-screen h-screen overflow-auto mb-4" ref="scrollContainer" @touchstart="onTouchStart"
         @touchmove="onTouchMove" @touchend="onTouchEnd">
-        <div class="w-screen overflow-hidden flex items-center justify-center gap-[10%] my-2 mb-5 pb-3">
+        <div class="w-screen overflow-hidden flex items-center justify-center gap-[10%] my-2 mb-3 pb-3">
             <button class="custom-box custom-right" @click="isModalVisible = true">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="32" viewBox="0 0 24 24">
                     <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
@@ -13,19 +13,7 @@
                 <p class="font-poppins font-medium text-[13px] text-white">Filtre</p>
             </button>
         </div>
-        <!-- <div v-if="hasError" class="erreur">
-            <div class="message">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
-                    viewBox="0 0 24 24">
-                    <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                        stroke-width="2"
-                        d="m21.73 18l-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3M12 9v4m0 4h.01" />
-                </svg>
-                <p>Une erreur est survenue</p>
-                <p class="text-[8px]">veuillez contacter la direction s'il vous plait</p>
-                <p class="text-[8px]">ou veuiller vérifier l'état de votre connexion</p>
-            </div>
-        </div> -->
+        <loading v-if="loader" class="w-full mb-3" />
         <div class="flex flex-col items-center space-y-3 mb-10">
             <div v-for="item in items" :key="item.oc_asset_objectid"
                 class="w-[95%] rounded-sm bg-sky-100  flex flex-col text-sky-900 " @click="selectItem(item)">
@@ -33,19 +21,21 @@
                     <div class="w-full flex items-center justify-between">
                         <p class="font-poppins font-semibold text-[12px] tracking-wider">{{ item?.oc_asset_code }}</p>
                         <p class="font-poppins font-semibold text-[9px] tracking-wider">{{ item?.oc_asset_nomenclature
-                        }}
+                            }}
                         </p>
-                        <p class="font-poppins font-normal text-[11px] tracking-wider">{{ datetime(item?.oc_asset_updatetime) }}</p>
+                        <p class="font-poppins font-normal text-[11px] tracking-wider">{{
+                            datetime(item?.oc_asset_updatetime) }}</p>
                     </div>
                     <div class="w-full flex flex-col items-start justify-center">
                         <div class=" w-full  flex items-end">
                             <div class="flex items-center">
-                                <p class="font-poppins font-semibold text-sm tracking-wider">{{formatInstructions(item?.oc_asset_description)}}</p>
+                                <p class="font-poppins font-semibold text-sm tracking-wider">
+                                    {{ formatInstructions(item?.oc_asset_description) }}</p>
                             </div>
                         </div>
                         <div class=" w-full flex items-end">
                             <p class="font-poppins text-[12px] tracking-wider flex items-end ">{{ item?.oc_asset_service
-                                }}
+                            }}
                             </p>
                         </div>
                     </div>
@@ -59,20 +49,25 @@
                     <p class="" v-if="item?.oc_asset_comment9 == 5">Etat : A remplacer</p>
                     <p class="" v-if="item?.oc_asset_comment9 == ''">Etat : Aucune info</p>
                     <p class="" v-else-if="item?.oc_asset_comment9 == 0">Etat : neuf</p>
-                    <p v-if="item?.oc_asset_comment6== ''">Aucune info</p>
+                    <p v-if="item?.oc_asset_comment6 == ''">Aucune info</p>
                     <p v-else>{{ item?.oc_asset_comment6 }}</p>
                 </div>
             </div>
-            <div v-if="this.items.length === 0" class="">
+            <div v-if="this.items.length === 0 && !this.loader" class="">
                 <p class="text-sky-900 text-[12px]">Aucune informations sur cette infrastructure</p>
             </div>
-            <button v-if="next" @click="summer" class=" flex items-center justify-center border-1 border-sky-950 font-poppins text-sky-950 text-[16px] px-3 gap-1  rounded-xl">
+            <div v-if="this.loader" class="">
+                <p class="text-sky-900 text-[12px]">Téléchargement en cours .....</p>
+            </div>
+            <button v-if="$store.state.checksuite" @click="summer"
+                class=" flex items-center justify-center border-1 border-sky-950 font-poppins text-sky-950 text-[16px] px-3 gap-1  rounded-xl">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                     viewBox="0 0 24 24"><!-- Icon from Lucide by Lucide Contributors - https://github.com/lucide-icons/lucide/blob/main/LICENSE -->
                     <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                         stroke-width="2" d="M12 5v14m7-7l-7 7l-7-7" />
                 </svg>
-                <p>suite</p></button>
+                <p>suite</p>
+            </button>
         </div>
         <VueFinalModal v-model="isModalVisible" :click-to-close="true" class="flex justify-center items-end"
             transition="vfm-fade-in-up">
@@ -90,28 +85,18 @@
                         </svg>
                         <p class="font-poppins text-3xl text-sky-900  font-extralight">Filtre</p>
                     </div>
-                    <input type="text"
-                        class="w-[100%] "
-                        placeholder="Nomanclature" v-model="oc_asset_nomenclature">
-                    <input type="text"
-                        class="w-[100%] "
-                        placeholder="Description" v-model="oc_asset_description">
-                    <input type="text"
-                        class="w-[100%] "
-                        placeholder="Fournisseur" v-model="oc_asset_supplieruid">
+                    <input type="text" class="w-[100%] " placeholder="Nomanclature" v-model="oc_asset_nomenclature">
+                    <input type="text" class="w-[100%] " placeholder="Description" v-model="oc_asset_description">
+                    <input type="text" class="w-[100%] " placeholder="Fournisseur" v-model="oc_asset_supplieruid">
                     <div class="w-[100%]  flex justify-between ">
-                        <input type="number"
-                            class="w-[48%]  rounded-lg p-2"
-                            placeholder="code" v-model="oc_asset_code">
-                        <input type="number"
-                            class="w-[48%]  rounded-lg p-2"
-                            placeholder="Numéro de série" v-model="oc_asset_serial">
+                        <input type="number" class="w-[48%]  rounded-lg p-2" placeholder="code" v-model="oc_asset_code">
+                        <input type="number" class="w-[48%]  rounded-lg p-2" placeholder="Numéro de série"
+                            v-model="oc_asset_serial">
                     </div>
                     <div class="w-[100%]  flex justify-between ">
                         <div class="w-[48%] relative flex items-center">
-                            <input type="date"
-                                class="relative w-full rounded-lg  py-1 "
-                                placeholder="code" v-model="oc_asset_purchasedate__gte">
+                            <input type="date" class="relative w-full rounded-lg  py-1 " placeholder="code"
+                                v-model="oc_asset_purchasedate__gte">
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" class="absolute right-[2px]"
                                 viewBox="0 0 24 24">
                                 <path fill="#014268"
@@ -119,9 +104,8 @@
                             </svg>
                         </div>
                         <div class="w-[48%] relative flex items-center">
-                            <input type="date"
-                                class="relative w-full rounded-lg  py-1 "
-                                placeholder="code" v-model="oc_asset_purchasedate__lte">
+                            <input type="date" class="relative w-full rounded-lg  py-1 " placeholder="code"
+                                v-model="oc_asset_purchasedate__lte">
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" class="absolute right-[2px]"
                                 viewBox="0 0 24 24">
                                 <path fill="#014268"
@@ -131,7 +115,8 @@
                     </div>
                     <div class="flex gap-5 ">
                         <button
-                            class="py-1.5 my-1 rounded-lg border-1 border-[#014268] m-0 font-bold text-[#014268] active:text-[#fff] active:bg-[#014268] grow basis-1" @click="vide">Vider</button>
+                            class="py-1.5 my-1 rounded-lg border-1 border-[#014268] m-0 font-bold text-[#014268] active:text-[#fff] active:bg-[#014268] grow basis-1"
+                            @click="vide">Vider</button>
                         <button
                             class="py-1.5 my-1 rounded-lg bg-[#014268] font-bold text-white grow basis-1 active:text-[#014268] active:bg-[#ffff] active:border-1 active:border-[#014268]"
                             @click="FiltrerEquipement">Recherche</button>
@@ -177,11 +162,12 @@ export default {
             refreshing: false,
             next: '',
             count: 1,
-            saledate: true
+            saledate: true,
+            loader: false
         }
     },
     methods: {
-        vide(){
+        vide() {
             this.oc_asset_purchasedate__lte = '';
             this.oc_asset_purchasedate__gte = '';
             this.oc_asset_serial = '';
@@ -268,24 +254,27 @@ export default {
         },
         summer() {
             this.count++,
-            this.Getinventaire()
+                this.Getinventaire()
         },
         Getinventaire() {
+            this.loader = true;
             axios.get(`/oc_assets/?page=${this.count}&oc_asset_service__istartswith=${this.$store.state.lieu || this.$store.state.user.default_service_id}&oc_asset_nomenclature__istartswith=I&oc_asset_saledate__isnull=${this.saledate}&oc_asset_comment9=${this.$store.state.code ?? ''}&oc_asset_comment12__lte=${this.$store.state.start_date || ''}`)
                 .then((reponse) => {
                     this.items.push(...reponse.data.results)
                     // this.items = reponse.data.results
                     this.next = reponse.data.next
+                    this.$store.state.checksuite = this.next
                     this.$store.state.infrastructures = this.items
                     console.log(this.items)
                     window.localStorage.setItem('infrastructure', JSON.stringify(this.items))
-
+                    this.loader = false;
                 })
                 .catch((error) => {
                     console.error("Erreur lors de la récupération de l'inventaire :", error);
                     this.hasError = true;
                     this.$store.state.infrastructures = JSON.parse(window.localStorage.getItem('infrastructure'))
                     this.next = false
+                    this.loader = false;
                 });
         }
     },
