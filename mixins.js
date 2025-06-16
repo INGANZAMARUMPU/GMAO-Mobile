@@ -57,13 +57,13 @@ export default {
         .then((reponse) => {
           this.$store.state.static = reponse.data;
           this.$store.state.lieu = this.lieu;
+          this.$store.state.loader = false
           window.localStorage.setItem("statics", JSON.stringify(reponse.data));
         })
         .catch((error) => {
           console.log(error);
-          this.$store.state.static = JSON.parse(
-            window.localStorage.getItem("statics")
-          );
+          this.$store.state.static = JSON.parse(window.localStorage.getItem("statics"));
+          this.$store.state.loader = false
         });
     },
   },

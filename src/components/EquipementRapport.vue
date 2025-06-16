@@ -135,6 +135,7 @@ export default {
     },
     mounted() {
         if (this.$store.state.static.length === 0 ?? '') {
+            this.$store.state.loader = true
             this.getStatics(this.start_date, this.end_date, this.lieu)
         } else {
             this.static = this.$store.state.static

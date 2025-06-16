@@ -1,5 +1,6 @@
 <template>
     <Base #slot1>
+    <loading v-if="this.$store.state.loader" class="absolute top-[20.2%] w-full" />
     <div class="relative h-8/8 overflow-y-auto">
         <div class="w-screen relative flex justify-center my-2">
             <button
@@ -12,19 +13,18 @@
                         color="#ffffff" />
                 </svg>
             </button>
-            <div class="toast flex justify-center ">
-                <div class="w-80 bg-black/80 text-white text-[9pt] rounded-lg p-3 flex justify-between items-center"
-                    v-if="staticalert">
-                    <p>Votre recherche dépasse la limite du secteur attribué</p>
-                    <button class="bg-sky-950 p-2 rounnded-xl" @click="this.staticalert = false">OK</button>
-                </div>
-            </div>
         </div>
-
         <div class="">
             <Equipement></Equipement>
         </div>
     </div>
+    <div class="toast flex justify-center ">
+            <div class="w-80 bg-black/80 text-white text-[8pt] rounded-lg p-3 flex justify-between items-center"
+                v-if="this.$store.state.loader">
+                <p>En cours de chargement</p>
+                <button class="bg-sky-950 p-2 rounnded-xl" @click="this.planAlert = false">OK</button>
+            </div>
+        </div>
     <VueFinalModal v-model="isModalVisible" :click-to-close="true" class=" !w-full flex flex-col justify-end"
         transition="vfm-fade-in-up">
         <div class="w-full bg-white rounded-t-4xl shadow-lg transition-transform duration-300 ease-in-out"
@@ -45,11 +45,13 @@
                     <option value="">Provinces</option>
                     <option v-for="list in listprovinces" :value="list.oc_label_id">{{ list.oc_label_value }}</option>
                 </select>
-                <select name="" id="" class="w-[100%]" v-model="district" v-if="pays.length <= 5">
+                <select name="" id="" class="w-[100%]" v-model="district" v-if="pays.length <= 5 && province">
                     <option value="">Disctrictes</option>
                     <option v-for="list in listdistricts" :value="list.oc_label_id">{{ list.oc_label_value }}</option>
                 </select>
-                <select name="" id="" class="w-[100%]" v-model="hopital" v-if="pays.length <= 8 && district">
+                <loading v-if="search" />
+                <select name="" id="" class="w-[100%]" v-model="hopital"
+                    v-if="pays.length <= 8 && district && search === false">
                     <option value="">Etablisement</option>
                     <option v-for="list in listetablissement" :value="list.oc_label_id">{{ list.oc_label_value }}
                     </option>
@@ -134,7 +136,9 @@ export default {
             listetablissement: [],
             lieu: '',
             staticalert: false,
-            pays: this.$store.state.user.default_service_id
+            pays: this.$store.state.user.default_service_id,
+            search: false,
+            loader: false
         }
     },
     computed: {
@@ -191,9 +195,11 @@ export default {
             this.$store.state.district = this.lieu
             this.lieu = this.hopital || this.district || this.province || this.pays;
             console.log(this.lieu)
+            this.loader = true
+            this.$store.state.loader = this.loader
             this.getStatics(this.start_date, this.end_date, this.lieu)
+            this.activerStaticalert()
             this.isModalVisible = false
-
         },
         fetchLabels() {
             axios.get('/oc_labels/?oc_label_id__iregex=^BI\\.[a-z]*[.]?[a-z]*$')
@@ -233,9 +239,11 @@ export default {
             })
         },
         district(newVal) {
+            this.search = true
             axios.get(`/oc_labels/?oc_label_id__iregex=${newVal}.[a-z]*$`)
                 .then((reponse) => {
                     this.listetablissement = reponse.data.results
+                    this.search = false
                 })
         },
 

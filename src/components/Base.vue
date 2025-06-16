@@ -54,7 +54,7 @@
                 </svg>
             </button>
             <div class="py-2">
-                <loading v-if="this.$store.state.is_loading" />
+                <!-- <loading v-if="this.$store.state.is_loading" /> -->
             </div>
         </div>
         <div class="h-[90%] overflow-auto">
@@ -300,6 +300,9 @@ export default {
             axios.get(`/oc_assets/?search=${this.keyword}&oc_asset_service__istartswith= ${this.$store.state.user.default_service_id}&oc_asset_nomenclature__startswith=E`)
                 .then((reponse) => {
                     this.$store.state.equipements = reponse.data.results
+                    this.next = reponse.data.next
+                    this.$store.state.checksuite = this.next
+                    console.log(reponse.data.next)
                     this.$router.push({ path: '/Inventaire' })
                     console.log(this.items)
                 }).catch((error) => {
@@ -311,6 +314,8 @@ export default {
                 .then((reponse) => {
                     this.$store.state.infrastructures = reponse.data.results
                     this.$router.push({ path: '/Inventaire' })
+                    this.next = reponse.data.next
+                    this.$store.state.checksuite = this.next
                     console.log(reponse.data)
                 }).catch((error) => {
                     const vyose = JSON.parse(window.localStorage.getItem('infrastructure'))

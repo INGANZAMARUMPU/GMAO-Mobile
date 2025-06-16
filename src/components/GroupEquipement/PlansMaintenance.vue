@@ -1,7 +1,7 @@
 <template>
     <Base #slot3>
     <div class="h-full mb-4 overflow-auto" v-if="!showNewView">
-        <div class="flex items-center justify-center  my-2 mb-2 pb-3">
+        <div class="flex items-center justify-center  my-2 mb-3 pb-3">
             <button @click="isModalVisible = true" class="custom-box custom-left">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="32" viewBox="0 0 24 24">
                     <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
@@ -36,6 +36,7 @@
                         d="M5.53 17.506q-.978-1.142-1.504-2.558T3.5 12q0-3.616 2.664-6.058T12.5 3.5V2l3.673 2.75L12.5 7.5V6Q9.86 6 7.93 7.718T6 12q0 1.13.399 2.15t1.13 1.846zM11.5 22l-3.673-2.75L11.5 16.5V18q2.64 0 4.57-1.718T18 12q0-1.13-.399-2.16q-.399-1.028-1.13-1.855l1.998-1.51q.979 1.142 1.505 2.558T20.5 12q0 3.616-2.664 6.058T11.5 20.5z" />
                 </svg>
             </button>
+            <loading v-if="loader" class="w-full mb-3" />
         </div>
         <div class="toast flex justify-center ">
             <div class="w-80 bg-black/80 text-white text-[8pt] rounded-lg p-3 flex justify-between items-center"
@@ -81,8 +82,11 @@
                     <p class="font-poppins">{{ datetime(item.oc_maintenanceplan_historydate) }}</p>
                 </div>
             </div>
-            <div v-if="this.items.length === 0" class="">
+            <div v-if="this.items.length === 0 && this.loader === false" class="">
                 <p class="text-sky-900 text-[12px]">Aucun plans</p>
+            </div>
+            <div v-if="this.loader" class="">
+                <p class="text-sky-900 text-[12px]">Téléchargement en cours .....</p>
             </div>
         </div>
         <VueFinalModal v-model="isInfo" :click-to-close="true" class="flex justify-center items-center"
@@ -224,11 +228,10 @@ import axios from 'axios'
 import { VueFinalModal } from 'vue-final-modal'
 import { Keyboard } from '@capacitor/keyboard'
 import { addOfflineRequest, getAllRequests, deleteRequest } from '../../indexDb';
-
-
+import loading from '../../components/loading.vue'
 export default {
     components: {
-        VueFinalModal, Base
+        VueFinalModal, Base, loading
     },
     props: {
         equipementId: {
@@ -279,6 +282,7 @@ export default {
             serverid: '1',
             postalert: false,
             submitType: '',
+            loader: false
         }
     },
     methods: {
@@ -296,6 +300,7 @@ export default {
             }
         },
         async FiltrerMaintenancePlan() {
+            this.loader = true
             try {
                 const params = {
                     oc_maintenanceplan_assetuid: this.oc_maintenanceplan_assetuid || '',
@@ -308,9 +313,11 @@ export default {
                 const response = await axios.get("/oc_maintenanceplanshistory/", { params });
                 this.items = response.data.results;
                 this.isModalVisible = false
+                this.loader = false
             } catch (error) {
                 console.error("Erreur lors du filtrage des opérations de maintenance :", error);
                 this.displayErrorOrRefreshToken(error, this.FiltrerMaintenanceOperations);
+                this.loader = false
             }
         },
         Modifier(plus) {
@@ -341,7 +348,9 @@ export default {
             console.log(this.plus)
         },
         selectItem(plus) {
-            this.$store.state.code_plan = plus
+            console.log(this.plus)
+            this.$store.state.code_plan = this.plus.oc_maintenanceplan_assetuid
+            console.log(this.$store.state.code_plan)
             this.$router.push('/Operation')
         },
         handleNewItem() {
@@ -357,7 +366,7 @@ export default {
         returnToMainView() {
             this.showNewView = false
         },
-        replaceInStorage(doc){
+        replaceInStorage(doc) {
             let existing = JSON.parse(window.localStorage.getItem('waiting_plans') || '[]');
             const index = existing.findIndex(
                 item => item.oc_maintenanceplan_historydate === this.oc_maintenanceplan_historydate
@@ -370,7 +379,7 @@ export default {
             }
             window.localStorage.setItem('waiting_plans', JSON.stringify(existing));
         },
-        replaceInListed(doc){
+        replaceInListed(doc) {
             const index = this.items.findIndex(
                 item => item.oc_maintenanceplan_historydate === this.oc_maintenanceplan_historydate
             );
@@ -398,10 +407,11 @@ export default {
             this.showNewView = false
         },
         async postPlan() {
+            this.loader = true
             let existing = JSON.parse(window.localStorage.getItem('waiting_plans') || '[]');
             existing = existing.filter(x => x.oc_maintenanceplan_historydate != this.oc_maintenanceplan_historydate)
+            this.items = this.items.filter(x => x.oc_maintenanceplan_historydate != this.oc_maintenanceplan_historydate)
             window.localStorage.setItem('waiting_plans', JSON.stringify(existing));
-
             const data = {
                 oc_maintenanceplan_assetuid: `${this.assetid}`,
                 oc_maintenanceplan_serverid: this.serverid,
@@ -421,12 +431,14 @@ export default {
                 await addOfflineRequest({ method: 'post', url, data });
                 this.items.unshift(data);
                 this.showNewView = false;
+                this.loader = false
                 return;
             } else {
                 try {
                     const response = await axios.post(url, data);
                     this.items.unshift(response.data);
                     this.showNewView = false;
+                    this.loader = false
                 } catch (error) {
                     console.error("Erreur lors de l'envoi :", error);
                     this.hasError = true;
@@ -514,18 +526,25 @@ export default {
             this.keyboardHeight = 0;
         },
         getPlan() {
+            this.loader = true
             this.monitorNetworkStatus()
-            let planLocal = JSON.parse(window.localStorage.getItem('waiting_plans'))
-            if(!!this.assetid) {
+            let planLocal = JSON.parse(window.localStorage.getItem('waiting_plans') || "[]")
+            if (!!this.assetid) {
                 planLocal = planLocal.filter(item => item.oc_maintenanceplan_assetuid === this.assetid)
             }
             this.items.unshift(...planLocal)
-            axios.get(`/oc_maintenanceplanshistory/?oc_maintenanceplan_assetuid__oc_asset_code=${this.$store.state.code_inventaire.oc_asset_code || ''}&oc_maintenanceplan_assetuid__oc_asset_service__istartswith=${this.$store.state.user.default_service_id}`)
+            if(this.$store.state.user.default_service_id === 'bi'){
+                const check_id = this.$store.state.user.default_service_id
+                this.check_id = ''
+            }else {
+                this.check_id = this.$store.state.user.default_service_id
+            }
+            axios.get(`/oc_maintenanceplanshistory/?oc_maintenanceplan_assetuid__oc_asset_code=${this.$store.state.code_inventaire.oc_asset_code || ''}&oc_maintenanceplan_assetuid__oc_asset_service__startswith=${this.check_id}`)
                 .then((reponse) => {
                     this.items.push(...reponse.data.results)
                     this.$store.state.PlanMaintance.push(...reponse.data.results)
                     window.localStorage.setItem('plans', JSON.stringify(reponse.data.results))
-
+                    this.loader = false
                 }).catch((error) => {
                     console.error("Erreur lors de la récupération de l'inventaire :", error);
                     this.hasError = true;
@@ -536,6 +555,7 @@ export default {
                                 this.items.unshift(item.data)
                         }
                     })
+                    this.loader = false
                 });
         }
     },

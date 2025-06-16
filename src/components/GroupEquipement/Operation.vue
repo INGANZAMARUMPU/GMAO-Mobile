@@ -1,7 +1,7 @@
 <template>
     <Base #slot4>
     <div class="w-screen h-full overflow-auto " v-if="!showNewView">
-        <div class="w-screen overflow-hidden flex items-center justify-center gap-[10%] my-2 mb-5 pb-3">
+        <div class="w-screen overflow-hidden flex items-center justify-center gap-[10%] my-2 mb-3 pb-3">
             <button class="custom-box custom-left" @click="isModalVisible = true">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="32" viewBox="0 0 24 24">
                     <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
@@ -11,8 +11,7 @@
                 </svg>
                 <p class="font-poppins font-medium text-[13px] text-white">Filtre</p>
             </button>
-            <button class="custom-box custom-right" @click="handleNewItem"
-                v-if="$store.state.user.default_page === 'maintenance' & this.$store.state.code_plan[0]?.oc_maintenanceplan_assetuid">
+            <button class="custom-box custom-right" @click="handleNewItem" v-if="nouvel">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="32"
                     viewBox="0 0 24 24"><!-- Icon from Lucide by Lucide Contributors - https://github.com/lucide-icons/lucide/blob/main/LICENSE -->
                     <path fill="none" stroke="#ffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -31,13 +30,14 @@
         <div class="w-screen relative flex justify-center my-2" v-if="$store.state.user.default_page === 'maintenance'">
             <button
                 class="w-12 h-12 flex justify-center items-center bg-sky-900/90 rounded-xl fixed bottom-30 right-6 shadow-[1px_1px_5px_1px_rgba(0,0,0,0.5)]"
-                @click="this.$router.go('/Operation')">
+                @click="synchronisation">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
                     viewBox="0 0 24 24"><!-- Icon from Material Symbols Light by Google - https://github.com/google/material-design-icons/blob/master/LICENSE -->
                     <path fill="#ffffff"
                         d="M5.53 17.506q-.978-1.142-1.504-2.558T3.5 12q0-3.616 2.664-6.058T12.5 3.5V2l3.673 2.75L12.5 7.5V6Q9.86 6 7.93 7.718T6 12q0 1.13.399 2.15t1.13 1.846zM11.5 22l-3.673-2.75L11.5 16.5V18q2.64 0 4.57-1.718T18 12q0-1.13-.399-2.16q-.399-1.028-1.13-1.855l1.998-1.51q.979 1.142 1.505 2.558T20.5 12q0 3.616-2.664 6.058T11.5 20.5z" />
                 </svg>
             </button>
+            <loading v-if="loader" class="w-full mb-3" />
         </div>
         <div class="w-screen flex flex-col items-center space-y-3 mb-4">
             <div v-for="item in filteredItems" :key="item.oc_maintenanceoperation_objectid"
@@ -67,20 +67,20 @@
                     </p>
                 </div>
             </div>
-            <p class="text-sky-900 text-[12px]" v-if="$store.state.code_inventaire.oc_asset_description">Aucune
-                opération</p>
+            <p class="text-sky-900 text-[12px]" v-if="this.filteredItems.length === 0 && this.loader === false">Aucune opération</p>
+            <div v-if="this.loader" class="">
+                <p class="text-sky-900 text-[12px]">Téléchargement en cours .....</p>
+            </div>
             <!-- Sinon, si items est vide ET qu'il n'y a pas de description -->
             <p class="text-sky-900 text-[12px]"
-                v-else-if="items.length === 0 && !$store.state.code_inventaire.oc_asset_description">veuillez tout
-                d'abord choisir un plan de maintenance
-            </p>
+                v-else-if="items.length === 0 && !$store.state.code_plan">veuillez tout d'abord choisir un plan de maintenance </p>
         </div>
         <VueFinalModal v-model="isInfo" :click-to-close="true" class="flex justify-center items-center"
             transition="vfm-fade-in-up">
-            <div class="w-80 max-h-80 bg-white rounded-xl shadow-lg transition-transform duration-300 ease-in-out overflow-hidden"
-                :style="{ bottom: isKeyboardVisible ? `translateY${keyboardHeight}` : 'translateY(0)' }">
+            <div class="w-80 max-h-full bg-white rounded-xl shadow-lg transition-transform duration-300 ease-in-out overflow-hidden"
+                :style="{ transform: isKeyboardVisible ? `translateY(-${keyboardHeight}px)` : 'translateY(0)' }">
                 <div class="py-4 px-4 ">
-                    <div class="flex items-center gap-3 pb-3">
+                    <div class="flex items-center pb-2 gap-3">
                         <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
                             viewBox="0 0 24 24"><!-- Icon from Material Symbols by Google - https://github.com/google/material-design-icons/blob/master/LICENSE -->
                             <path fill="#014268"
@@ -92,9 +92,9 @@
                         <p class="font-poppins leading-5 font-base"
                             v-html="formatInstructions(plus.oc_maintenanceoperation_comment)"></p>
                     </div>
-                    <div class="flex justify-center px-4 pt-3 pb-0 gap-9">
+                    <div class="flex justify-between px-4 pt-3 pb-0 gap-9">
                         <button
-                            class="font-normal text-slate-300 py-1 active:text-slate-500  active:bg-sky-500/30 active:border-1 active:border-sky-500/30  rounded-md grow basis-1 max-w-30"
+                            class="font-normal py-1 text-slate-500 active:text-sky-800 active:bg-sky-500/30 active:border-1 active:border-sky-500/30  rounded-md grow basis-1"
                             @click="isInfo = false">Fermer</button>
                     </div>
                 </div>
@@ -148,7 +148,8 @@
                     </div>
                     <div class="flex gap-5 ">
                         <button
-                            class="py-1.5 my-1 rounded-lg border-1 border-[#014268] m-0 font-bold text-[#014268] active:text-[#fff] active:bg-[#014268] grow basis-1" @click="vide">Vider</button>
+                            class="py-1.5 my-1 rounded-lg border-1 border-[#014268] m-0 font-bold text-[#014268] active:text-[#fff] active:bg-[#014268] grow basis-1"
+                            @click="vide">Vider</button>
                         <button
                             class="py-1.5 my-1 rounded-lg bg-[#014268] font-bold text-white grow basis-1 active:text-[#014268] active:bg-[#ffff] active:border-1 active:border-[#014268]"
                             @click="FiltrerMaintenanceOperations">Recherche</button>
@@ -176,8 +177,9 @@
                     <p class="">Référence inventaire</p>
                     <div class="flex ">
                         <!-- <p class="ml-2 font-semibold">{{ this.$store.state.code_plan.oc_maintenanceplan_assetuid }}</p> -->
-                        <input type="text" name="" id="" :value="refe+' '+nameplan" placeholder="Référence inventaire"
-                            class="w-full p-2 mt-2" disabled>
+                        <input type="text" name="" id=""
+                            :value="$store.state.code_inventaire.oc_asset_code + ' ' + nameplan"
+                            placeholder="Référence inventaire" class="w-full p-2 mt-2" disabled>
                     </div>
                 </div>
                 <input type="text" class="w-full   p-2" placeholder="Supplier"
@@ -222,10 +224,11 @@ import axios from 'axios'
 import { VueFinalModal } from 'vue-final-modal'
 import { Keyboard } from '@capacitor/keyboard'
 import { addOfflineRequest, getAllRequests, deleteRequest } from '../../indexDb';
+import loading from '../../components/loading.vue'
 
 export default {
     components: {
-        VueFinalModal, Base
+        VueFinalModal, Base, loading
     },
     props: {
         nom: {
@@ -235,7 +238,7 @@ export default {
     },
     computed: {
         filteredItems() {
-            const code = this.$store.state.code_plan[0]?.oc_maintenanceplan_assetuid
+            const code = this.$store.state.code_plan
             if (!code) {
                 return this.items
             }
@@ -246,6 +249,11 @@ export default {
         // equipementInventaire() {
         //     return this.$store.state.equipements;
         // }
+    },
+    watch: {
+        "$store.state.code_inventaire"(newVal) {
+            this.check = newVal
+        }
     },
     data() {
         return {
@@ -268,14 +276,34 @@ export default {
             oc_maintenanceoperation_comment3: '',
             oc_maintenanceoperation_comment5: '',
             oc_maintenanceoperation_comment: '',
-            refe: this.$store.state.code_inventaire.oc_asset_code,
+            refe: this.$store.state?.code_inventaire?.oc_asset_code,
             isReallyOnline: false,
             nameplan: this.$store.state.code_inventaire.oc_asset_description,
             postalert: false,
             submitType: '',
+            oc_maintenanceoperation_historydate: null,
+            loader: false,
+            nouvel: false,
+            check: ''
         }
     },
     methods: {
+        nouvelle() {
+            this.check = this.$store.state.checkoperation.length
+            console.log(this.$store.state.code_inventaire.length)
+            console.log(this.check)
+            if (this.$store.state.user.default_page === 'maintenance' && this.check > 0) {
+                console.log('bonjour')
+                this.nouvel = true
+            } else if (this.$store.state.user.default_page === 'maintenance' && this.check > 0) {
+                console.log('bonne nuit')
+                this.nouvel = false
+            }
+        },
+        synchronisation() {
+            this.$store.state.code_inventaire = []
+            this.$router.go('/Operation')
+        },
         vide() {
             this.oc_maintenanceoperation_maintenanceplanuid = '';
             this.oc_maintenanceoperation_operator = '';
@@ -317,19 +345,46 @@ export default {
             this.oc_maintenanceoperation_comment2 = info.oc_maintenanceoperation_comment2
             this.oc_maintenanceoperation_comment3 = info.oc_maintenanceoperation_comment3
             this.oc_maintenanceoperation_comment5 = info.oc_maintenanceoperation_comment5
-
+            this.oc_maintenanceoperation_historydate = info.oc_maintenanceoperation_historydate
         },
         PlusInfo(info) {
-            if (info.__local) {
+            if (info.mode == 'offline') {
                 this.Modifier(info)
             } else {
                 this.selectInfo(info)
             }
         },
+        selectInfo(info) {
+            this.isInfo = true
+            this.plus = info
+            console.log(this.plus)
+        },
+        replaceInStorage(doc) {
+            let existing = JSON.parse(window.localStorage.getItem('waiting_operation') || '[]');
+            const index = existing.findIndex(
+                item => item.oc_maintenanceoperation_historydate === this.oc_maintenanceoperation_historydate
+            );
+            if (index !== -1) {
+                existing[index] = doc;
+            } else {
+                doc.oc_maintenanceoperation_historydate = new Date().toISOString()
+                existing.unshift(doc);
+            }
+            window.localStorage.setItem('waiting_operation', JSON.stringify(existing));
+        },
+        replaceInListed(doc) {
+            const index = this.items.findIndex(
+                item => item.oc_maintenanceoperation_historydate === this.oc_maintenanceoperation_historydate
+            );
+            if (index !== -1) {
+                this.items[index] = doc;
+            } else {
+                this.items.unshift(doc);
+            }
+        },
         putOperation() {
-
             const doc = {
-                'oc_maintenanceoperation_maintenanceplanuid': this.refe,
+                'oc_maintenanceoperation_maintenanceplanuid': this.$store.state.code_inventaire.oc_asset_code,
                 'oc_maintenanceoperation_operator': this.$store.state.code_plan.oc_maintenanceplan_operator,
                 'oc_maintenanceoperation_result': this.oc_maintenanceoperation_result,
                 'oc_maintenanceoperation_comment': this.oc_maintenanceoperation_comment,
@@ -337,32 +392,28 @@ export default {
                 'oc_maintenanceoperation_comment2': this.oc_maintenanceoperation_comment2,
                 'oc_maintenanceoperation_comment3': this.oc_maintenanceoperation_comment3,
                 'oc_maintenanceoperation_comment5': this.oc_maintenanceoperation_comment5,
+                mode: 'offline',
             };
-            let existing = JSON.parse(window.localStorage.getItem('putOperation') || '[]');
-            if (!Array.isArray(existing)) {
-                existing = [];
-            }
-            const index = existing.findIndex(
-                item => item.oc_maintenanceplan_assetuid === doc.oc_maintenanceplan_assetuid
-            );
-            if (index !== -1) {
-                existing[index] = doc;
-            } else {
-                existing.unshift(doc);
-            }
-            window.localStorage.setItem('putOperation', JSON.stringify(existing));
+            this.replaceInListed(doc);
+            this.replaceInStorage(doc);
             this.showNewView = false
-            this.$router.go('/Operation')
         },
         getOperation() {
-            console.log('bonjour')
-            axios.get(`/oc_maintenanceoperations/?oc_maintenanceoperation_maintenanceplanuid=${this.$store.state.code_plan[0]?.oc_maintenanceplan_assetuid}`)
+            this.loader = true
+            this.monitorNetworkStatus()
+            this.nouvelle()
+            let planLocal = JSON.parse(window.localStorage.getItem('waiting_operation') || "[]")
+            if (!!this.assetid) {
+                planLocal = planLocal.filter(item => item.oc_maintenanceplan_assetuid === this.assetid)
+            }
+            this.items.unshift(...planLocal)
+            axios.get(`/oc_maintenanceoperations/?oc_maintenanceoperation_maintenanceplanuid=${this.$store.state.code_plan}`)
                 .then((reponse) => {
                     this.items = reponse.data.results
                     this.$store.state.Operation = reponse.data.results
                     console.log(this.items)
                     window.localStorage.setItem('operation', JSON.stringify(reponse.data.results))
-
+                    this.loader = false
                 }).catch((error) => {
                     console.error("Erreur lors de la récupération de l'inventaire :", error);
                     this.hasError = true;
@@ -374,10 +425,7 @@ export default {
                                 this.items.unshift(item.data)
                         }
                     })
-                    let planLocal = JSON.parse(window.localStorage.getItem('putOperation'))
-                    planLocal = planLocal.map(item => ({ ...item, __local: true }))
-                    this.items.unshift(...planLocal)
-                    console.log(this.items)
+                    this.loader = false
                 });
         },
         handleNewItem() {
@@ -407,7 +455,11 @@ export default {
             this.keyboardHeight = 0;
         },
         async postPlan() {
-            window.localStorage.removeItem('putOperation')
+            this.loader = true
+            let existing = JSON.parse(window.localStorage.getItem('waiting_operation') || '[]');
+            existing = existing.filter(x => x.oc_maintenanceoperation_historydate != this.oc_maintenanceoperation_historydate)
+            this.items = this.items.filter(x => x.oc_maintenanceoperation_historydate != this.oc_maintenanceoperation_historydate)
+            window.localStorage.setItem('waiting_operation', JSON.stringify(existing));
             const data = {
                 'oc_maintenanceoperation_maintenanceplanuid': this.refe,
                 'oc_maintenanceoperation_operator': this.$store.state.code_plan.oc_maintenanceplan_operator,
@@ -417,6 +469,8 @@ export default {
                 'oc_maintenanceoperation_comment2': this.oc_maintenanceoperation_comment2,
                 'oc_maintenanceoperation_comment3': this.oc_maintenanceoperation_comment3,
                 'oc_maintenanceoperation_comment5': this.oc_maintenanceoperation_comment5,
+                'oc_maintenanceoperation_historydate': this.oc_maintenanceoperation_historydate
+
             };
 
             const url = '/oc_maintenanceoperations/';
@@ -426,16 +480,19 @@ export default {
                 await addOfflineRequest({ method: 'post', url, data });
                 this.items.unshift(data);
                 this.showNewView = false;
-                console.warn("📦 Requête enregistrée dans IndexedDB (offline).");
+                this.loader = false
                 return;
-            }
-            try {
-                const response = await axios.post(url, data);
-                this.items.push(response.data);
-                this.showNewView = false;
-            } catch (error) {
-                console.error("❌ Erreur lors de l'envoi :", error);
-                this.hasError = true;
+            } else {
+                try {
+                    const response = await axios.post(url, data);
+                    this.items.unshift(response.data);
+                    this.showNewView = false;
+                    this.loader = false
+                } catch (error) {
+                    console.error("❌ Erreur lors de l'envoi :", error);
+                    this.hasError = true;
+                    this.loader = false
+                }
             }
         },
 
@@ -494,7 +551,6 @@ export default {
         Keyboard.addListener('keyboardWillShow', this.handleKeyboardShow);
         Keyboard.addListener('keyboardWillHide', this.handleKeyboardHide);
         window.addEventListener('online', this.resendOfflineRequests);
-        this.monitorNetworkStatus();
         this.getOperation()
     },
     beforeUnmount() {
