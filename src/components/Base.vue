@@ -322,25 +322,30 @@ export default {
                     this.$store.state.equipements = reponse.data.results
                     this.next = reponse.data.next
                     this.$store.state.checksuite = this.next
-                    console.log(reponse.data.next)
                     this.$router.push({ path: '/Inventaire' })
-                    console.log(this.items)
                 }).catch((error) => {
                     const vyose = JSON.parse(window.localStorage.getItem('equipement'))
                     this.$store.state.equipements = vyose.filter(item => (item.oc_asset_code === this.$store.state.keyword))
-                    this.$router.push({ path: '/Inventaire' })
+                }).then(() => {
+                    if (this.$store.state.equipements.length > 0) {
+                        this.$router.push({ path: '/Inventaire' })
+                    }
                 })
             axios.get(`/oc_assets/?search=${this.keyword}&oc_asset_service__istartswith=${this.$store.state.user.default_service_id}&oc_asset_nomenclature__startswith=I`)
                 .then((reponse) => {
                     this.$store.state.infrastructures = reponse.data.results
-                    this.$router.push({ path: '/Inventaire' })
+                    this.$router.push({ path: '/Infrastructure' })
                     this.next = reponse.data.next
                     this.$store.state.checksuite = this.next
-                    console.log(reponse.data)
                 }).catch((error) => {
                     const vyose = JSON.parse(window.localStorage.getItem('infrastructure'))
                     this.$store.state.infrastructures = vyose.filter(item => (item.oc_asset_code === this.$store.state.keyword))
-                    this.$router.push({ path: '/Inventaire' })
+                }).then(() => {
+                    if (this.$store.state.infrastructures.length > 0) {
+                        this.$router.push({ path: '/Infrastructure' })
+                    } else {
+                        // TOASTINGA KO UBUZE ICO KINTU
+                    }
                 })
         },
         navigate(path) {
