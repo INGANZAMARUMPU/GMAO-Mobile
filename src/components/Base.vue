@@ -47,6 +47,17 @@
                     </div>
                 </div>
             </div>
+            <!-- <div class="relative flex justify-center items-center">
+                <select v-model="prefix" @change="updateInput"
+                    class="rounded-sm outline-2 outline-sky-800 text-[13px] font-poppins font-normal ">
+                    <option value="">--</option>
+                    <option value="Mr. ">Mr.</option>
+                    <option value="Mme ">Mme</option>
+                    <option value="Dr. ">Dr.</option>
+                </select>
+                <input type="text" v-model="inputText" class="w-80 rounded-sm outline-2 outline-sky-800 text-[13px] font-poppins font-normal px-4 py-2 "
+                    placeholder="Nom complet" />
+            </div> -->
             <button class="custom-box custom-bottom" @click="isQRcode = true">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
                     <g fill="none" stroke="#ffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
@@ -256,10 +267,16 @@ export default {
             refreshing: false,
             isDeconnection: false,
             info: false,
+            prefix: '',
+            inputText: '',
 
         }
     },
     methods: {
+        updateInput() {
+            const withoutPrefix = this.inputText.replace(/^(Mr\. |Mme |Dr\. )?/, '');
+            this.inputText = this.prefix + withoutPrefix;
+        },
         logout() {
             this.$store.state.user = null;
             this.$store.state.code_inventaire = [];

@@ -44,6 +44,26 @@
                 <div class="value">{{
                     money(static.total_equipements) }}</div>
             </div>
+            <div @click="infoEquistatus(static.status_counts?.equipements?.Fonctionnel_et_en_service?.code)">
+                <div class="key">Fontionnel et en service</div>
+                <div class="value">{{
+                    money(static.status_counts?.equipements?.Fonctionnel_et_en_service?.quantite) }}</div>
+            </div>
+            <div @click="infoEquistatus(static.status_counts?.equipements?.Fonctionnel_et_hors_service?.code)">
+                <div class="key">Fontionnel et hors service</div>
+                <div class="value">{{
+                    money(static.status_counts?.equipements?.Fonctionnel_et_hors_service?.quantite) }}</div>
+            </div>
+            <div @click="infoEquistatus(tatic.status_counts?.equipements?.Non_reparable?.code)">
+                <div class="key">Non reparable</div>
+                <div class="value">{{
+                    money(static.status_counts?.equipements?.Non_reparable?.quantite) }}</div>
+            </div>
+            <div @click="infoEquistatus(static.status_counts?.equipements?.Maintenance_requise?.code)">
+                <div class="key">Maintenance requise</div>
+                <div class="value">{{
+                    money(static.status_counts?.equipements?.Maintenance_requise?.quantite) }}</div>
+            </div>
             <div @click="infoEqui(static.etat_counts?.equipements.Bon_etat.code)">
                 <div class="key">En bon état</div>
                 <div class="value">{{ money(static.etat_counts?.equipements.Bon_etat.quantite) }}</div>
@@ -70,26 +90,6 @@
                 <div class="key">A remplacer</div>
                 <div class="value">{{
                     money(static.etat_counts?.equipements.A_remplacer.quantite) }}</div>
-            </div>
-            <div @click="infoEquistatus(static.status_counts?.equipements?.Fonctionnel_et_en_service?.code)">
-                <div class="key">Fontionnel et en service</div>
-                <div class="value">{{
-                    money(static.status_counts?.equipements?.Fonctionnel_et_en_service?.quantite) }}</div>
-            </div>
-            <div @click="infoEquistatus(static.status_counts?.equipements?.Fonctionnel_et_hors_service?.code)">
-                <div class="key">Fontionnel et hors service</div>
-                <div class="value">{{
-                    money(static.status_counts?.equipements?.Fonctionnel_et_hors_service?.quantite) }}</div>
-            </div>
-            <div @click="infoEquistatus(tatic.status_counts?.equipements?.Non_reparable?.code)">
-                <div class="key">Non reparable</div>
-                <div class="value">{{
-                    money(static.status_counts?.equipements?.Non_reparable?.quantite) }}</div>
-            </div>
-            <div @click="infoEquistatus(static.status_counts?.equipements?.Maintenance_requise?.code)">
-                <div class="key">Maintenance requise</div>
-                <div class="value">{{
-                    money(static.status_counts?.equipements?.Maintenance_requise?.quantite) }}</div>
             </div>
             <div>
                 <div class="key">Fraction</div>
