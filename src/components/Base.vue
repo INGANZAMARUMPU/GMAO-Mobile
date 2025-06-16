@@ -47,6 +47,13 @@
                     </div>
                 </div>
             </div>
+            <div class="toast flex justify-center ">
+                <div class="w-80 bg-black/80 text-white text-[8pt] rounded-lg p-3 flex justify-between items-center"
+                    v-if="staticAlert">
+                    <p>choisis un équipement ou infrastructure</p>
+                    <button class="bg-sky-950 p-2 rounnded-xl" @click="this.staticAlert = false">OK</button>
+                </div>
+            </div>
             <button class="custom-box custom-bottom" @click="isQRcode = true">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
                     <g fill="none" stroke="#ffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
@@ -256,7 +263,7 @@ export default {
             refreshing: false,
             isDeconnection: false,
             info: false,
-
+            staticAlert: false
         }
     },
     methods: {
@@ -305,19 +312,20 @@ export default {
                     this.$store.state.equipements = reponse.data.results
                     this.next = reponse.data.next
                     this.$store.state.checksuite = this.next
-                    this.$router.push({ path: '/Inventaire' })
                 }).catch((error) => {
                     const vyose = JSON.parse(window.localStorage.getItem('equipement'))
                     this.$store.state.equipements = vyose.filter(item => (item.oc_asset_code === this.$store.state.keyword))
                 }).then(() => {
+                    console.log('equipement',this.$store.state.equipements)
                     if (this.$store.state.equipements.length > 0) {
                         this.$router.push({ path: '/Inventaire' })
+                        
                     }
                 })
             axios.get(`/oc_assets/?search=${this.keyword}&oc_asset_service__istartswith=${this.$store.state.user.default_service_id}&oc_asset_nomenclature__startswith=I`)
                 .then((reponse) => {
                     this.$store.state.infrastructures = reponse.data.results
-                    this.$router.push({ path: '/Infrastructure' })
+                    console.log('infra', this.$store.state.infrastructures)
                     this.next = reponse.data.next
                     this.$store.state.checksuite = this.next
                 }).catch((error) => {
@@ -327,7 +335,10 @@ export default {
                     if (this.$store.state.infrastructures.length > 0) {
                         this.$router.push({ path: '/Infrastructure' })
                     } else {
-                        // TOASTINGA KO UBUZE ICO KINTU
+                        this.staticAlert = true
+                        setTimeout(() => {
+                            this.staticAlert = false;
+                        }, 3000);
                     }
                 })
         },
