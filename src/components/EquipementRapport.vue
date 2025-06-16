@@ -71,6 +71,26 @@
                 <div class="value">{{
                     money(static.etat_counts?.equipements.A_remplacer.quantite) }}</div>
             </div>
+            <div @click="infoEquistatus(static.status_counts?.equipements?.Fonctionnel_et_en_service?.code)">
+                <div class="key">Fontionnel et en service</div>
+                <div class="value">{{
+                    money(static.status_counts?.equipements?.Fonctionnel_et_en_service?.quantite) }}</div>
+            </div>
+            <div @click="infoEquistatus(static.status_counts?.equipements?.Fonctionnel_et_hors_service?.code)">
+                <div class="key">Fontionnel et hors service</div>
+                <div class="value">{{
+                    money(static.status_counts?.equipements?.Fonctionnel_et_hors_service?.quantite) }}</div>
+            </div>
+            <div @click="infoEquistatus(tatic.status_counts?.equipements?.Non_reparable?.code)">
+                <div class="key">Non reparable</div>
+                <div class="value">{{
+                    money(static.status_counts?.equipements?.Non_reparable?.quantite) }}</div>
+            </div>
+            <div @click="infoEquistatus(static.status_counts?.equipements?.Maintenance_requise?.code)">
+                <div class="key">Maintenance requise</div>
+                <div class="value">{{
+                    money(static.status_counts?.equipements?.Maintenance_requise?.quantite) }}</div>
+            </div>
             <div>
                 <div class="key">Fraction</div>
                 <div class=" value">{{
@@ -117,6 +137,10 @@ export default {
         },
         infoEqui(eq) {
             this.$store.state.codeEqui = eq
+            this.$router.push('/Inventaire')
+        },
+        infoEquistatus(status){
+            this.$store.state.codeEquistatus = status
             this.$router.push('/Inventaire')
         },
         totalinfra(){

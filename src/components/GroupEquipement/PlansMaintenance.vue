@@ -73,7 +73,7 @@
                         </div>
                         <div class="flex justify-between">
                             <p class="font-poppins text-[10px] tracking-wider description">{{
-                                item.oc_maintenanceplan_instructions || `(Aucune instruction)` }}</p>
+                                formatplan(item.oc_maintenanceplan_instructions) || `(Aucune instruction)` }}</p>
                         </div>
                     </div>
                 </div>
@@ -282,7 +282,8 @@ export default {
             serverid: '1',
             postalert: false,
             submitType: '',
-            loader: false
+            loader: false,
+            isPosting: [],
         }
     },
     methods: {
@@ -446,8 +447,10 @@ export default {
             }
         },
         async resendOfflineRequests() {
+            if (!this.isResending) return; // déjà en cours
+            this.isResending = true;
             const requests = await getAllRequests();
-
+            
             for (const req of requests) {
                 try {
                     console.warn('📦 Tentative d’envoi :', req); // Tout le contenu
@@ -475,23 +478,23 @@ export default {
                 this.isReallyOnline = res.ok;
                 console.log('🌐 Connexion réelle :', res.ok);
 
-                if (res.ok) {
-                    this.resendOfflineRequests();
-                }
+                // if (res.ok) {
+                //     this.resendOfflineRequests();
+                // }
             } catch (err) {
                 console.warn('🚫 Connexion réelle impossible :', err);
                 this.isReallyOnline = false;
             }
         },
-
         monitorNetworkStatus() {
-            window.addEventListener('online', this.verifyConnection);
+            window.addEventListener('online', () => {
+                this.verifyConnection();
+                // this.resendOfflineRequests();
+            });
             window.addEventListener('offline', () => {
                 this.isReallyOnline = false;
                 console.warn('📴 Mode hors-ligne détecté.');
             });
-
-            this.verifyConnection(); // Vérifie dès le démarrage
         },
         handleResize() {
             const currentHeight = window.innerHeight;
@@ -527,16 +530,16 @@ export default {
         },
         getPlan() {
             this.loader = true
-            this.monitorNetworkStatus()
+            // this.monitorNetworkStatus()
             let planLocal = JSON.parse(window.localStorage.getItem('waiting_plans') || "[]")
             if (!!this.assetid) {
                 planLocal = planLocal.filter(item => item.oc_maintenanceplan_assetuid === this.assetid)
             }
             this.items.unshift(...planLocal)
-            if(this.$store.state.user.default_service_id === 'bi'){
+            if (this.$store.state.user.default_service_id === 'bi') {
                 const check_id = this.$store.state.user.default_service_id
                 this.check_id = ''
-            }else {
+            } else {
                 this.check_id = this.$store.state.user.default_service_id
             }
             axios.get(`/oc_maintenanceplanshistory/?oc_maintenanceplan_assetuid__oc_asset_code=${this.$store.state.code_inventaire.oc_asset_code || ''}&oc_maintenanceplan_assetuid__oc_asset_service__startswith=${this.check_id}`)
@@ -564,7 +567,8 @@ export default {
         window.addEventListener('resize', this.handleResize);
         Keyboard.addListener('keyboardWillShow', this.handleKeyboardShow);
         Keyboard.addListener('keyboardWillHide', this.handleKeyboardHide);
-        window.addEventListener('online', this.resendOfflineRequests);
+        // window.addEventListener('online', this.resendOfflineRequests);
+        this.monitorNetworkStatus();
         this.getPlan()
     },
     beforeUnmount() {

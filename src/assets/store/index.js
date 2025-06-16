@@ -24,7 +24,8 @@ const store = createStore({
       putPlan: [],
       loader : '',
       checksuite: false,
-      checkoperation: []
+      checkoperation: [],
+      codeEquistatus: []
     };
   },
 

@@ -1,8 +1,7 @@
 <template>
     <Base #slot5>
-    <div class="w-screen h-screen overflow-auto mb-4" ref="scrollContainer" @touchstart="onTouchStart"
-        @touchmove="onTouchMove" @touchend="onTouchEnd">
-        <div class="w-screen overflow-hidden flex items-center justify-center gap-[10%] my-2 mb-3 pb-3">
+    <div class="w-screen h-screen overflow-auto mb-4" ref="scrollContainer">
+        <div class="w-screen overflow-hidden flex items-center justify-center gap-[10%] mt-2 mb-0 pb-2">
             <button class="custom-box custom-right" @click="isModalVisible = true">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="32" viewBox="0 0 24 24">
                     <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
@@ -13,15 +12,25 @@
                 <p class="font-poppins font-medium text-[13px] text-white">Filtre</p>
             </button>
         </div>
+        <div class="w-screen relative flex justify-center my-2" v-if="$store.state.user.default_page === 'maintenance'">
+            <button
+                class="w-12 h-12 flex justify-center items-center bg-sky-900/90 rounded-xl fixed bottom-30 right-6 shadow-[1px_1px_5px_1px_rgba(0,0,0,0.5)]"
+                @click="this.$router.go('/Infrastructure')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
+                    <path fill="#ffffff"
+                        d="M5.53 17.506q-.978-1.142-1.504-2.558T3.5 12q0-3.616 2.664-6.058T12.5 3.5V2l3.673 2.75L12.5 7.5V6Q9.86 6 7.93 7.718T6 12q0 1.13.399 2.15t1.13 1.846zM11.5 22l-3.673-2.75L11.5 16.5V18q2.64 0 4.57-1.718T18 12q0-1.13-.399-2.16q-.399-1.028-1.13-1.855l1.998-1.51q.979 1.142 1.505 2.558T20.5 12q0 3.616-2.664 6.058T11.5 20.5z" />
+                </svg>
+            </button>
+        </div>
         <loading v-if="loader" class="w-full mb-3" />
-        <div class="flex flex-col items-center space-y-3 mb-10">
+        <div class="w-screen h-full  overflow-auto flex flex-col items-center space-y-3 mb-[57%]">
             <div v-for="item in items" :key="item.oc_asset_objectid"
                 class="w-[95%] rounded-sm bg-sky-100  flex flex-col text-sky-900 " @click="selectItem(item)">
                 <div class="p-2">
                     <div class="w-full flex items-center justify-between">
                         <p class="font-poppins font-semibold text-[12px] tracking-wider">{{ item?.oc_asset_code }}</p>
                         <p class="font-poppins font-semibold text-[9px] tracking-wider">{{ item?.oc_asset_nomenclature
-                            }}
+                        }}
                         </p>
                         <p class="font-poppins font-normal text-[11px] tracking-wider">{{
                             datetime(item?.oc_asset_updatetime) }}</p>
@@ -35,7 +44,7 @@
                         </div>
                         <div class=" w-full flex items-end">
                             <p class="font-poppins text-[12px] tracking-wider flex items-end ">{{ item?.oc_asset_service
-                            }}
+                                }}
                             </p>
                         </div>
                     </div>

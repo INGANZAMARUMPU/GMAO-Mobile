@@ -7,9 +7,12 @@
                 </div>
                 <div class="justify-between items-center flex gap-3 p-4">
                     <div class="">
-                        <p class="font-segoe-ui-variable font-semibold text-[10px] "> {{ this.$store.state.user.fullname}}</p>
-                        <p for="" class="text-end font-segoe-ui-variable font-light text-[10px] sm:text-[10px]"> {{this.$store.state.user.default_page }}</p>
-                        <p for="" class="text-end font-segoe-ui-variable font-light text-[10px] sm:text-[10px]"> {{this.$store.state.user.default_service_id }}</p>
+                        <p class="font-segoe-ui-variable font-semibold text-[10px] "> {{
+                            this.$store.state.user.fullname }}</p>
+                        <p for="" class="text-end font-segoe-ui-variable font-light text-[10px] sm:text-[10px]">
+                            {{ this.$store.state.user.default_page }}</p>
+                        <p for="" class="text-end font-segoe-ui-variable font-light text-[10px] sm:text-[10px]">
+                            {{ this.$store.state.user.default_service_id }}</p>
                     </div>
                     <div class="">
                         <div class=" w-full h-full  flex items-center justify-center bg-white rounded-2xl"
@@ -183,32 +186,32 @@
         <VueFinalModal v-model="info" :click-to-close="true" class="flex items-center justify-center">
             <div
                 class="w-70 bg-white shadow-lg overflow-hidden flex flex-col justify-center items-center rounded-lg py-4">
-                
+
                 <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50"
-                                viewBox="0 0 24 24"><!-- Icon from Lucide by Lucide Contributors - https://github.com/lucide-icons/lucide/blob/main/LICENSE -->
-                                <g fill="none" stroke="#014268" stroke-linecap="round" stroke-linejoin="round"
-                                    stroke-width="2">
-                                    <path d="M18 20a6 6 0 0 0-12 0" />
-                                    <circle cx="12" cy="10" r="4" />
-                                    <circle cx="12" cy="12" r="10" />
-                                </g>
-                            </svg>
-                            <div class="w-full px-3 mt-2 flex flex-col gap-3">
-                                <div class="w-full bg-sky-300/30 rounded-lg flex justify-between items-center px-2 py-2">
-                                    <p class="font-poppins font-semibold text-[14px] ">Nom</p>
-                                    <p class="font-poppins text-[11px]">{{ this.$store.state.user.fullname}}</p>
-                                </div>
-                                <div class="w-full bg-sky-300/30 rounded-lg flex justify-between items-center px-2 py-2">
-                                    <p class="font-poppins font-semibold text-[14px] ">Poste</p>
-                                    <p class="font-poppins text-[11px]">{{ this.$store.state.user.default_page}}</p>
-                                </div>
-                                <div class="w-full bg-sky-300/30 rounded-lg flex justify-between items-center px-2 py-2">
-                                    <p class="font-poppins font-semibold text-[14px] ">Service</p>
-                                    <p class="font-poppins text-[11px]">{{ this.$store.state.user.default_service_id}}</p>
-                                </div>
-                            </div>
+                    viewBox="0 0 24 24"><!-- Icon from Lucide by Lucide Contributors - https://github.com/lucide-icons/lucide/blob/main/LICENSE -->
+                    <g fill="none" stroke="#014268" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                        <path d="M18 20a6 6 0 0 0-12 0" />
+                        <circle cx="12" cy="10" r="4" />
+                        <circle cx="12" cy="12" r="10" />
+                    </g>
+                </svg>
+                <div class="w-full px-3 mt-2 flex flex-col gap-3">
+                    <div class="w-full bg-sky-300/30 rounded-lg flex justify-between items-center px-2 py-2">
+                        <p class="font-poppins font-semibold text-[14px] ">Nom</p>
+                        <p class="font-poppins text-[11px]">{{ this.$store.state.user.fullname }}</p>
+                    </div>
+                    <div class="w-full bg-sky-300/30 rounded-lg flex justify-between items-center px-2 py-2">
+                        <p class="font-poppins font-semibold text-[14px] ">Poste</p>
+                        <p class="font-poppins text-[11px]">{{ this.$store.state.user.default_page }}</p>
+                    </div>
+                    <div class="w-full bg-sky-300/30 rounded-lg flex justify-between items-center px-2 py-2">
+                        <p class="font-poppins font-semibold text-[14px] ">Service</p>
+                        <p class="font-poppins text-[11px]">{{ this.$store.state.user.default_service_id }}</p>
+                    </div>
+                </div>
                 <button @click="isDeconnection = true"
-                    class="bg-white border-2 border-sky-900 px-2 py-1 rounded-sm text-sky-950 mt-3 font-poppins text-[12px]">Se deconnecter</button>
+                    class="bg-white border-2 border-sky-900 px-2 py-1 rounded-sm text-sky-950 mt-3 font-poppins text-[12px]">Se
+                    deconnecter</button>
             </div>
         </VueFinalModal>
     </div>

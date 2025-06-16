@@ -1,5 +1,6 @@
 <template>
-    <div class="w-screen h-screen overflow-hidden bg-[#014268] flex justify-center items-center" @keyup.enter="postLogin">
+    <div class="w-screen h-screen overflow-hidden bg-[#014268] flex justify-center items-center"
+        @keyup.enter="postLogin">
         <!-- <img src="../assets/view/img/Frame 38.png" alt="" class="fixed"> -->
         <div class="w-80 h-95 bg-white relative rounded-2xl shadow-black shadow-2xl flex overflow-hidden flex-col"
             :style="{ transform: isKeyboardVisible ? `translateY(-${keyboardHeight})` : 'translateY(0)' }">
@@ -10,12 +11,14 @@
                 <input type="number" v-model="userid"
                     class="w-[90%]  rounded-lg bg-sky-200  font-bold active:border-sky-800 outline-none login"
                     placeholder="Nom de l'utilisateur">
-                <input type="password" v-model="password"
-                    class="w-[90%]  rounded-lg bg-sky-200  font-bold text-sm active:border-sky-800 outline-none login"
-                    placeholder="Mot de passe">
-                    <p v-if="password">veuiller saisir le mot de passe</p>
+                <div class="w-[90%]">
+                    <input type="password" v-model="password"
+                        class="w-full  rounded-lg bg-sky-200  font-bold text-sm active:border-sky-800 outline-none mb-0 login"
+                        placeholder="Mot de passe">
+                    <p class="pl-4 ml-0 text-red-600" v-if="fieldErrors.password">{{ fieldErrors.password[0] }}</p>
+                </div>
             </div>
-            <div class=" w-full flex justify-center items-center my-7">
+            <div class=" w-full flex justify-center items-center my-2">
                 <button
                     class="w-[50%] py-3 bg-sky-950 rounded-lg font-Orbitron text-white tracking-wider shadow-slate-400 shadow-xl"
                     @click="postLogin">connecter</button>
@@ -43,8 +46,9 @@ export default {
             keyboardHeight: 0,
             userid: '',
             password: '',
-            start_date: '2024-01-01',
-            end_date: '2025-01-01'
+            start_date: '',
+            end_date: '',
+            fieldErrors: []
         }
     },
     methods: {
@@ -81,7 +85,15 @@ export default {
                     this.$router.push('/');
                     console.log(this.$store.state.user)
                     console.log('bonne nuit')
-                })
+                }).catch((error) => {
+                    if (error.response && error.response.data) {
+                        this.fieldErrors = error.response.data;
+                    } else {
+                        this.fieldErrors = [];
+                        this.apiError = 'Erreur inconnue';
+                    }
+                });
+
         },
     },
     mounted() {

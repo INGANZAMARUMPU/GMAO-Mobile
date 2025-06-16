@@ -1,5 +1,21 @@
 <template>
     <Base #slot1>
+    <div class="relative flex justify-center items-center my-4">
+        <div class="flex justify-end items-center">
+            <input type="search" name="" id="" placeholder="Recherche par numero"
+                class="w-80 rounded-sm outline-2 outline-sky-800 text-[13px] font-poppins font-normal px-4 py-2 "
+                v-model="keyword" @keyup.enter="Getinventaire(keyword)">
+            <div class="absolute  mx-1 flex bg-sky-900 p-1  justify-center items-center rounded-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" @click="Getinventaire(keyword)"
+                    viewBox="0 0 24 24">
+                    <g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="m21 21l-4.3-4.3" />
+                    </g>
+                </svg>
+            </div>
+        </div>
+    </div>
     <loading v-if="this.$store.state.loader" class="absolute top-[20.2%] w-full" />
     <div class="relative h-8/8 overflow-y-auto">
         <div class="w-screen relative flex justify-center my-2">
@@ -19,12 +35,12 @@
         </div>
     </div>
     <div class="toast flex justify-center ">
-            <div class="w-80 bg-black/80 text-white text-[8pt] rounded-lg p-3 flex justify-between items-center"
-                v-if="this.$store.state.loader">
-                <p>En cours de chargement</p>
-                <button class="bg-sky-950 p-2 rounnded-xl" @click="this.planAlert = false">OK</button>
-            </div>
+        <div class="w-80 bg-black/80 text-white text-[8pt] rounded-lg p-3 flex justify-between items-center"
+            v-if="this.$store.state.loader">
+            <p>En cours de chargement</p>
+            <button class="bg-sky-950 p-2 rounnded-xl" @click="this.planAlert = false">OK</button>
         </div>
+    </div>
     <VueFinalModal v-model="isModalVisible" :click-to-close="true" class=" !w-full flex flex-col justify-end"
         transition="vfm-fade-in-up">
         <div class="w-full bg-white rounded-t-4xl shadow-lg transition-transform duration-300 ease-in-out"

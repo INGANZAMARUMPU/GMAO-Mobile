@@ -1,7 +1,8 @@
 <template>
     <Base #slot4>
+
     <div class="w-screen h-full overflow-auto " v-if="!showNewView">
-        <div class="w-screen overflow-hidden flex items-center justify-center gap-[10%] my-2 mb-3 pb-3">
+        <div class="w-screen overflow-hidden flex items-center justify-center gap-[10%] mt-2 mb-0 pb-2">
             <button class="custom-box custom-left" @click="isModalVisible = true">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="32" viewBox="0 0 24 24">
                     <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
@@ -39,7 +40,7 @@
             </button>
             <loading v-if="loader" class="w-full mb-3" />
         </div>
-        <div class="w-screen flex flex-col items-center space-y-3 mb-4">
+        <div class="w-screen h-full  overflow-auto flex flex-col items-center space-y-3 mb-[57%]">
             <div v-for="item in filteredItems" :key="item.oc_maintenanceoperation_objectid"
                 class="w-[95%] rounded-2xl bg-sky-100 flex flex-col text-sky-900 p-2" @click="PlusInfo(item)">
                 <div class="w-full flex items-center justify-between">
@@ -67,13 +68,14 @@
                     </p>
                 </div>
             </div>
-            <p class="text-sky-900 text-[12px]" v-if="this.filteredItems.length === 0 && this.loader === false">Aucune opération</p>
+            <p class="text-sky-900 text-[12px]" v-if="this.filteredItems.length === 0 && this.loader === false">Aucune
+                opération</p>
             <div v-if="this.loader" class="">
                 <p class="text-sky-900 text-[12px]">Téléchargement en cours .....</p>
             </div>
             <!-- Sinon, si items est vide ET qu'il n'y a pas de description -->
-            <p class="text-sky-900 text-[12px]"
-                v-else-if="items.length === 0 && !$store.state.code_plan">veuillez tout d'abord choisir un plan de maintenance </p>
+            <p class="text-sky-900 text-[12px]" v-else-if="items.length === 0 && !$store.state.code_plan">veuillez tout
+                d'abord choisir un plan de maintenance </p>
         </div>
         <VueFinalModal v-model="isInfo" :click-to-close="true" class="flex justify-center items-center"
             transition="vfm-fade-in-up">
@@ -284,6 +286,7 @@ export default {
             oc_maintenanceoperation_historydate: null,
             loader: false,
             nouvel: false,
+            isResending: false,
             check: ''
         }
     },
@@ -315,7 +318,7 @@ export default {
             if (this.submitType === 'put') {
                 this.putOperation();
             } else if (this.submitType === 'post') {
-                this.postPlan();
+                this.postoperation();
             }
         },
         async FiltrerMaintenanceOperations() {
@@ -400,7 +403,7 @@ export default {
         },
         getOperation() {
             this.loader = true
-            this.monitorNetworkStatus()
+            // this.monitorNetworkStatus()
             this.nouvelle()
             let planLocal = JSON.parse(window.localStorage.getItem('waiting_operation') || "[]")
             if (!!this.assetid) {
@@ -454,7 +457,7 @@ export default {
             this.isKeyboardVisible = false;
             this.keyboardHeight = 0;
         },
-        async postPlan() {
+        async postoperation() {
             this.loader = true
             let existing = JSON.parse(window.localStorage.getItem('waiting_operation') || '[]');
             existing = existing.filter(x => x.oc_maintenanceoperation_historydate != this.oc_maintenanceoperation_historydate)
@@ -498,7 +501,6 @@ export default {
 
         async resendOfflineRequests() {
             const requests = await getAllRequests();
-
             for (const req of requests) {
                 try {
                     await axios.post(req.url, req.data);
@@ -526,9 +528,9 @@ export default {
                 this.isReallyOnline = res.ok;
                 console.log('🌐 Connexion réelle :', res.ok);
 
-                if (res.ok) {
-                    this.resendOfflineRequests();
-                }
+                // if (res.ok) {
+                //     this.resendOfflineRequests();
+                // }
             } catch (err) {
                 console.warn('🚫 Connexion réelle impossible :', err);
                 this.isReallyOnline = false;
@@ -542,7 +544,7 @@ export default {
                 console.warn('📴 Mode hors-ligne détecté.');
             });
 
-            this.verifyConnection(); // Vérifie dès le démarrage
+            // this.verifyConnection(); // Vérifie dès le démarrage
         },
     },
     mounted() {
